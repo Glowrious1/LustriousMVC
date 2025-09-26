@@ -2,6 +2,6 @@
 {
     public class Funcionario
     {   
-        aa
+       
     }
 }
