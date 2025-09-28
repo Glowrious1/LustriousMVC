@@ -34,36 +34,41 @@ namespace Lustrious.Controllers
         {
             return View();
         }
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
         public IActionResult CriarCliente(Cliente cliente)
         {
             using var conn = db.GetConnection();
-            using var cmd = new MySqlCommand("InsertCliente", conn);
+            using var cmd = new MySqlCommand("insertCliente", conn);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("vNome", cliente.Nome);
             cmd.Parameters.AddWithValue ("vEmail", cliente.Email);
-            cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
             cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
+            cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
             cmd.ExecuteNonQuery();
-            return RedirectToAction("CriarAutor");
+            TempData["ok"] = "Cliente Cadastrado!";
+            return RedirectToAction(nameof(Index));
         }
+
         [HttpGet]
         public IActionResult EditarCliente(int id)
         {
              using var conn = db.GetConnection();   
+
              Cliente? cliente = null;
-            using (var cmd = new MySqlCommand("ObterCliente", conn) { CommandType = System.Data.CommandType.StoredProcedure })
+            using (var cmd = new MySqlCommand("obterCliente", conn)
+            { CommandType = System.Data.CommandType.StoredProcedure })
             {
-                cmd.Parameters.AddWithValue("vId", id);
+                cmd.Parameters.AddWithValue("vIdClient", id);
                 using var rd = cmd.ExecuteReader();
                 if (rd.Read())
                 {
                     cliente = new Cliente
                     {
-                        IdClient = rd.GetInt32("vIdClient"),
-                        Nome = rd.GetString("vNome"),
-                        Email = rd.GetString("vEmail"),
-                        Senha = rd.GetString("vSenha"),
-                        CPF = rd.GetString("vCPF")
+                        IdClient = rd.GetInt32("IdClient"),
+                        Nome = rd.GetString("Nome"),
+                        Email = rd.GetString("Email"),
+                        Senha = rd.GetString("Senha"),
+                        CPF = rd.GetString("CPF")
 
                     };
                 }
@@ -71,17 +76,16 @@ namespace Lustrious.Controllers
             return View(cliente);
         }
         [HttpPost, ValidateAntiForgeryToken]
-
          public IActionResult EditarCliente(Cliente model)
         {
             if (model.IdClient <= 0) return NotFound();
-            if(string.IsNullOrWhiteSpace(model.Email))
+            if(string.IsNullOrWhiteSpace(model.Nome))
               {
-                ModelState.AddModelError("", "Informe seu Email");
+                ModelState.AddModelError("", "Informe seu Nome");
             }
             using var conn2 = db.GetConnection();
             using var cmd = new MySqlCommand("UpdateCliente", conn2) { CommandType = System.Data.CommandType.StoredProcedure };
-            cmd.Parameters.AddWithValue("vId",model.IdClient);
+            cmd.Parameters.AddWithValue("vIdClient", model.IdClient);
             cmd.Parameters.AddWithValue("vNome",model.Nome);
             cmd.Parameters.AddWithValue("vEmail", model.Email);
             cmd.Parameters.AddWithValue("vSenha", model.Senha);
@@ -92,7 +96,7 @@ namespace Lustrious.Controllers
             return RedirectToAction(nameof(Index));
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult Excluir(int id)
+        public IActionResult ExcluirCliente(int id)
         {
             using var conn = db.GetConnection();
             try

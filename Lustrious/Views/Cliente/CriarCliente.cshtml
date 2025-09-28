@@ -1,0 +1,19 @@
+﻿@model Lustrious.Models.Cliente
+
+<h2>Cadastra Cliente</h2>
+
+<form asp-action="CriarCliente" method="post">
+	@Html.AntiForgeryToken()
+	<div>
+		<label>Nome</label>
+		<input asp-for="Nome" required/>
+		<label>CPF</label>
+		<input asp-for="CPF" required />
+		<label>Email</label>
+		<input asp-for="Email" required />
+		<label>Senha</label>
+		<input asp-for="Senha" required />
+
+		<button type="submit">Salvar</button>
+	</div>
+</form>
