@@ -2,6 +2,7 @@
 using Lustrious.Data;
 using Lustrious.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Lustrious.Controllers
 {
@@ -22,7 +23,7 @@ namespace Lustrious.Controllers
                     IdClient = rd.GetInt32("IdClient"),
                     Nome = rd.GetString("nome"),
                     Email = rd.GetString("email"),
-                    CPF = rd.GetInt32("CPF"),
+                    CPF = rd.GetString("CPF"),
                     Senha = rd.GetString("Senha")
                 });
             }

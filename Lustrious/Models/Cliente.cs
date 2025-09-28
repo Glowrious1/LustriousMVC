@@ -7,10 +7,9 @@
 
         public string Email { get; set; }
 
-        public int CPF { get; set; }
+        public string CPF{ get; set; }
 
         public string Senha { get; set; }
 
-        public int CepCli {  get; set; }
     }
 }
