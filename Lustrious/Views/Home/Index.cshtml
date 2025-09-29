@@ -1,8 +1,32 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+<body>
+    <container>
+        <div class="fullscreen">
+            <img src="~/imagens/lustrious2.png" alt="Lustrious" />
+        </div>
+    </container>
+</body>
+<style>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    body{
+        background-color: #363636;
+    }
+
+    .fullscreen {
+        height: 45%; 
+        width: 100%; 
+        overflow: hidden;
+        
+        
+    }
+
+        .fullscreen img {
+            border-radius:30px;
+            width: 100%;
+            height:100%;
+            object-fit: cover; 
+        }
+
+</style>
