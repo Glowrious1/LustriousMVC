@@ -8,6 +8,5 @@
         public string Descricao { get; set; }
         public decimal ValorUnitario { get; set; }
 
-
     }
 }

@@ -30,5 +30,36 @@ namespace Lustrious.Controllers
             
             return View(lista);
         }
+        public IActionResult CriarProduto()
+        {
+            return View();
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult CriarProduto(Produto produto)
+        {
+            using var conn = db.GetConnection();
+            using var cmd = new MySqlCommand("insertProduto", conn);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("vNomeProd", produto.NomeProd);
+            cmd.Parameters.AddWithValue("vqtd", produto.qtd);
+            cmd.Parameters.AddWithValue("vDescricao", produto.Descricao);
+            cmd.Parameters.AddWithValue("vValorUnitario", produto.ValorUnitario);
+            cmd.ExecuteNonQuery();
+            TempData["Ok"] = "Produto Cadastrado!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult EditarProduto(int id)
+        {
+            using var conn = db.GetConnection();
+            Produto? produto = null;
+            using (var cmd = new MySqlCommand("obterProduto", conn)
+            { CommandType = System.Data.CommandType.StoredProcedure })
+            {
+                cmd.Parameters.AddWithValue("vId", id);
+            }
+        }
+
     }
 }
