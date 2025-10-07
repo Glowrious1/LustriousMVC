@@ -14,7 +14,7 @@ namespace Lustrious.Controllers
         {
             var lista = new List<Produto>();
             using var conn = db.GetConnection();
-            using var cmd = new MySqlCommand("selectProduto", conn) { CommandType = System.Data.CommandType.StoredProcedure}
+            using var cmd = new MySqlCommand("selectProduto", conn) { CommandType = System.Data.CommandType.StoredProcedure };
             using var rd = cmd .ExecuteReader();
             while (rd.Read())
             {
@@ -100,7 +100,7 @@ namespace Lustrious.Controllers
             using var conn = db.GetConnection();
             try
             {
-                using var cmd = new MySqlCommand("deleteProduto", conn) { CommandType = System.Data.CommandType.StoredProcedure}
+                using var cmd = new MySqlCommand("deleteProduto", conn) { CommandType = System.Data.CommandType.StoredProcedure };
                 cmd.Parameters.AddWithValue("vCodigoBarras", id);
                 cmd.ExecuteNonQuery();
                 TempData["Ok"] = "Produto excluido!";
