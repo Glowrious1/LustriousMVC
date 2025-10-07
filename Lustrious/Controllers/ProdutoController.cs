@@ -58,8 +58,58 @@ namespace Lustrious.Controllers
             { CommandType = System.Data.CommandType.StoredProcedure })
             {
                 cmd.Parameters.AddWithValue("vId", id);
+                using var rd = cmd.ExecuteReader();
+                if (rd.Read())
+                {
+                    produto = new Produto
+                    {
+                        CodigoBarras = rd.GetInt32("CodigoBarras"),
+                        NomeProd = rd.GetString("NomeProd"),
+                        qtd = rd.GetInt32("qtd"),
+                        Descricao = rd.GetString("Descricao"),
+                        ValorUnitario = rd.GetDecimal("ValorUnitario")
+                    };
+                }
             }
+            return View(produto);
         }
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult EditarProduto(Produto model)
+        {
+            if (model.CodigoBarras <= 0) return NotFound();
+            if (string.IsNullOrWhiteSpace(model.NomeProd))
+            {
+                ModelState.AddModelError("", "Informe seu nome!");
+            }
+            using var conn2 = db.GetConnection();
+            using var cmd = new MySqlCommand("updateProduto", conn2)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("vCodigoBarra", model.CodigoBarras);
+            cmd.Parameters.AddWithValue("vNomeProd", model.NomeProd);
+            cmd.Parameters.AddWithValue("vqtd", model.qtd);
+            cmd.Parameters.AddWithValue("vDescricao", model.Descricao);
+            cmd.Parameters.AddWithValue("vValorUnitario", model.ValorUnitario);
+            cmd.ExecuteNonQuery();
 
+            TempData["Ok"] = "Produto atualizado";
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult ExcluirProduto(int id)
+        {
+            using var conn = db.GetConnection();
+            try
+            {
+                using var cmd = new MySqlCommand("deleteProduto", conn) { CommandType = System.Data.CommandType.StoredProcedure}
+                cmd.Parameters.AddWithValue("vCodigoBarras", id);
+                cmd.ExecuteNonQuery();
+                TempData["Ok"] = "Produto excluido!";
+            }
+            catch (MySqlException ex)
+            {
+                TempData["Ok"] = ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
