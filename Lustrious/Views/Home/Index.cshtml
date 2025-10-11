@@ -1,32 +1,112 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<body>
-    <container>
-        <div class="fullscreen">
-            <img src="~/imagens/lustrious2.png" alt="Lustrious" />
-        </div>
-    </container>
-</body>
+<header>
+   
+
+</header>
+
+<main>
+    <div class="hero">
+        <img src="~/imagens/HOME.PNG" alt="Lustrious" />
+
+        <!-- 🔹 Texto central -->
+        <h1 class="hero-text">LUSTRIOUS</h1>
+    </div>
+</main>
+
 <style>
-
-    body{
-        background-color: #363636;
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Times New Roman', serif;
+        background-color: #fff;
     }
 
-    .fullscreen {
-        height: 45%; 
-        width: 100%; 
-        overflow: hidden;
-        
-        
+    header {
+        z-index: 10;
+        box-sizing: border-box;
+        padding: 20px 60px;
     }
 
-        .fullscreen img {
-            border-radius:30px;
-            width: 100%;
-            height:100%;
-            object-fit: cover; 
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 40px;
+    }
+
+    /* LOGO */
+    .logo {
+        font-size: 18px;
+        color: #b5954b;
+        text-align: center;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+    }
+
+    .bar {
+        color: #d6b36a; /* dourado mais claro */
+        margin-left: 10px;
+        font-weight: normal;
+    }
+
+    nav {
+        display: flex;
+        align-items: center;
+    }
+
+        nav a {
+            text-decoration: none;
+            color: #000;
+            margin: 0 25px;
+            font-weight: 500;
+            position: relative;
         }
 
+            nav a:not(:last-child)::after {
+                content: "";
+                position: absolute;
+                right: -25px;
+                top: 0;
+                height: 100%;
+                width: 1px;
+                background-color: #d6b36a;
+            }
+
+    /* HERO */
+    .hero {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        z-index: -1;
+    }
+
+        .hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+    .hero-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 90px;
+        font-weight: 400;
+        letter-spacing: 6px;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        font-family: 'Times New Roman', serif;
+    }
 </style>
