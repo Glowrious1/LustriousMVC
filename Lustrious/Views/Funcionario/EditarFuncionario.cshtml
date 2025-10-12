@@ -5,8 +5,142 @@
     ViewData["Title"] = "Editar Funcionario";
 }
 
+<style>
+    /* === GERAL === */
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #c7b99e; /* fundo bege */
+        font-family: 'Times New Roman', serif;
+    }
+
+    /* === NAVBAR === */
+    header {
+        background-color: #fff;
+        border-bottom: 4px solid #e8d09d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 50px;
+        box-sizing: border-box;
+    }
+
+    .logo {
+        font-family: 'Times New Roman', serif;
+        color: #b68c5a;
+        font-size: 20px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 60px;
+    }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #000;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+            .nav-links a:hover {
+                color: #b68c5a;
+            }
+
+    /* === CONTAINER CENTRAL === */
+    .card {
+        background-color: #f6f0cc; /* amarelo claro */
+        border-radius: 15px;
+        padding: 40px;
+        width: 500px;
+        margin: 80px auto;
+        box-shadow: 0 0 0 5px #c7b99e;
+        border: 3px solid #d1b97f;
+        text-align: center;
+    }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+    /* === FORMULÁRIO === */
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1b97f;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 12px;
+        }
+
+    /* === BOTÕES === */
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .btn-submit {
+        background-color: #b5a271;
+        color: #fff;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+        .btn-submit:hover {
+            background-color: #a08d5c;
+        }
+
+    .btn-cancel {
+        background-color: #9c2b2b; /* cor de fundo normal */
+        color: #fff; /* cor do texto normal */
+        text-decoration: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        font-size: 12px;
+        display: inline-block;
+        transition: all 0.3s ease; /* suaviza a mudança de cor */
+    }
+
+        .btn-cancel:hover {
+            background-color: #5B1A1A; /* cor de fundo quando o mouse estiver em cima */
+            color: #fff; /* cor do texto quando o mouse estiver em cima */
+        }
+
+
+    /* === VALIDAÇÃO === */
+    .validation {
+        color: red;
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+</style>
+
 <div class="card">
-    <h2>Editar Funcionário</h2>
+    <h2>EDITAR FUNCIONARIO</h2>
 
     @if (!ViewData.ModelState.IsValid)
     {
@@ -23,112 +157,23 @@
         <input type="hidden" asp-for="IdFun" />
 
         <div class="form-group">
-            <label>Nome</label>
-            <input asp-for="Nome" required />
+            <label for="Nome">NOME DO FUNCIONÁRIO:</label>
+            <input asp-for="Nome" placeholder="Digite o nome aqui..." required />
         </div>
+
         <div class="form-group">
-            <label>Email</label>
-            <input asp-for="Email" required />
+            <label for="Email">EMAIL:</label>
+            <input asp-for="Email" placeholder="Digite o email aqui..." required />
         </div>
+
         <div class="form-group">
-            <label>Senha</label>
-            <input asp-for="Senha" type="password" required />
+            <label for="Senha">SENHA:</label>
+            <input asp-for="Senha" type="password" placeholder="Digite a senha aqui..." required />
         </div>
 
         <div class="actions">
-            <button type="submit" class="btn-submit">Salvar</button>
-            <a asp-action="Index" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-submit">EDITAR</button>
+            <a asp-action="Index" class="btn-cancel">CANCELAR</a>
         </div>
     </form>
 </div>
-
-<style>
-    body {
-        background-color: #363636;
-        color: #fff;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .card {
-        background-color: #212121;
-        padding: 25px;
-        margin: 50px auto;
-        border-radius: 12px;
-        max-width: 500px;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
-        color: white;
-    }
-
-    h2 {
-        margin-bottom: 20px;
-        font-weight: 600;
-        color: white;
-    }
-
-    .validation div {
-        background-color: #d9534f;
-        padding: 8px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-        color: #fff;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
-    }
-
-        .form-group label {
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            outline: none;
-        }
-
-    .actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 15px;
-    }
-
-    .btn-submit {
-        background-color: #99694E;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        color: #fff;
-    }
-
-        .btn-submit:hover {
-            background-color: #8a5946;
-        }
-
-    .btn-cancel {
-        background-color: #99694E;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: bold;
-        color: #fff;
-        transition: background-color 0.3s;
-    }
-
-        .btn-cancel:hover {
-            background-color: #8a5946;
-        }
-</style>
-
-<style>
-
-
-
-</style>
