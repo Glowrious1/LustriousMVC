@@ -1,17 +1,63 @@
 -- Criando a Data Base
 create database dbilumina;
 -- Usando a Data Base
-use dbilumina ;
+use dbilumina;
 
 -- Criação de tabelas
+
+-- Sugestão que vão encher o saco de vcs pra fazer
+/*
+
+												レゼ SUPREMACY
+
+O ideal seria fazer a especialização aqui, pegar os dados repetitivos de tabelas que serão utilizados em varias verificações. 
+Também seria legal colocar o tipo/nivel de acesso do usuario, que dá pra fazer algo bem legal no backend.
+Ah também algo que notei é que vocês não estão utilizando on cascade, tem que saber usar, mas é bem facil.
+O critério é: Se vão ter casos onde o PAI da informação (FOREIGN KEY) vai ser excluido, você coloca essa clausula 
+*ON DELETE CASCADE*
+
+create table Login (
+IdLogin int primary key auto_increment,
+Nome varchar(200) not null,
+Email varchar(150) not null,
+Senha varchar(250),
+NivelAcesso ENUM("Cliente", "Funcionario", "Administrador") default "Cliente"
+);
+
+Create table Cliente(
+IdClient int primary key auto_increment,
+CPF varchar(12) unique not null
+foreing key (IdClient) references Login(IdLogin) on delete cascade
+Fica a critério de vocês adicionar mais colunas.
+
+);
+
+create table Funcionario (
+IdFun int primary key auto_increment
+foreing key (IdFun) references Login(IdLogin) on delete cascade
+Fica a critério de vocês adicionar mais colunas.
+Sugestões de colunas:
+Salario decimal(9,2) not null,
+Status ENUM("Ativo", "Inativo") default "Ativo"
+);
+
+Bom quando eu fui fazer reclamaram de não ter tabela pro admin, eu acho inutil, mas como eles pedem vou colocar aq tb.
+
+create table Administrador(
+IdAdmin int primary key,
+DataAdmissao date,
+Estado ENUM("Ativo", "Inativo"),
+foreing key (IdAdmin) references Login(IdLogin) on delete cascade
+);
+*/
 
 Create table Cliente(
 IdClient int primary key auto_increment,
 Nome varchar(200) not null,
 Email varchar(150) not null,
-CPF varchar(12) unique not null,
+CPF varchar(14) unique not null, -- Estava 12 mudei pra 14 pq ia dar erro.
 Senha varchar(250),
-CepCli int
+CepCli int -- CEP vai no endereço, da pra fazer integração com API legal, bem facil de fazer
 );
 
 create table Funcionario (
@@ -41,50 +87,85 @@ CEP int primary key,
 Logradouro varchar(200) not null,
 IdBairro int not null,
 IdCidade int not null,
-IdEstado int not null
+IdEstado int not null,
+IdUser int not null,
+foreign key (IdUser) references Login(IdLogin)
 );
 
 create table Entrega(
 IdEntrega int primary key auto_increment,
+IdEndereco int not null,
 DataEntrega date,
 ValorFrete decimal(7,2),
 DataPrevista date,
- role enum ('Pedido enviado','Produto saiu para entrega', 'Seu Produto Chegou')
+ role enum ('Pedido enviado','Produto saiu para entrega', 'Seu Produto Chegou'),
+foreign key (IdEndereco) references Endereco(IdEndereco)
 );
 
 create table Produto(
 CodigoBarras bigint primary key,
- NomeProd varchar(200) not null,
- qtd int,
- Descricao varchar(250),
- ValorUnitario decimal(7,2)
- );
+NomeProd varchar(200) not null,
+qtd int,
+Descricao varchar(250),
+ValorUnitario decimal(9,2)
+);
+
+create table Favoritos(
+IdFav int primary key auto_increment,
+IdUser int not null,
+IdProd int not null,
+foreign key (IdUser) references Login(IdLogin) on delete cascade,
+foreign key (IdProd) references Produto(CodigoBarras) on delete cascade
+);
+
+create table Carrinho(
+IdCarrinho int primary key auto_increment,
+IdProd int not null,
+Qtd int not null,
+IdUser int not null,
+foreign key (IdUser) references Login(IdLogin) on delete cascade
+-- Se for ter promoção colocar uma coluna pro preço do produto.
+);
+
+create table Categoria(
+codCategoria int primary key auto_increment,
+Categoria varchar(155)
+);
+
+create table tipoProduto(
+codTipoProduto int primary key auto_increment,
+TipoProduto varchar(255) not null,
+codCategoria int, -- fk
+foreign key (codCategoria) references Categoria(codCategoria)
+);
  
- create table Venda (
- IdVenda int primary key auto_increment,
- NomeProd varchar(250) not null,
- ValorTotal decimal(7,2) not null,
- DataVenda Datetime,
- IdClient int,
- NF int,
- IdEntrega int,
- IdFun int
- );
+ create table Venda(
+IdVenda int primary key auto_increment,
+NomeProd varchar(250) not null,
+ValorTotal decimal(9,2) not null,
+DataVenda Datetime,
+IdClient int,
+NF int,
+IdEntrega int,
+IdFun int
+);
  
  create table VendaProduto(
- valorItem decimal(7,2),
+ valorItem decimal(9,2),
  Qtd int,
  CodigoBarras bigint,
- IdVenda int);
+ IdVenda int
+ );
  
  create table NotaFiscal (
  NF int primary key auto_increment,
- TotalNota decimal(7,2),
+ TotalNota decimal(9,2),
  DataEmissao date not null
- );
+);
  
+ create table
  
- -- Criando as chaves primarias
+ -- Criando as chaves primarias //Nathan: foreign key ????
  
  Alter table Endereco
  add Constraint fk_IdBairro_Endereco foreign key (IdBairro) references Bairro(IdBairro),
@@ -100,7 +181,7 @@ CodigoBarras bigint primary key,
  add Constraint fk_IdCliente_Venda foreign key (IdClient) references Cliente(IdClient),
  add Constraint fk_NF_Venda foreign key (NF) references NotaFiscal(NF),
  add Constraint fk_IdEntrega_Venda foreign key (IdEntrega) references Entrega(IdEntrega),
- add Constraint fk_IdFun_Venda     foreign key (IdFun)         references    Funcionario(IdFun);
+ add Constraint fk_IdFun_Venda foreign key (IdFun) references Funcionario(IdFun);
  
  
  
@@ -142,6 +223,38 @@ CodigoBarras bigint primary key,
  
  
   delimiter $$
+
+-- Nessa parte é legal colocar todos os UFs, para colocar num selectzão que fica legal. Vou colocar o código com os inserts aqui, fica a critério de vocês utilizar ou não.
+-- É melhor hard codar essa parte pq o usuário é burro.
+/*
+INSERT INTO Estado (UF) VALUES ('AC');
+INSERT INTO Estado (UF) VALUES ('AL');
+INSERT INTO Estado (UF) VALUES ('AP');
+INSERT INTO Estado (UF) VALUES ('AM');
+INSERT INTO Estado (UF) VALUES ('BA');
+INSERT INTO Estado (UF) VALUES ('CE');
+INSERT INTO Estado (UF) VALUES ('DF');
+INSERT INTO Estado (UF) VALUES ('ES');
+INSERT INTO Estado (UF) VALUES ('GO');
+INSERT INTO Estado (UF) VALUES ('MA');
+INSERT INTO Estado (UF) VALUES ('MT');
+INSERT INTO Estado (UF) VALUES ('MS');
+INSERT INTO Estado (UF) VALUES ('MG');
+INSERT INTO Estado (UF) VALUES ('PA');
+INSERT INTO Estado (UF) VALUES ('PB');
+INSERT INTO Estado (UF) VALUES ('PR');
+INSERT INTO Estado (UF) VALUES ('PE');
+INSERT INTO Estado (UF) VALUES ('PI');
+INSERT INTO Estado (UF) VALUES ('RJ');
+INSERT INTO Estado (UF) VALUES ('RN');
+INSERT INTO Estado (UF) VALUES ('RS');
+INSERT INTO Estado (UF) VALUES ('RO');
+INSERT INTO Estado (UF) VALUES ('RR');
+INSERT INTO Estado (UF) VALUES ('SC');
+INSERT INTO Estado (UF) VALUES ('SP');
+INSERT INTO Estado (UF) VALUES ('SE');
+INSERT INTO Estado (UF) VALUES ('TO');
+*/
  create  procedure InsertEstado(
  in vUF char(2)
  )

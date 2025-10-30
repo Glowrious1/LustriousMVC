@@ -1,7 +1,15 @@
+using Lustrious.Models;
+using Lustrious.Repositorio;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//Adicionando as Interfaces de Repositorio
+builder.Services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
+builder.Services.AddScoped<IFuncionarioRepositorio, FuncionarioRepositorio>();
+builder.Services.AddScoped<Cliente>();
 
 var app = builder.Build();
 

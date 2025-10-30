@@ -4,31 +4,20 @@ using Lustrious.Models;
 using MySql.Data.MySqlClient;
 using System.Data;
 using Microsoft.Net.Http.Headers;
+using Lustrious.Repositorio;
 
 namespace Lustrious.Controllers
 {
     public class ClienteController : Controller
     {
-        public readonly DataBase db = new DataBase();
-        public IActionResult Index()
-
+        private IClienteRepositorio _clienteRepositorio;
+        public ClienteController(IClienteRepositorio clienteRepositorio)
         {
-            var lista = new List<Cliente>();
-            using var conn = db.GetConnection();
-            using var cmd = new MySqlCommand("selectCliente", conn) { CommandType = System.Data.CommandType.StoredProcedure };
-            using var rd = cmd.ExecuteReader();
-            while (rd.Read())
-            {
-                lista.Add(new Cliente
-                {
-                    IdClient = rd.GetInt32("IdClient"),
-                    Nome = rd.GetString("nome"),
-                    Email = rd.GetString("email"),
-                    CPF = rd.GetString("CPF"),
-                    Senha = rd.GetString("Senha")
-                });
-            }
-            return View(lista);
+            _clienteRepositorio = clienteRepositorio;
+        }
+        public IActionResult Index()
+        {
+            return View(_clienteRepositorio.ListarClientes());
         }
         public IActionResult CriarCliente()
         {
@@ -37,14 +26,7 @@ namespace Lustrious.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult CriarCliente(Cliente cliente)
         {
-            using var conn = db.GetConnection();
-            using var cmd = new MySqlCommand("insertCliente", conn);
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("vNome", cliente.Nome);
-            cmd.Parameters.AddWithValue ("vEmail", cliente.Email);
-            cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
-            cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
-            cmd.ExecuteNonQuery();
+            _clienteRepositorio.CadastrarCliente(cliente);
             TempData["ok"] = "Cliente Cadastrado!";
             return RedirectToAction(nameof(Index));
         }
@@ -52,64 +34,20 @@ namespace Lustrious.Controllers
         [HttpGet]
         public IActionResult EditarCliente(int id)
         {
-             using var conn = db.GetConnection();   
-
-             Cliente? cliente = null;
-            using (var cmd = new MySqlCommand("obterCliente", conn)
-            { CommandType = System.Data.CommandType.StoredProcedure })
-            {
-                cmd.Parameters.AddWithValue("vIdClient", id);
-                using var rd = cmd.ExecuteReader();
-                if (rd.Read())
-                {
-                    cliente = new Cliente
-                    {
-                        IdClient = rd.GetInt32("IdClient"),
-                        Nome = rd.GetString("Nome"),
-                        Email = rd.GetString("Email"),
-                        Senha = rd.GetString("Senha"),
-                        CPF = rd.GetString("CPF")
-
-                    };
-                }
-            }
-            return View(cliente);
+            return View(_clienteRepositorio.AcharCliente(id));
         }
         [HttpPost, ValidateAntiForgeryToken]
          public IActionResult EditarCliente(Cliente model)
         {
-            if (model.IdClient <= 0) return NotFound();
-            if(string.IsNullOrWhiteSpace(model.Nome))
-              {
-                ModelState.AddModelError("", "Informe seu Nome");
-            }
-            using var conn2 = db.GetConnection();
-            using var cmd = new MySqlCommand("UpdateCliente", conn2) { CommandType = System.Data.CommandType.StoredProcedure };
-            cmd.Parameters.AddWithValue("vIdClient", model.IdClient);
-            cmd.Parameters.AddWithValue("vNome",model.Nome);
-            cmd.Parameters.AddWithValue("vEmail", model.Email);
-            cmd.Parameters.AddWithValue("vSenha", model.Senha);
-            cmd.Parameters.AddWithValue("vCPF",model.CPF);
-            cmd.ExecuteNonQuery();
-
+            _clienteRepositorio.AlterarCliente(model);
             TempData["ok"] = "Cliente Atualizado!";
             return RedirectToAction(nameof(Index));
         }
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult ExcluirCliente(int id)
         {
-            using var conn = db.GetConnection();
-            try
-            {
-                using var cmd = new MySqlCommand("DeleteCliente", conn) { CommandType = System.Data.CommandType.StoredProcedure };
-                cmd.Parameters.AddWithValue("vIdClient", id);
-                cmd.ExecuteNonQuery();
-                TempData["ok"] = "Autor Excluido!";
-            }
-            catch (MySqlException ex)
-            {
-                TempData["ok"]=ex.Message;
-            }
+            _clienteRepositorio.ExcluirCliente(id);
+            TempData["ok"] = "Cliente Excluído!";
             return RedirectToAction(nameof(Index));
         }
     }

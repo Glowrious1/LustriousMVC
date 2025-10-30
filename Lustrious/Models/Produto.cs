@@ -7,6 +7,5 @@
         public int qtd { get; set; }
         public string Descricao { get; set; }
         public decimal ValorUnitario { get; set; }
-
     }
 }
