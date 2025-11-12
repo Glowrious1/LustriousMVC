@@ -29,7 +29,6 @@ namespace Lustrious.Repositorio
                     cmd.ExecuteNonQuery();
                 }
             }
-
         }
         public Cliente AcharCliente(int id)
         {
