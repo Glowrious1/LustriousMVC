@@ -68,8 +68,11 @@ UF char(2) not null
 );
 
 create table Endereco (
-CEP int primary key,
+IdEndereco int primary key auto_increment,
+CEP varchar(9) ,
 Logradouro varchar(200) not null,
+numero varchar(11) ,
+complemento varchar(155),
 IdBairro int not null,
 IdCidade int not null,
 IdEstado int not null,
@@ -107,6 +110,8 @@ create table Carrinho(
 IdCarrinho int primary key auto_increment,
 IdProd int not null,
 Qtd int not null,
+ValorUnitario decimal(9,2),
+ValorTotal decimal(9,2),
 IdUser int not null,
 foreign key (IdUser) references Usuario(IdUser) on delete cascade
 -- Se for ter promoção colocar uma coluna pro preço do produto.
@@ -284,12 +289,21 @@ insert into tipoProduto  (TipoProduto,codCategoria) values ('Creme de Barbear',4
  
  call InsertEstado ("SP");
  
- 
+ CEP varchar(9) ,
+Logradouro varchar(200) not null,
+numero varchar(11) ,
+complemento varchar(155),
+IdBairro int not null,
+IdCidade int not null,
+IdEstado int not null,
+IdUser int not null
  
  delimiter $$
   create  procedure insertEndereco(
-  in vCEP int,
+  in vCEP varchar(9),
   in vLogradouro varchar(200),
+  in vNumero int ,
+  in vComplemento varchar(155),
   in vCidade varchar(200),
   in vBairro varchar(200),
     in vUF char(2)
@@ -317,7 +331,7 @@ insert into tipoProduto  (TipoProduto,codCategoria) values ('Creme de Barbear',4
     insert into Estado(UF) values (vUF);
      end if;
      set dEstado := (select IdUF From Estado where UF = vUF);
-     insert into Endereco (CEP,Logradouro,IdBairro,IdCidade,IdEstado) values (vCEP,vLogradouro,dBairro,dCidade,dEstado);
+     insert into Endereco (CEP,Logradouro,numero,complemento,IdBairro,IdCidade,IdEstado) values (vCEP,vLogradouro,vNumero,vComplemento,dBairro,dCidade,dEstado);
       else select("esse Endereço já está registrado!");
    end if ;
   end ;
