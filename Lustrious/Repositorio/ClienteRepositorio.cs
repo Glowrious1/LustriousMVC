@@ -19,13 +19,16 @@ namespace Lustrious.Repositorio
             using(var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using(var cmd = new MySqlCommand("insertCliente", conexao))
+                using(var cmd = new MySqlCommand("insertUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", cliente.Nome);
                     cmd.Parameters.AddWithValue("vEmail", cliente.Email);
                     cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
                     cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
+                    cmd.Parameters.AddWithValue("vRole", "Cliente");
+                    cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
+                    cmd.Parameters.AddWithValue("vFoto", cliente.Foto);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -36,7 +39,7 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("obterCliente", conexao))
+                using (var cmd = new MySqlCommand("obterUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vId", id);
@@ -53,10 +56,11 @@ namespace Lustrious.Repositorio
                     {
                         cliente = new Usuario()
                         {
-                            IdUser = Convert.ToInt32(dr["IdCliente"]),
+                            IdUser = Convert.ToInt32(dr["IdUser"]),
                             Nome = (string)dr["Nome"],
                             Email = (string)dr["Email"],
                             Senha = (string)dr["Senha"],
+                            Sexo = (string)dr["Sexo"],
                             CPF = (string)dr["CPF"]
                         };
                     }
@@ -70,7 +74,7 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("selectCliente", conexao))
+                using (var cmd = new MySqlCommand("selectUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
@@ -85,12 +89,15 @@ namespace Lustrious.Repositorio
                     {
                         clientes.Add(new Usuario
                             {
-                                IdUser = Convert.ToInt32(dr["IdCliente"]),
+                                IdUser = Convert.ToInt32(dr["IdUser"]),
                                 Nome = (string)dr["Nome"],
                                 Email = (string)dr["Email"],
                                 Senha = (string)dr["Senha"],
-                                CPF = (string)dr["CPF"]
-                            }
+                                Sexo = (string)dr["Sexo"],
+                                CPF = (string)dr["CPF"],
+                                Role = (string)dr["Role"],
+                                CEP = (int)dr["CEP"]
+                        }
                         );
                     }
                 }
@@ -102,13 +109,15 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("updateCliente", conexao))
+                using (var cmd = new MySqlCommand("updateUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", cliente.Nome);
                     cmd.Parameters.AddWithValue("vEmail", cliente.Email);
                     cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
                     cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
+                    cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
+                    cmd.Parameters.AddWithValue("vCEP", cliente.CEP);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }
@@ -119,7 +128,7 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("DeleteCliente", conexao))
+                using (var cmd = new MySqlCommand("DeleteUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vId", id);

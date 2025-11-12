@@ -412,7 +412,7 @@ call selectUsuario;
 
 create procedure obterUsuario (in vId int)
 begin
-  select IdUser,Nome,Email,Senha,Sexo,CPF from funcionario where IdUser = vId;
+  select IdUser,Nome,Email,Senha,Sexo,CPF from Usuario where IdUser = vId;
 end $$	
 
 	
@@ -420,13 +420,13 @@ create procedure updateUsuario(
 in vIdUser int, in vNome varchar(200), in vEmail varchar(150),in vSenha varchar(250),vSexo varchar(20),vCEP int
 )
 begin
-    update Usuario set Nome = vNome, Email = vEmail, Senha = vSenha, Sexo = vSexo, CPF = vCPF,CEP = vCEP  where IdFun = vIdFun;
+    update Usuario set Nome = vNome, Email = vEmail, Senha = vSenha, Sexo = vSexo, CPF = vCPF,CEP = vCEP  where IdUser = vIdUser;
 end $$
 
 
 
 
-create procedure DeleterUser(in vIdUser int)
+create procedure DeleteUsuario(in vIdUser int)
 begin
   if exists (select IdUser from Usuario where IdUser = vIdUser)then
 	 delete  from Usuario  where IdUser = vIdUser ;
