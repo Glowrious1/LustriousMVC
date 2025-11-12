@@ -1,6 +1,6 @@
 ﻿namespace Lustrious.Models
 {
-    public class Cliente
+    public class Usuario
     {
         public int IdClient { get; set; }
         public string Nome { get; set; }

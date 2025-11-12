@@ -4,7 +4,7 @@
     {
         public int IdCidade { get; set; }
 
-        public string Bairro { get; set; }
+        public string bairro { get; set; }
 
 
     }

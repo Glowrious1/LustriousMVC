@@ -3,10 +3,10 @@ namespace Lustrious.Repositorio
 {
     public interface IClienteRepositorio
     {
-        public void CadastrarCliente(Cliente cliente);
-        public Cliente AcharCliente(int id);
-        public IEnumerable<Cliente> ListarClientes();
-        public void AlterarCliente(Cliente cliente);
+        public void CadastrarCliente(Usuario cliente);
+        public Usuario AcharCliente(int id);
+        public IEnumerable<Usuario> ListarClientes();
+        public void AlterarCliente(Usuario cliente);
         public void ExcluirCliente(int id);
     }
 }

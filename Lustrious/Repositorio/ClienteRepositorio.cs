@@ -14,7 +14,7 @@ namespace Lustrious.Repositorio
         {
             _dataBase = dataBase;
         }
-        public void CadastrarCliente(Cliente cliente)
+        public void CadastrarCliente(Usuario cliente)
         {
             using(var conexao = _dataBase.GetConnection())
             {
@@ -30,9 +30,9 @@ namespace Lustrious.Repositorio
                 }
             }
         }
-        public Cliente AcharCliente(int id)
+        public Usuario AcharCliente(int id)
         {
-            Cliente cliente = new Cliente();
+            Usuario cliente = new Usuario();
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
@@ -51,7 +51,7 @@ namespace Lustrious.Repositorio
 
                     foreach (DataRow dr in dt.Rows)
                     {
-                        cliente = new Cliente()
+                        cliente = new Usuario()
                         {
                             IdClient = Convert.ToInt32(dr["IdCliente"]),
                             Nome = (string)dr["Nome"],
@@ -64,9 +64,9 @@ namespace Lustrious.Repositorio
             }
             return cliente;
         }
-        public IEnumerable<Cliente> ListarClientes()
+        public IEnumerable<Usuario> ListarClientes()
         {
-            List<Cliente> clientes = new List<Cliente>();
+            List<Usuario> clientes = new List<Usuario>();
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
@@ -83,7 +83,7 @@ namespace Lustrious.Repositorio
 
                     foreach (DataRow dr in dt.Rows)
                     {
-                        clientes.Add(new Cliente
+                        clientes.Add(new Usuario
                             {
                                 IdClient = Convert.ToInt32(dr["IdCliente"]),
                                 Nome = (string)dr["Nome"],
@@ -97,7 +97,7 @@ namespace Lustrious.Repositorio
             }
             return clientes;
         }
-        public void AlterarCliente(Cliente cliente)
+        public void AlterarCliente(Usuario cliente)
         {
             using (var conexao = _dataBase.GetConnection())
             {

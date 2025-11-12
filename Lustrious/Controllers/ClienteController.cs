@@ -24,7 +24,7 @@ namespace Lustrious.Controllers
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult CriarCliente(Cliente cliente)
+        public IActionResult CriarCliente(Usuario cliente)
         {
             _clienteRepositorio.CadastrarCliente(cliente);
             TempData["ok"] = "Cliente Cadastrado!";
@@ -37,7 +37,7 @@ namespace Lustrious.Controllers
             return View(_clienteRepositorio.AcharCliente(id));
         }
         [HttpPost, ValidateAntiForgeryToken]
-         public IActionResult EditarCliente(Cliente model)
+         public IActionResult EditarCliente(Usuario model)
         {
             _clienteRepositorio.AlterarCliente(model);
             TempData["ok"] = "Cliente Atualizado!";
