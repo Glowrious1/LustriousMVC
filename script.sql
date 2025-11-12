@@ -82,10 +82,10 @@ IdUser int not null
 create table Entrega(
 IdEntrega int primary key auto_increment,
 IdEndereco int not null,
-DataEntrega date,
+DataEntrega dateTime,
 ValorFrete decimal(7,2),
 DataPrevista date,
- role enum ('Pedido enviado','Produto saiu para entrega', 'Seu Produto Chegou'),
+ Status enum ('Pedido enviado','Produto saiu para entrega', 'Seu Produto Chegou'),
 foreign key (IdEndereco) references Endereco(IdEndereco)
 );
 
@@ -93,7 +93,7 @@ create table Produto(
 CodigoBarras bigint primary key,
 NomeProd varchar(200) not null,
 qtd int,
-Role Enum('Masculino','Feminino','Unissex'),
+Genero Enum('Masculino','Feminino','Unissex'),
 Descricao varchar(250),
 ValorUnitario decimal(9,2)
 );

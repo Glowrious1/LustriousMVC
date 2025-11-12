@@ -53,7 +53,7 @@ namespace Lustrious.Repositorio
                     {
                         cliente = new Usuario()
                         {
-                            IdClient = Convert.ToInt32(dr["IdCliente"]),
+                            IdUser = Convert.ToInt32(dr["IdCliente"]),
                             Nome = (string)dr["Nome"],
                             Email = (string)dr["Email"],
                             Senha = (string)dr["Senha"],
@@ -85,7 +85,7 @@ namespace Lustrious.Repositorio
                     {
                         clientes.Add(new Usuario
                             {
-                                IdClient = Convert.ToInt32(dr["IdCliente"]),
+                                IdUser = Convert.ToInt32(dr["IdCliente"]),
                                 Nome = (string)dr["Nome"],
                                 Email = (string)dr["Email"],
                                 Senha = (string)dr["Senha"],

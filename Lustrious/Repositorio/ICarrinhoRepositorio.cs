@@ -1,4 +1,6 @@
-﻿namespace Lustrious.Repositorio
+﻿using Lustrious.Models;
+
+namespace Lustrious.Repositorio
 {
     public interface ICarrinhoRepositorio
     {
