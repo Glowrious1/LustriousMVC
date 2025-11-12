@@ -5,33 +5,25 @@ use dbilumina;
 
 -- Criação de tabelas
 
--- Sugestão que vão encher o saco de vcs pra fazer
+
+
+
+
+create table Usuario (
+IdUser int primary key auto_increment ,
+Nome varchar(155) ,
+Foto varchar(255), 
+Email varchar(155) ,
+Senha varchar(150) ,
+Sexo enum('Masculino','Feminino','NERF'),
+CPF varchar(14) not null,
+Role enum('Admin','Cliente','Funcionario'),
+CEP int,
+Ativo char(1)  default '1'
+);
+
+
 /*
-
-												レゼ SUPREMACY
-
-O ideal seria fazer a especialização aqui, pegar os dados repetitivos de tabelas que serão utilizados em varias verificações. 
-Também seria legal colocar o tipo/nivel de acesso do usuario, que dá pra fazer algo bem legal no backend.
-Ah também algo que notei é que vocês não estão utilizando on cascade, tem que saber usar, mas é bem facil.
-O critério é: Se vão ter casos onde o PAI da informação (FOREIGN KEY) vai ser excluido, você coloca essa clausula 
-*ON DELETE CASCADE*
-
-create table Login (
-IdLogin int primary key auto_increment,
-Nome varchar(200) not null,
-Email varchar(150) not null,
-Senha varchar(250),
-NivelAcesso ENUM("Cliente", "Funcionario", "Administrador") default "Cliente"
-);
-
-Create table Cliente(
-IdClient int primary key auto_increment,
-CPF varchar(12) unique not null
-foreing key (IdClient) references Login(IdLogin) on delete cascade
-Fica a critério de vocês adicionar mais colunas.
-
-);
-
 create table Funcionario (
 IdFun int primary key auto_increment
 foreing key (IdFun) references Login(IdLogin) on delete cascade
@@ -41,15 +33,6 @@ Salario decimal(9,2) not null,
 Status ENUM("Ativo", "Inativo") default "Ativo"
 );
 
-Bom quando eu fui fazer reclamaram de não ter tabela pro admin, eu acho inutil, mas como eles pedem vou colocar aq tb.
-
-create table Administrador(
-IdAdmin int primary key,
-DataAdmissao date,
-Estado ENUM("Ativo", "Inativo"),
-foreing key (IdAdmin) references Login(IdLogin) on delete cascade
-);
-*/
 
 Create table Cliente(
 IdClient int primary key auto_increment,
@@ -66,6 +49,8 @@ Nome varchar(200) not null,
 Email varchar(150) not null,
 Senha varchar(250) not null
 );
+*/
+
 
 create table Bairro (
 IdBairro int primary key auto_increment,
@@ -88,8 +73,7 @@ Logradouro varchar(200) not null,
 IdBairro int not null,
 IdCidade int not null,
 IdEstado int not null,
-IdUser int not null,
-foreign key (IdUser) references Login(IdLogin)
+IdUser int not null
 );
 
 create table Entrega(
@@ -106,6 +90,7 @@ create table Produto(
 CodigoBarras bigint primary key,
 NomeProd varchar(200) not null,
 qtd int,
+Role Enum('Masculino','Feminino','Unissex'),
 Descricao varchar(250),
 ValorUnitario decimal(9,2)
 );
@@ -114,7 +99,7 @@ create table Favoritos(
 IdFav int primary key auto_increment,
 IdUser int not null,
 IdProd int not null,
-foreign key (IdUser) references Login(IdLogin) on delete cascade,
+foreign key (IdUser) references Usuario(IdUser) on delete cascade,
 foreign key (IdProd) references Produto(CodigoBarras) on delete cascade
 );
 
@@ -123,7 +108,7 @@ IdCarrinho int primary key auto_increment,
 IdProd int not null,
 Qtd int not null,
 IdUser int not null,
-foreign key (IdUser) references Login(IdLogin) on delete cascade
+foreign key (IdUser) references Usuario(IdUser) on delete cascade
 -- Se for ter promoção colocar uma coluna pro preço do produto.
 );
 
@@ -144,10 +129,9 @@ IdVenda int primary key auto_increment,
 NomeProd varchar(250) not null,
 ValorTotal decimal(9,2) not null,
 DataVenda Datetime,
-IdClient int,
+IdUser int,
 NF int,
-IdEntrega int,
-IdFun int
+IdEntrega int
 );
  
  create table VendaProduto(
@@ -163,22 +147,27 @@ IdFun int
  DataEmissao date not null
 );
  
- create table
+ALTER TABLE Produto 
+ADD COLUMN codCategoria INT,
+ADD COLUMN codTipoProduto INT,
+ADD CONSTRAINT fk_Produto_Categoria FOREIGN KEY (codCategoria) REFERENCES Categoria(codCategoria),
+ADD CONSTRAINT fk_Produto_TipoProduto FOREIGN KEY (codTipoProduto) REFERENCES tipoProduto(codTipoProduto);
+
  
- -- Criando as chaves primarias //Nathan: foreign key ????
+ -- Criando as chaves  Foreign key 
  
  Alter table Endereco
  add Constraint fk_IdBairro_Endereco foreign key (IdBairro) references Bairro(IdBairro),
  add Constraint fk_IdCidade_Endereco foreign key (IdCidade) references Cidade(IdCidade),
  add Constraint fk_IdEstado_Endereco foreign key (IdEstado) references Estado(IDUF);
  
- alter table Cliente add constraint fk_CepCli_Cliente foreign key(CepCli) references Endereco(Cep);
+ alter table Usuario add constraint fk_CEP_Usuario foreign key(CEP) references Endereco(Cep);
  
  alter table VendaProduto add constraint fk_Codigobarras_Vendaproduto foreign key(CodigoBarras) references Produto(CodigoBarras),
  add constraint fk_IdVenda_Vendaproduto foreign key (IdVenda) references Venda(IdVenda);
  
  alter table Venda 
- add Constraint fk_IdCliente_Venda foreign key (IdClient) references Cliente(IdClient),
+ add Constraint fk_IdCliente_Venda foreign key (IdClient) references Usuario(IdUser),
  add Constraint fk_NF_Venda foreign key (NF) references NotaFiscal(NF),
  add Constraint fk_IdEntrega_Venda foreign key (IdEntrega) references Entrega(IdEntrega),
  add Constraint fk_IdFun_Venda foreign key (IdFun) references Funcionario(IdFun);
@@ -254,6 +243,30 @@ INSERT INTO Estado (UF) VALUES ('SC');
 INSERT INTO Estado (UF) VALUES ('SP');
 INSERT INTO Estado (UF) VALUES ('SE');
 INSERT INTO Estado (UF) VALUES ('TO');
+INSERT INTO Categoria (Categoria) values ('Maquiagens');
+INSERT INTO Categoria (Categoria) values ('Skincare');
+INSERT INTO Categoria (Categoria) values ('Cabelo');
+INSERT INTO Categoria (Categoria) values ('Corpo');
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Gloss',1);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Corretivo',1);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Base',1);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Rimel',1);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Batom',1);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Blush',1);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Hidratante fácial',2);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Prime',2);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('esfoliante facial',2);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Protetor',2);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Shampoo',3);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Condicionador',3);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Óleo',3);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Hidratante capilar',3);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Creme hidratante',4);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Desodorante',4);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Esfoliante',4);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Perfume',4);
+insert into tipoProduto  (TipoProduto,codCategoria) values ('Creme de Barbear',4);
+
 */
  create  procedure InsertEstado(
  in vUF char(2)
@@ -270,6 +283,8 @@ INSERT INTO Estado (UF) VALUES ('TO');
  $$
  
  call InsertEstado ("SP");
+ 
+ 
  
  delimiter $$
   create  procedure insertEndereco(
@@ -329,116 +344,248 @@ INSERT INTO Estado (UF) VALUES ('TO');
  select * from Funcionario ;
  
  
+ create table Usuario (
+IdUser int primary key auto_increment ,
+Nome varchar(155) ,
+Foto varchar(255), 
+Email varchar(155) ,
+Senha varchar(150) ,
+Sexo enum('Masculino','Feminino','NERF'),
+CPF varchar(14) not null,
+Role enum('Admin','Cliente','Funcionario'),
+CEP int,
+Ativo char(1)  default '1'
+);
+
+-- Usuario
+ 
  delimiter $$
- create  procedure insertCliente (
+ create  procedure insertUsuario (
  in vNome varchar(250),
  in vEmail varchar(150),
  in vCPF varchar(12),
- in vSenha varchar(250)
+ in vSenha varchar(250),
+ in vRole varchar(20),
+ in vSexo varchar(20),
+ in vFoto varchar(255)
  )
 begin
  
-   if not exists (select IdClient from cliente where CPF = vCPF ) then
+   if not exists (select IdUser from Usuario where CPF = vCPF ) then
    
-     insert into cliente (Nome,Email,CPF,Senha) values (vNome,vEmail,vCPF,vSenha);
-     else select("Esse Cliente já está registrado");
+     insert into Usuario (Nome,Email,Foto,CPF,Senha,Sexo,Role,Ativo) values (vNome,vEmail,vFoto,vCPF,vSenha,vSexo,vRole,1);
+     else select("Esse Usuario já está registrado");
      end if;
 end ;
 $$
 
-call insertCliente("Let0icia","Moto@4.com","43289210825","1234");
+call insertCliente("Daniel","Daniel@email.com","124-574-242-21","12345","Admin","Masculino");
 
-delimiter $$
-create procedure insertProduto(
-in vCodigoBarras bigint,
-in vNomeProd varchar(200),
-in vQtd int,
-in vDescricao varchar(250),
-in vValorUnitario decimal(7,2)
-)
-begin
- if not exists(select CodigoBarras from Produto where CodigoBarras = vCodigoBarras)then
-    insert into Produto values(vCodigoBarras,vNomeProd,vQtd,vDescricao,vValorUnitario);
-    else select('Produto já está registrado');
-    end if ;
-end ;
-$$
-call insertProduto (254932837248,'Pergume Lavuar',25,'Pergume lAVOUAR',12.2)
 
+Usuario
 delimiter $$
-create procedure selectFuncionario()
+create procedure selectUsuario()
 begin
  
-select IdFun, Nome,Email,Senha from Funcionario order by Nome; 
+select IdUser, Nome,Email,Senha,Sexo,CPF,Role,CEP from Usuario order by Nome; 
 end $$
 
-call selectFuncionario;
+call selectUsuario;
 
-create  procedure selectCliente()
+
+
+
+
+create procedure obterUsuario (in vId int)
 begin
- select  IdClient,nome,CPF,Email,Senha from cliente order by Nome ; 
-end $$
-
-call selectCliente;
-
-create procedure selectProduto()
-begin
- select NomeProd,CodigoBarras,Descricao,qtd,ValorUnitario from Produto order by NomeProd ;
-end $$
-
-call selectProduto;
-create  procedure obterCliente (in vIdClient int)
-begin
-   select IdClient,Nome,Email,CPF,Senha from Cliente where IdClient = vIdClient;
-end $$
-
-create procedure obterFuncionario (in vId int)
-begin
-  select IdFun,Nome,Email,Senha from funcionario where IdFun = vId;
+  select IdUser,Nome,Email,Senha,Sexo,CPF from funcionario where IdUser = vId;
 end $$	
 
 	
-create procedure updateFuncionario (
-in vIdFun int, in vNome varchar(200), in vEmail varchar(150),in vSenha varchar(250)
+create procedure updateUsuario(
+in vIdUser int, in vNome varchar(200), in vEmail varchar(150),in vSenha varchar(250),vSexo varchar(20),vCEP int
 )
 begin
-    update funcionario set Nome = vNome, Email = vEmail, Senha = vSenha  where IdFun = vIdFun;
+    update Usuario set Nome = vNome, Email = vEmail, Senha = vSenha, Sexo = vSexo, CPF = vCPF,CEP = vCEP  where IdFun = vIdFun;
 end $$
 
-create procedure updateCliente (
-in vIdClient int, in vNome varchar(200), in vEmail varchar(150),in vSenha varchar(250), in vCPF varchar(11)
-)
-begin
-    update cliente set Nome = vNome, Email = vEmail,CPF = vCPF, Senha = vSenha  where IdClient = vIdClient;
-end $$
 
-delimiter $$
-create procedure DeleteCliente(in vIdClient int)
+
+
+create procedure DeleterUser(in vIdUser int)
 begin
-  if exists (select IdClient from Cliente where IdClient = vIdClient)then
-	 delete from Cliente where IdClient = vIdClient ;
-     else select('Não existe este Cliente');
+  if exists (select IdUser from Usuario where IdUser = vIdUser)then
+	 delete  from Usuario  where IdUser = vIdUser ;
+     else select('Não existe este Usuario');
      end if ;
 end $$
 
+-- Produtos
 
-create procedure DeleteFuncionario(in vIdFun int)
-begin
-  if exists (select IdFun from Funcionario where IdFun = vIdFun)then
-	 delete  from Funcionario  where IdFun = vIdFun ;
-     else select('Não existe este Funcionario');
-     end if ;
-end $$
-
-
-
-/*
 delimiter $$
-create procedure selectEndereco()
-begin 
- select CEP,Logradouro from Endereco order by Logradouro;
+create   procedure selectProdutos()
+begin
+  select 
+    p.CodigoBarras,
+    p.NomeProd,
+    p.qtd,
+    p.Descricao,
+    p.ValorUnitario,
+    p.Role,
+    c.Categoria as NomeCategoria,
+    t.TipoProduto as NomeTipoProduto
+  from Produto p
+  left join Categoria c on p.codCategoria = c.codCategoria
+  left join tipoProduto t on p.codTipoProduto = t.codTipoProduto
+  order by p.NomeProd;
 end$$
 delimiter ;
-*/
-$$
+
+delimiter $$ 
+create  procedure updateProduto(
+  in vCodigo bigint,
+  in vNome varchar(200),
+  in vQtd int,
+  in vDesc varchar(250),
+  in vValor decimal(9,2),
+  in vRole enum('Masculino','Feminino','Unissex'),
+  in vCodCategoria int,
+  in vCodTipoProduto int
+)
+begin
+  if exists(select CodigoBarras from Produto where CodigoBarras = vCodigo) then
+  
+    update Produto 
+    set NomeProd = vNome,
+        qtd = vQtd,
+        Descricao = vDesc,
+        ValorUnitario = vValor,
+        Role = vRole,
+        codCategoria = vCodCategoria,
+        codTipoProduto = vCodTipoProduto
+    where CodigoBarras = vCodigo;
+    
+  else
+    select 'Produto não encontrado' as Mensagem;
+  end if;
+end$$
+delimiter ;
+
+
+delimiter $$
+create procedure deleteProduto(in vCodigo bigint)
+begin
+  if exists(select CodigoBarras from Produto where CodigoBarras = vCodigo) then
+    delete from Produto where CodigoBarras = vCodigo;
+  else
+    select 'Produto não encontrado';
+  end if;
+end$$
+delimiter ;
+
+delimiter $$
+create  procedure selectProdutosPorCategoria(in vCodCategoria int)
+begin
+  select 
+    p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario, p.Role,
+    c.Categoria, t.TipoProduto
+  from Produto p
+  join Categoria c on p.codCategoria = c.codCategoria
+  join tipoProduto t on p.codTipoProduto = t.codTipoProduto
+  where p.codCategoria = vCodCategoria
+  order by p.NomeProd;
+end$$
+delimiter ;
+
+delimiter $$
+create  procedure selectProdutosPorTipo(in vCodTipoProduto int)
+begin
+  select 
+    p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario, p.Role,
+    c.Categoria, t.TipoProduto
+  from Produto p
+  join Categoria c on p.codCategoria = c.codCategoria
+  join tipoProduto t on p.codTipoProduto = t.codTipoProduto
+  where p.codTipoProduto = vCodTipoProduto
+  order by p.NomeProd;
+end$$
+delimiter ;
+
+
+
+
+
+delimiter $$ 
+create  procedure insertProduto(
+  in vCodigoBarras bigint,
+  in vNomeProd varchar(200),
+  in vQtd int,
+  in vDescricao varchar(250),
+  in vValorUnitario decimal(7,2),
+  in vRole enum('Masculino','Feminino','Unissex'),
+  in vCodCategoria int,
+  in vCodTipoProduto int
+)
+begin
+  if not exists(select CodigoBarras from Produto where CodigoBarras = vCodigoBarras) then
+  
+    if exists(select codCategoria from Categoria where codCategoria = vCodCategoria)
+       and exists(select codTipoProduto from tipoProduto where codTipoProduto = vCodTipoProduto) then
+    
+      insert into Produto 
+      (CodigoBarras, NomeProd, qtd, Descricao, ValorUnitario, Role, codCategoria, codTipoProduto)
+      values 
+      (vCodigoBarras, vNomeProd, vQtd, vDescricao, vValorUnitario, vRole, vCodCategoria, vCodTipoProduto);
+      
+    else 
+      select 'Categoria ou Tipo de Produto inválido' as Mensagem;
+    end if;
+    
+  else 
+    select 'Produto já está registrado' as Mensagem;
+  end if;
+end$$
+delimiter ;
+
+call insertProduto (254932837248,'Pergume Lavuar',25,'Pergume lAVOUAR',12.2)
+
+
+delimiter $$
+create procedure addCarrinho(
+  in vIdUser int,
+  in vCodigo bigint,
+  in vQtd int
+)
+begin
+  if exists(select CodigoBarras from Produto where CodigoBarras = vCodigo) then
+    if exists(select IdCarrinho from Carrinho where IdUser = vIdUser and IdProd = vCodigo) then
+      update Carrinho set Qtd = Qtd + vQtd 
+      where IdUser = vIdUser and IdProd = vCodigo;
+    else
+      insert into Carrinho (IdUser, IdProd, Qtd) values (vIdUser, vCodigo, vQtd);
+    end if;
+  else
+    select 'Produto inexistente';
+  end if;
+end$$
+delimiter ;
+
+delimiter $$
+create procedure selectCarrinho(in vIdUser int)
+begin
+  select c.IdCarrinho, p.NomeProd, c.Qtd, p.ValorUnitario, (p.ValorUnitario * c.Qtd) as Subtotal
+  from Carrinho c
+  join Produto p on c.IdProd = p.CodigoBarras
+  where c.IdUser = vIdUser;
+end$$
+delimiter ;
+
+delimiter $$
+create procedure deleteCarrinhoItem(in vIdCarrinho int)
+begin
+  delete from Carrinho where IdCarrinho = vIdCarrinho;
+end$$
+delimiter ;
+
+
  use dbilumina ;
