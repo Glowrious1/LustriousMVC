@@ -15,10 +15,10 @@ Nome varchar(155) ,
 Foto varchar(255), 
 Email varchar(155) ,
 Senha varchar(150) ,
-Sexo enum('Masculino','Feminino','NERF'),
+Sexo enum('Masculino','Feminino','Outro'),
 CPF varchar(14) not null,
 Role enum('Admin','Cliente','Funcionario'),
-CEP int,
+IdEndereco  int null,
 Ativo char(1)  default '1'
 );
 
@@ -76,7 +76,7 @@ complemento varchar(155),
 IdBairro int not null,
 IdCidade int not null,
 IdEstado int not null,
-IdUser int not null
+IdUser int  null
 );
 
 create table Entrega(
@@ -101,7 +101,7 @@ ValorUnitario decimal(9,2)
 create table Favoritos(
 IdFav int primary key auto_increment,
 IdUser int not null,
-IdProd int not null,
+IdProd bigint not null,
 foreign key (IdUser) references Usuario(IdUser) on delete cascade,
 foreign key (IdProd) references Produto(CodigoBarras) on delete cascade
 );
@@ -140,6 +140,7 @@ IdEntrega int
 );
  
  create table VendaProduto(
+IdVendaProduto int primary key auto_increment,
  valorItem decimal(9,2),
  Qtd int,
  CodigoBarras bigint,
@@ -164,18 +165,18 @@ ADD CONSTRAINT fk_Produto_TipoProduto FOREIGN KEY (codTipoProduto) REFERENCES ti
  Alter table Endereco
  add Constraint fk_IdBairro_Endereco foreign key (IdBairro) references Bairro(IdBairro),
  add Constraint fk_IdCidade_Endereco foreign key (IdCidade) references Cidade(IdCidade),
- add Constraint fk_IdEstado_Endereco foreign key (IdEstado) references Estado(IDUF);
+ add Constraint fk_IdEstado_Endereco foreign key (IdEstado) references Estado(IDUF),
+ add Constraint fk_IdUser_Endereco foreign key (IdUser) References Usuario(IdUser) on delete set null;
  
- alter table Usuario add constraint fk_CEP_Usuario foreign key(CEP) references Endereco(Cep);
+ alter table Usuario add constraint fk_IdEndereco_Usuario foreign key(IdEndereco) references Endereco(IdEndereco);
  
  alter table VendaProduto add constraint fk_Codigobarras_Vendaproduto foreign key(CodigoBarras) references Produto(CodigoBarras),
  add constraint fk_IdVenda_Vendaproduto foreign key (IdVenda) references Venda(IdVenda);
  
  alter table Venda 
- add Constraint fk_IdCliente_Venda foreign key (IdClient) references Usuario(IdUser),
+ add Constraint fk_IdUser_Venda foreign key (IdUser) references Usuario(IdUser),
  add Constraint fk_NF_Venda foreign key (NF) references NotaFiscal(NF),
- add Constraint fk_IdEntrega_Venda foreign key (IdEntrega) references Entrega(IdEntrega),
- add Constraint fk_IdFun_Venda foreign key (IdFun) references Funcionario(IdFun);
+ add Constraint fk_IdEntrega_Venda foreign key (IdEntrega) references Entrega(IdEntrega);
  
  
  
@@ -358,18 +359,7 @@ IdUser int not null
  select * from Funcionario ;
  
  
- create table Usuario (
-IdUser int primary key auto_increment ,
-Nome varchar(155) ,
-Foto varchar(255), 
-Email varchar(155) ,
-Senha varchar(150) ,
-Sexo enum('Masculino','Feminino','NERF'),
-CPF varchar(14) not null,
-Role enum('Admin','Cliente','Funcionario'),
-CEP int,
-Ativo char(1)  default '1'
-);
+
 
 -- Usuario
  
