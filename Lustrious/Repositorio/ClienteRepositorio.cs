@@ -67,7 +67,7 @@ namespace Lustrious.Repositorio
                 }
             }
             return cliente;
-        }
+        } 
         public IEnumerable<Usuario> ListarClientes()
         {
             List<Usuario> clientes = new List<Usuario>();
