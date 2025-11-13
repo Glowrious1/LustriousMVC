@@ -7,35 +7,36 @@ using System.Net.Sockets;
 
 namespace Lustrious.Repositorio
 {
-    public class ClienteRepositorio : IClienteRepositorio
+    public class FuncionarioRepositorio : IFuncionarioRepositorio
     {
         private readonly DataBase _dataBase;
-        public ClienteRepositorio(DataBase dataBase)
+
+        public FuncionarioRepositorio(DataBase dataBase)
         {
             _dataBase = dataBase;
         }
-        public void CadastrarCliente(Usuario cliente)
+        public void CadastrarFuncionario(Usuario funcionario)
         {
-            using(var conexao = _dataBase.GetConnection())
+            using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using(var cmd = new MySqlCommand("insertUsuario", conexao))
+                using (var cmd = new MySqlCommand("insertUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("vNome", cliente.Nome);
-                    cmd.Parameters.AddWithValue("vEmail", cliente.Email);
-                    cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
-                    cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
-                    cmd.Parameters.AddWithValue("vRole", "Cliente");
-                    cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
-                    cmd.Parameters.AddWithValue("vFoto", cliente.Foto);
+                    cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
+                    cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
+                    cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
+                    cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
+                    cmd.Parameters.AddWithValue("vRole", funcionario.Role);
+                    cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
+                    cmd.Parameters.AddWithValue("vFoto", funcionario.Foto);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
-        public Usuario AcharCliente(int id)
+        public Usuario AcharFuncionario(int id)
         {
-            Usuario cliente = new Usuario();
+            Usuario funcionario = new Usuario();
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
@@ -54,7 +55,7 @@ namespace Lustrious.Repositorio
 
                     foreach (DataRow dr in dt.Rows)
                     {
-                        cliente = new Usuario()
+                        funcionario = new Usuario()
                         {
                             IdUser = Convert.ToInt32(dr["IdUser"]),
                             Nome = (string)dr["Nome"],
@@ -66,11 +67,11 @@ namespace Lustrious.Repositorio
                     }
                 }
             }
-            return cliente;
-        } 
-        public IEnumerable<Usuario> ListarClientes()
+            return funcionario;
+        }
+        public IEnumerable<Usuario> ListarFuncionario()
         {
-            List<Usuario> clientes = new List<Usuario>();
+            List<Usuario> funcionario = new List<Usuario>();
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
@@ -87,43 +88,45 @@ namespace Lustrious.Repositorio
 
                     foreach (DataRow dr in dt.Rows)
                     {
-                        clientes.Add(new Usuario
-                            {
-                                IdUser = Convert.ToInt32(dr["IdUser"]),
-                                Nome = (string)dr["Nome"],
-                                Email = (string)dr["Email"],
-                                Senha = (string)dr["Senha"],
-                                Sexo = (string)dr["Sexo"],
-                                CPF = (string)dr["CPF"],
-                                Role = (string)dr["Role"],
-                                CEP = (int)dr["CEP"]
+                        funcionario.Add(new Usuario
+                        {
+                            IdUser = Convert.ToInt32(dr["IdUser"]),
+                            Nome = (string)dr["Nome"],
+                            Email = (string)dr["Email"],
+                            Senha = (string)dr["Senha"],
+                            Sexo = (string)dr["Sexo"],
+                            CPF = (string)dr["CPF"],
+                            Role = (string)dr["Role"],
+                            CEP = (int)dr["CEP"]
                         }
                         );
                     }
                 }
             }
-            return clientes;
+            return funcionario;
         }
-        public void AlterarCliente(Usuario cliente)
+
+
+        public void AlterarFuncionario(Usuario funcionario)
         {
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("updateUsuario", conexao))
+                using (var cmd = new MySqlCommand("updateFuncionario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("vNome", cliente.Nome);
-                    cmd.Parameters.AddWithValue("vEmail", cliente.Email);
-                    cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
-                    cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
-                    cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
-                    cmd.Parameters.AddWithValue("vCEP", cliente.CEP);
+                    cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
+                    cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
+                    cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
+                    cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
+                    cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
+                    cmd.Parameters.AddWithValue("vCEP", funcionario.CEP);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }
             }
         }
-        public void ExcluirCliente(int id)
+        public void ExcluirFuncionario(int id)
         {
             using (var conexao = _dataBase.GetConnection())
             {
@@ -139,3 +142,4 @@ namespace Lustrious.Repositorio
         }
     }
 }
+
