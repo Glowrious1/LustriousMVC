@@ -88,7 +88,7 @@ namespace Lustrious.Repositorio
                     foreach (DataRow dr in dt.Rows)
                     {
                         clientes.Add(new Usuario
-                            {
+                        {
                                 IdUser = Convert.ToInt32(dr["IdUser"]),
                                 Nome = (string)dr["Nome"],
                                 Email = (string)dr["Email"],
@@ -97,8 +97,7 @@ namespace Lustrious.Repositorio
                                 CPF = (string)dr["CPF"],
                                 Role = (string)dr["Role"],
                                 CEP = (int)dr["CEP"]
-                        }
-                        );
+                        });
                     }
                 }
             }

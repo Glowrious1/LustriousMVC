@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Lustrious.Repositorio
 {
-    //Os : indicam que o RepositorioProduto está heradndo as funcionalidades da interface IProdutoRepositorio.
+    //Os : indicam que o RepositorioProduto está heradndo as funcionalidades da interface IProdutoRepositorio.// 
     public class ProdutoRepositorio : IProdutoRepostorio
     {
             private readonly DataBase _dataBase;
@@ -13,11 +13,26 @@ namespace Lustrious.Repositorio
             {
                 _dataBase = dataBase;
             }
-            public void CadastrarProduto(Produto produto)
+            public void CadastrarProduto(Produto produto, IFormFile? capa)
             {
-                using (var conexao = _dataBase.GetConnection())
+                string? relPath = null;
+                if (capa != null && capa.Length >0)
+            {
+                var ext = Path.GetExtension(capa.FileName);
+                var fileName = $"{Guid.NewGuid()}{ext}";
+                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "capas");
+                Directory.CreateDirectory(saveDir);
+                var absPath = Path.Combine(saveDir, fileName);
+                using var fs = new FileStream(absPath, FileMode.Create);
+                capa.CopyTo(fs);
+                relPath = Path.Combine("capas", fileName).Replace("\\", "/");
+            }
+
+            using var conn2 = db.GetConnection();
+            using (var conexao = _dataBase.GetConnection())
                 {
                     conexao.Open();
+                    
                     using (var cmd = new MySqlCommand("insertProduto", conexao))
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;

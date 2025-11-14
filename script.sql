@@ -93,6 +93,7 @@ create table Produto(
 CodigoBarras bigint primary key,
 NomeProd varchar(200) not null,
 qtd int,
+foto varchar(255),
 Genero Enum('Masculino','Feminino','Unissex'),
 Descricao varchar(250),
 ValorUnitario decimal(9,2)
