@@ -8,7 +8,13 @@ namespace Lustrious.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly DataBase db = new DataBase();
+        private readonly DataBase _db;
+
+        public AuthController(DataBase db)
+        {
+            _db = db;
+        }
+
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
@@ -24,17 +30,18 @@ namespace Lustrious.Controllers
                 return View();
             }
 
-
-            using var conexao = db.GetConnection();
+            using var conexao = _db.GetConnection();
             using var cmd = new MySqlCommand("ObterUsuarioEmail", conexao);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("p_email", email);
-            var reader = cmd.ExecuteReader();
+
+            using var reader = cmd.ExecuteReader();
             if (!reader.Read())
             {
                 ViewBag.Erro = "Email ou senha inválidos.";
                 return View();
             }
+
             var id = reader.GetInt32("IdUser");
             var nome = reader.GetString("Nome");
             var role = reader.GetString("Role");
@@ -54,9 +61,11 @@ namespace Lustrious.Controllers
             catch
             { ok = false; }
             if(!ok)
-            {                 ViewBag.Erro = "Email ou senha inválidos.";
+            {
+                ViewBag.Erro = "Email ou senha inválidos.";
                 return View();
             }
+
             HttpContext.Session.SetInt32(SessionsKeys.UserId, id);
             HttpContext.Session.SetString(SessionsKeys.UserName, nome);
             HttpContext.Session.SetString(SessionsKeys.UserEmail, email);
@@ -66,8 +75,6 @@ namespace Lustrious.Controllers
                 return Redirect(returnUrl);
 
             return RedirectToAction("Index", "Home");
-
-
         }
 
         [HttpPost,ValidateAntiForgeryToken]
