@@ -7,5 +7,8 @@
         public int Qtd { get; set; }
         public decimal ValorTotal { get; set; }
         public decimal ValorUnitario { get; set; }
+
+        // Lista de itens no carrinho
+        public List<VendaProduto> Items { get; set; } = new List<VendaProduto>();
     }
 }
