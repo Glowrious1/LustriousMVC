@@ -62,6 +62,22 @@ namespace Lustrious.Repositorio
             }
         }
 
+        public int RegistrarEntrega(Entrega entrega)
+        {
+            using var conn = _dataBase.GetConnection();
+            using var cmd = new MySqlCommand("insertEntrega", conn);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("vIdEndereco", entrega.IdEndereco);
+            cmd.Parameters.AddWithValue("vDataEntrega", entrega.DataEntrega);
+            cmd.Parameters.AddWithValue("vValorFrete", entrega.ValorFrete);
+            cmd.Parameters.AddWithValue("vDataPrevista", entrega.DataPrevista);
+            cmd.Parameters.AddWithValue("vStatus", entrega.Status);
+            cmd.ExecuteNonQuery();
+
+            using var cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", conn);
+            return Convert.ToInt32(cmdId.ExecuteScalar());
+        }
+
         public Venda AcharVenda(int id)
         {
             Venda venda = null;

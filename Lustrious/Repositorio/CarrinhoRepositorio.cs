@@ -4,6 +4,10 @@ using MySql.Data.MySqlClient;
 using System.Numerics;
 using System.Linq;
 using System.Collections.Generic;
+using System;
+using System.Net.Http;
+using System.Text.Json;
+using Lustrious.Services;
 
 namespace Lustrious.Repositorio
 {
@@ -12,10 +16,12 @@ namespace Lustrious.Repositorio
     {
         private readonly DataBase _dataBase;
         private readonly IVendaRepositorio _vendaRepositorio;
-        public CarrinhoRepositorio(DataBase dataBase, IVendaRepositorio vendaRepositorio)
+        private readonly IFreteService _freteService;
+        public CarrinhoRepositorio(DataBase dataBase, IVendaRepositorio vendaRepositorio, IFreteService freteService)
         {
             _dataBase = dataBase;
             _vendaRepositorio = vendaRepositorio;
+            _freteService = freteService;
         }
         public void AdicionarItem(int produtoId, int userId)
         {
@@ -111,13 +117,28 @@ WHERE c.id_user = @userId", conexao))
                 // Calcular total
                 var total = itens.Sum(i => i.ValorItem * i.Qtd);
 
+                // Calcular frete usando serviço de frete
+                decimal frete = _freteService.CalcularFreteAsync(idEnd).GetAwaiter().GetResult();
+
+                // Registrar entrega e obter id
+                var entrega = new Entrega
+                {
+                    IdEndereco = idEnd,
+                    DataEntrega = DateTime.Now,
+                    ValorFrete = frete,
+                    DataPrevista = DateTime.Now.AddDays(3),
+                    Status = "Pendente"
+                };
+
+                int idEntrega = _vendaRepositorio.RegistrarEntrega(entrega);
+
                 var venda = new Venda
                 {
                     IdUser = userId,
                     DataVenda = DateTime.Now,
-                    ValorTotal = total,
+                    ValorTotal = total + frete, // adiciona o valor do frete ao total
                     NF =0,
-                    IdEntrega = idEnd
+                    IdEntrega = idEntrega
                 };
 
                 // Registrar venda via repositório de vendas
@@ -130,6 +151,15 @@ WHERE c.id_user = @userId", conexao))
                     cmdClear.ExecuteNonQuery();
                 }
             }
+        }
+
+        private string GetCepByEnderecoId(int enderecoId)
+        {
+            using var conn = _dataBase.GetConnection();
+            using var cmd = new MySqlCommand("SELECT cep FROM endereco WHERE id_endereco = @id", conn);
+            cmd.Parameters.AddWithValue("@id", enderecoId);
+            var result = cmd.ExecuteScalar();
+            return result == null || result == DBNull.Value ? string.Empty : result.ToString();
         }
         public void LimparCarrinho(int userId)
         {
