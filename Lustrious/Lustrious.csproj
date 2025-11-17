@@ -8,11 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-<<<<<<< HEAD
-    <PackageReference Include="MySql.Data" Version="9.4.0" />
-=======
+
     <PackageReference Include="MySql.Data" Version="9.5.0" />
->>>>>>> Daniel-dev
   </ItemGroup>
 
   <ItemGroup>
