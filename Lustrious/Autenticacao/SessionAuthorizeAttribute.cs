@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
+using System.Linq;
 
 namespace Lustrious.Autenticacao
 {
@@ -7,15 +9,16 @@ namespace Lustrious.Autenticacao
     {
         public string? RoleAnyOf { get; set; }
 
-        public override void OnActionExecuted(ActionExecutedContext context)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
             var http = context.HttpContext;
             var role  = http.Session.GetString(SessionsKeys.UserRole);
-            var userId = http.Session.GetString(SessionsKeys.UserId);
+            var userId = http.Session.GetInt32(SessionsKeys.UserId);
 
             if (userId == null)
             {
-                context.Result = new RedirectToActionResult("Login", "Autenticacao", null);
+                // redireciona para a action Login no controller Auth
+                context.Result = new RedirectToActionResult("Login", "Auth", null);
                 return;
             }
             if (!string.IsNullOrWhiteSpace(RoleAnyOf))
@@ -27,7 +30,7 @@ namespace Lustrious.Autenticacao
                     return;
                 }
             }
-            base.OnActionExecuted(context);
+            base.OnActionExecuting(context);
         }
     }
 }

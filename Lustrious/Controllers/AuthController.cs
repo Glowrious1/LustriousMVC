@@ -20,14 +20,13 @@ namespace Lustrious.Controllers
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(senha))
             {
-                ViewBag.Erro = "Por favor, preencha email e senha.";
+                ViewBag.Error = "Por favor, preencha email e senha.";
                 return View();
             }
 
 
-            var conexao = db.GetConnection();
-            conexao.Open();
-            var cmd = new MySqlCommand("ObterUsuarioEmail", conexao);
+            using var conexao = db.GetConnection();
+            using var cmd = new MySqlCommand("ObterUsuarioEmail", conexao);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("p_email", email);
             var reader = cmd.ExecuteReader();
@@ -53,8 +52,10 @@ namespace Lustrious.Controllers
                 ok = BCrypt.Net.BCrypt.Verify(senha, senhaHash);
             }
             catch
-            {
-                ok = false;
+            { ok = false; }
+            if(!ok)
+            {                 ViewBag.Erro = "Email ou senha inválidos.";
+                return View();
             }
             HttpContext.Session.SetInt32(SessionsKeys.UserId, id);
             HttpContext.Session.SetString(SessionsKeys.UserName, nome);
