@@ -20,7 +20,7 @@ namespace Lustrious.Repositorio
             conn.Open();
 
             // Usando nomes de colunas conforme Models/Favoritos.cs: id_prod, id_user
-            var sql = "INSERT IGNORE INTO favoritos (id_prod, id_user) VALUES (@produtoId, @userId);";
+            var sql = "INSERT  INTO favoritos (id_prod, id_user) VALUES (@produtoId, @userId);";
 
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@produtoId", produtoId);

@@ -396,6 +396,13 @@ end $$
 
 call selectUsuario;
 
+delimiter $$
+Create procedure ObterUsuarioEmail(IN p_email varchar(100))
+begin
+select IdUser,Nome,Email, Senha,role,ativo,Sexo,CPF from usuarios where email= p_email
+limit 1;
+end $$
+
 
 
 
