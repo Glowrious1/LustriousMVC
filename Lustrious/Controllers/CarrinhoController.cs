@@ -1,8 +1,10 @@
 ﻿using Lustrious.Repositorio;
 using Microsoft.AspNetCore.Mvc;
+using Lustrious.Autenticacao;
 
 namespace Lustrious.Controllers
 {
+    [SessionAuthorize]
     public class CarrinhoController : Controller
     {
         private ICarrinhoRepositorio _carrinhoRepositorio;
@@ -13,47 +15,73 @@ namespace Lustrious.Controllers
             _carrinhoRepositorio = carrinhoRepositorio;
         }
 
-        public IActionResult Index(int userId)
+        public IActionResult Index()
         {
-            return View(_carrinhoRepositorio.AcharCarrinho(userId));
+            var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            var carrinho = _carrinhoRepositorio.AcharCarrinho(userId.Value);
+            return View(carrinho);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AdicionarItem(int produtoId)
         {
-            int userId = 1; //Depois a gente pega o user logado
-            _carrinhoRepositorio.AdicionarItem(produtoId, userId);
-            return RedirectToAction("Index");
+            var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            _carrinhoRepositorio.AdicionarItem(produtoId, userId.Value);
+            return RedirectToAction(nameof(Index));
         }
 
-        [HttpDelete]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult RemoverItem(int produtoId)
         {
-            int userId = 1;
-            _carrinhoRepositorio.RemoverItem(produtoId, userId);
-            return RedirectToAction("Index");
+            var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            _carrinhoRepositorio.RemoverItem(produtoId, userId.Value);
+            return RedirectToAction(nameof(Index));
         }
 
-        [HttpDelete]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult RemoverTodosItens()
         {
-            int userId = 1; //Depois a gente pega o user logado
-            _carrinhoRepositorio.LimparCarrinho(userId);
-            return RedirectToAction("Index");
+            var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            _carrinhoRepositorio.LimparCarrinho(userId.Value);
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Checkout()
         {
-            return View();
+            var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            var carrinho = _carrinhoRepositorio.AcharCarrinho(userId.Value);
+            return View(carrinho);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Checkout(int idEnd)
         {
-            //Depois a gente faz algo legal usando a autenticação do usuário para pegar ele no banco
-            int userId = 1;
-            _carrinhoRepositorio.FinalizarCompra(idEnd, userId);
-            return View();
+            var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
+            if (userId == null)
+                return RedirectToAction("Login", "Auth");
+
+            _carrinhoRepositorio.FinalizarCompra(idEnd, userId.Value);
+            // após finalizar, redireciona para histórico de vendas ou para confirmação
+            return RedirectToAction("Index", "Venda");
         }
     }
 }
