@@ -26,6 +26,7 @@ builder.Services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
 builder.Services.AddScoped<ICarrinhoRepositorio, CarrinhoRepositorio>();
 builder.Services.AddScoped<IFuncionarioRepositorio, FuncionarioRepositorio>();
 builder.Services.AddScoped<IVendaRepositorio, VendaRepositorio>();
+builder.Services.AddScoped<IEnderecoRepositorio, EnderecoRepositorio>();
 
 // Http client and frete service
 builder.Services.AddHttpClient();

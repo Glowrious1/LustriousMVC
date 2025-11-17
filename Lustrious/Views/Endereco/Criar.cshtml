@@ -1,0 +1,26 @@
+@model Lustrious.Models.Endereco
+@{
+ ViewData["Title"] = "Adicionar Endereço";
+}
+<h2>Adicionar Endereço</h2>
+<form method="post" asp-action="Criar">
+ <div>
+ <label>Cep</label>
+ <input asp-for="Cep" />
+ </div>
+ <div>
+ <label>Logradouro</label>
+ <input asp-for="logradouro" />
+ </div>
+ <div>
+ <label>Numero</label>
+ <input asp-for="numero" />
+ </div>
+ <div>
+ <label>Complemento</label>
+ <input asp-for="complemento" />
+ </div>
+ <div>
+ <button type="submit">Salvar</button>
+ </div>
+</form>
