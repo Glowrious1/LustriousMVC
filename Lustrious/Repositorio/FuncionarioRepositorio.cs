@@ -1,4 +1,4 @@
-﻿using Lustrious.Data;
+﻿    using Lustrious.Data;
 using Lustrious.Models;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
@@ -17,6 +17,9 @@ namespace Lustrious.Repositorio
         }
         public void CadastrarFuncionario(Usuario funcionario)
         {
+
+            
+
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();

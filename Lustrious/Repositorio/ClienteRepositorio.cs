@@ -14,9 +14,25 @@ namespace Lustrious.Repositorio
         {
             _dataBase = dataBase;
         }
-        public void CadastrarCliente(Usuario cliente)
+        public void CadastrarCliente(Usuario cliente, IFormFile? foto)
         {
-            using(var conexao = _dataBase.GetConnection())
+
+
+            string? relPath = null;
+
+            if (foto != null && foto.Length > 0)
+            {
+                var ext = Path.GetExtension(foto.FileName);
+                var fileName = $"{Guid.NewGuid()}{ext}";
+                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosUsuario");
+                Directory.CreateDirectory(saveDir);
+                var absPath = Path.Combine(saveDir, fileName);
+                using var fs = new FileStream(absPath, FileMode.Create);
+                foto.CopyTo(fs);
+                relPath = Path.Combine("fotoUsuario", fileName).Replace("\\", "/");
+            }
+
+            using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
                 using(var cmd = new MySqlCommand("insertUsuario", conexao))
@@ -135,6 +151,11 @@ namespace Lustrious.Repositorio
                     conexao.Close();
                 }
             }
+        }
+
+        public void CadastrarCliente(Usuario cliente)
+        {
+            throw new NotImplementedException();
         }
     }
 }
