@@ -1,0 +1,22 @@
+@model IEnumerable<Lustrious.Models.Endereco>
+@{
+ ViewData["Title"] = "Meus Endereços";
+}
+<h2>Meus Endereços</h2>
+<p><a href="/Endereco/Criar">Adicionar novo endereço</a></p>
+<table>
+ <thead>
+ <tr><th>CEP</th><th>Logradouro</th><th>Numero</th><th>Complemento</th></tr>
+ </thead>
+ <tbody>
+ @foreach(var e in Model)
+ {
+ <tr>
+ <td>@e.Cep</td>
+ <td>@e.logradouro</td>
+ <td>@e.numero</td>
+ <td>@e.complemento</td>
+ </tr>
+ }
+ </tbody>
+</table>
