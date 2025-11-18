@@ -1,9 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Editar Cliente";
+    ViewData["Title"] = "Cadastrar Cliente";
 }
 
 <style>
-    <!-- body -->
     body {
         font-family: Arial, sans-serif;
         background: #c7b99a;
@@ -56,6 +55,7 @@
 
     .foto-preview {
         width: 150px;
+        opacity: 0.9;
     }
 
     .row {
@@ -76,8 +76,8 @@
         font-weight: bold;
         cursor: pointer;
     }
-   <!-- Editar -->
-    .editar {
+
+    .cadastrar {
         background: #c5bca2;
     }
 
@@ -86,17 +86,19 @@
         color: white;
     }
 
-    .select-sexo {
+    /* Botões estilo menu */
+    .sexo-box select {
         width: 150px;
         padding: 10px;
         border: 2px solid #ccb27a;
         border-radius: 6px;
         font-size: 14px;
+        background: #efe3b9;
     }
 </style>
 
 <div class="container">
-    <h2>EDITAR CLIENTE</h2>
+    <h2>CADASTRAR CLIENTE</h2>
 
     <div class="row">
 
@@ -114,23 +116,24 @@
             <input type="text" placeholder="Digite o CPF aqui..." />
 
             <div class="form-group">SEXO:</div>
-            <select class="select-sexo">
-                <option>Masculino</option>
-                <option>Feminino</option>
-                <option>Outro</option>
-            </select>
+            <div class="sexo-box">
+                <select>
+                    <option>Masculino</option>
+                    <option>Feminino</option>
+                    <option>Outro</option>
+                </select>
+            </div>
         </div>
 
-        <!-- FOTO -->
         <label class="foto-container" for="fotoInput">
             <img src="~/imagens/capa_foto.png" class="foto-preview" />
         </label>
+
         <input type="file" id="fotoInput" style="display:none;" />
     </div>
 
-    <!-- Botões -->
     <div class="button-row">
-        <button class="editar">EDITAR</button>
+        <button class="cadastrar">CADASTRAR</button>
         <button class="cancelar">CANCELAR</button>
     </div>
 </div>
