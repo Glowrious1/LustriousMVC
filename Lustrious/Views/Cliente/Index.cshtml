@@ -1,0 +1,164 @@
+﻿@{
+    ViewData["Title"] = "Clientes";
+}
+
+<!-- NAVBAR -->
+<header class="navbar-container">
+    <div class="navbar">
+        <div class="logo">
+            <img src="~/imagens/lustrious2.png" alt="Lustrious" style="height:32px; margin-right:8px;" />
+            LUSTRIOUS
+        </div>
+
+        <nav>
+            <a href="/Funcionario">FUNCIONÁRIO</a>
+            <a href="/Cliente">CLIENTE</a>
+        </nav>
+    </div>
+</header>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="main-content">
+    <div class="card">
+        <div class="card-header">
+            <h2>CLIENTES</h2>
+            <a class="new-btn" href="/Cliente/Criar">NOVO CLIENTE</a>
+        </div>
+
+        <table class="table-clientes">
+            <thead>
+                <tr>
+                    <th>NOME</th>
+                    <th>EMAIL</th>
+                    <th>SENHA</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- Vai repetir os clientes -->
+                @foreach (var cliente in Model)
+                {
+                    <tr>
+                        <td>@cliente.Nome</td>
+                        <td>@cliente.Email</td>
+                        <td>@cliente.Senha</td>
+
+                        <td>
+                            <a class="edit-btn" href="/Cliente/Editar/@cliente.Id">EDITAR</a>
+                            <a class="delete-btn" href="/Cliente/Deletar/@cliente.Id">EXCLUIR</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #3d3d3d;
+        font-family: 'Times New Roman', serif;
+    }
+
+    /* NAVBAR */
+    .navbar-container {
+        background: white;
+        border-bottom: 5px solid #b5954b;
+        padding: 15px 50px;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .logo {
+        color: #b5954b;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+    }
+
+    nav a {
+        text-decoration: none;
+        color: #363636;
+        margin-right: 25px;
+        font-weight: 500;
+    }
+
+    /* CARD CENTRAL */
+    .main-content {
+        display: flex;
+        justify-content: center;
+        padding: 40px 0;
+    }
+
+    .card {
+        background: #fff6c6;
+        width: 70%;
+        border-radius: 15px;
+        padding: 25px;
+        border: 4px solid #d6b36a;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+    .new-btn {
+        background: #d6b36a;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    /* TABELA */
+    .table-clientes {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .table-clientes th {
+            text-align: left;
+            padding: 12px 0;
+            font-weight: bold;
+            border-bottom: 2px solid #d6b36a;
+        }
+
+        .table-clientes td {
+            padding: 12px 0;
+        }
+
+    .edit-btn {
+        background: #8a8a8a;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-right: 8px;
+    }
+
+    .delete-btn {
+        background: #b54845;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+</style>
