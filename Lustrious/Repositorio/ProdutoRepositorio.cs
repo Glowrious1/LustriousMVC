@@ -75,7 +75,7 @@ namespace Lustrious.Repositorio
                 using (var conexao = _dataBase.GetConnection())
                 {
                     conexao.Open();
-                    using (var cmd = new MySqlCommand("selectProduto", conexao))
+                    using (var cmd = new MySqlCommand("selectProdutos", conexao))
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         MySqlDataAdapter da = new MySqlDataAdapter(cmd);

@@ -1,0 +1,32 @@
+﻿@model Lustrious.Models.Produto
+@{
+ ViewData["Title"] = "Editar Produto";
+}
+<h2>Editar Produto</h2>
+<form asp-action="EditarProduto" method="post">
+ <input type="hidden" name="CodigoBarras" value="@Model.CodigoBarras" />
+ <div>
+ <label>Nome</label>
+ <input type="text" name="NomeProd" value="@Model.NomeProd" />
+ </div>
+ <div>
+ <label>Quantidade</label>
+ <input type="number" name="qtd" value="@Model.qtd" />
+ </div>
+ <div>
+ <label>Genero</label>
+ <input type="text" name="Genero" value="@Model.Genero" />
+ </div>
+ <div>
+ <label>Descrição</label>
+ <textarea name="Descricao">@Model.Descricao</textarea>
+ </div>
+ <div>
+ <label>Valor Unitário</label>
+ <input type="number" step="0.01" name="ValorUnitario" value="@Model.ValorUnitario" />
+ </div>
+ <div style="margin-top:10px;">
+ <button type="submit">Salvar</button>
+ <a href="/Produto">Cancelar</a>
+ </div>
+</form>

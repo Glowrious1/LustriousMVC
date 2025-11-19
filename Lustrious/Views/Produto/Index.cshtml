@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Lustrious.Models.Produto>
+@{
+ ViewData["Title"] = "Produtos";
+}
+<h2>Produtos</h2>
+<p><a href="/Produto/CriarProduto">Novo Produto</a></p>
+@if (!Model.Any())
+{
+ <p>Nenhum produto cadastrado.</p>
+}
+else
+{
+ <table border="1" cellpadding="6">
+ <thead>
+ <tr>
+ <th>Código</th>
+ <th>Nome</th>
+ <th>Qtd</th>
+ <th>Gênero</th>
+ <th>Valor</th>
+ <th>Ações</th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach(var p in Model)
+ {
+ <tr>
+ <td>@p.CodigoBarras</td>
+ <td>@p.NomeProd</td>
+ <td>@p.qtd</td>
+ <td>@p.Genero</td>
+ <td>@p.ValorUnitario.ToString("C")</td>
+ <td>
+ <a href="/Produto/EditarProduto/@p.CodigoBarras">Editar</a> |
+ <form asp-action="ExcluirProduto" method="post" style="display:inline;">
+ <input type="hidden" name="id" value="@p.CodigoBarras" />
+ <button type="submit" onclick="return confirm('Deseja excluir este produto?');">Excluir</button>
+ </form>
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+}
