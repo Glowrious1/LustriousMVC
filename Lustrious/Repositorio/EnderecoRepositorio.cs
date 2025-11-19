@@ -75,5 +75,29 @@ namespace Lustrious.Repositorio
  cmd.Parameters.AddWithValue("vIdUser", endereco.IdUser);
  cmd.ExecuteNonQuery();
  }
+
+ public Endereco ObterEnderecoPorId(int id)
+ {
+ using var conn = _dataBase.GetConnection();
+ using var cmd = new MySqlCommand("SELECT * FROM endereco WHERE id_endereco = @id", conn);
+ cmd.Parameters.AddWithValue("@id", id);
+ using var reader = cmd.ExecuteReader();
+ if (reader.Read())
+ {
+ return new Endereco
+ {
+ IdEndereco = reader["id_endereco"] == DBNull.Value ?0 : Convert.ToInt32(reader["id_endereco"]),
+ Cep = reader["cep"] == DBNull.Value ? string.Empty : reader["cep"].ToString(),
+ logradouro = reader["logradouro"] == DBNull.Value ? string.Empty : reader["logradouro"].ToString(),
+ numero = reader["numero"] == DBNull.Value ? string.Empty : reader["numero"].ToString(),
+ complemento = reader["complemento"] == DBNull.Value ? string.Empty : reader["complemento"].ToString(),
+ Idbairro = reader["id_bairro"] == DBNull.Value ?0 : Convert.ToInt32(reader["id_bairro"]),
+ Idcidade = reader["id_cidade"] == DBNull.Value ?0 : Convert.ToInt32(reader["id_cidade"]),
+ Idestado = reader["id_estado"] == DBNull.Value ?0 : Convert.ToInt32(reader["id_estado"]),
+ IdUser = reader["id_user"] == DBNull.Value ?0 : Convert.ToInt32(reader["id_user"])
+ };
+ }
+ return null;
+ }
  }
 }
