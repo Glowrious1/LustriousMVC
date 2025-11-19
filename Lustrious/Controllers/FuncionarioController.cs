@@ -2,7 +2,7 @@
 
 namespace Lustrious.Controllers
 {
-    public class FuncionarioCotroller
+    public class FuncionarioController
     {
        
     }

@@ -9,8 +9,8 @@ namespace Lustrious.Data
 
         public MySqlConnection GetConnection()
         {
-            // Retornar a conexão fechada; os repositórios abrem explicitamente com .Open()
-            return new MySqlConnection(connectionString);
+            MySqlConnection conn = new MySqlConnection(connectionString);
+            return conn;
         }
     }
 }

@@ -116,8 +116,7 @@ namespace Lustrious.Repositorio
                                 Senha = (string)dr["Senha"],
                                 Sexo = (string)dr["Sexo"],
                                 CPF = (string)dr["CPF"],
-                                Role = (string)dr["Role"],
-                                CEP = dr.Table.Columns.Contains("CEP") && dr["CEP"] != DBNull.Value ? Convert.ToInt32(dr["CEP"]) :0
+                                Role = (string)dr["Role"]
                         });
                     }
                 }
