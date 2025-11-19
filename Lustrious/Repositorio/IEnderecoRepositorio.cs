@@ -7,5 +7,6 @@ namespace Lustrious.Repositorio
  {
  IEnumerable<Endereco> ListarEnderecosPorUsuario(int userId);
  void CadastrarEndereco(Endereco endereco);
+ void AtualizarEndereco(Endereco endereco);
  }
 }

@@ -5,8 +5,6 @@ using System.Numerics;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-using System.Net.Http;
-using System.Text.Json;
 using Lustrious.Services;
 
 namespace Lustrious.Repositorio

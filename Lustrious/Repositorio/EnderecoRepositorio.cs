@@ -3,6 +3,7 @@ using Lustrious.Models;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System;
 
 namespace Lustrious.Repositorio
 {
@@ -29,14 +30,14 @@ namespace Lustrious.Repositorio
  lista.Add(new Endereco
  {
  IdEndereco = Convert.ToInt32(dr["IdEndereco"]),
- Cep = dr["Cep"].ToString(),
- logradouro = dr["logradouro"].ToString(),
- numero = dr["numero"].ToString(),
- complemento = dr["complemento"].ToString(),
- Idbairro = Convert.ToInt32(dr["Idbairro"]),
- Idcidade = Convert.ToInt32(dr["Idcidade"]),
- Idestado = Convert.ToInt32(dr["Idestado"]),
- IdUser = Convert.ToInt32(dr["IdUser"]) 
+ Cep = dr.Table.Columns.Contains("Cep") ? dr["Cep"].ToString() : string.Empty,
+ logradouro = dr.Table.Columns.Contains("logradouro") ? dr["logradouro"].ToString() : string.Empty,
+ numero = dr.Table.Columns.Contains("numero") ? dr["numero"].ToString() : string.Empty,
+ complemento = dr.Table.Columns.Contains("complemento") ? dr["complemento"].ToString() : string.Empty,
+ Idbairro = dr.Table.Columns.Contains("Idbairro") && dr["Idbairro"] != DBNull.Value ? Convert.ToInt32(dr["Idbairro"]) :0,
+ Idcidade = dr.Table.Columns.Contains("Idcidade") && dr["Idcidade"] != DBNull.Value ? Convert.ToInt32(dr["Idcidade"]) :0,
+ Idestado = dr.Table.Columns.Contains("Idestado") && dr["Idestado"] != DBNull.Value ? Convert.ToInt32(dr["Idestado"]) :0,
+ IdUser = dr.Table.Columns.Contains("IdUser") && dr["IdUser"] != DBNull.Value ? Convert.ToInt32(dr["IdUser"]) :0
  });
  }
  return lista;
@@ -47,6 +48,23 @@ namespace Lustrious.Repositorio
  using var conn = _dataBase.GetConnection();
  using var cmd = new MySqlCommand("insertEndereco", conn);
  cmd.CommandType = System.Data.CommandType.StoredProcedure;
+ cmd.Parameters.AddWithValue("vCep", endereco.Cep);
+ cmd.Parameters.AddWithValue("vLogradouro", endereco.logradouro);
+ cmd.Parameters.AddWithValue("vNumero", endereco.numero);
+ cmd.Parameters.AddWithValue("vComplemento", endereco.complemento);
+ cmd.Parameters.AddWithValue("vIdBairro", endereco.Idbairro);
+ cmd.Parameters.AddWithValue("vIdCidade", endereco.Idcidade);
+ cmd.Parameters.AddWithValue("vIdEstado", endereco.Idestado);
+ cmd.Parameters.AddWithValue("vIdUser", endereco.IdUser);
+ cmd.ExecuteNonQuery();
+ }
+
+ public void AtualizarEndereco(Endereco endereco)
+ {
+ using var conn = _dataBase.GetConnection();
+ using var cmd = new MySqlCommand("updateEndereco", conn);
+ cmd.CommandType = System.Data.CommandType.StoredProcedure;
+ cmd.Parameters.AddWithValue("vIdEndereco", endereco.IdEndereco);
  cmd.Parameters.AddWithValue("vCep", endereco.Cep);
  cmd.Parameters.AddWithValue("vLogradouro", endereco.logradouro);
  cmd.Parameters.AddWithValue("vNumero", endereco.numero);

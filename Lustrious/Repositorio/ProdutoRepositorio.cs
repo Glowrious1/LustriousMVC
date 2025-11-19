@@ -2,6 +2,10 @@
 using Lustrious.Models;
 using Lustrious.Data;
 using System.Data;
+using System.Collections.Generic;
+using System;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace Lustrious.Repositorio
 {
@@ -13,23 +17,9 @@ namespace Lustrious.Repositorio
             {
                 _dataBase = dataBase;
             }
-            public void CadastrarProduto(Produto produto, IFormFile? capa)
+            public void CadastrarProduto(Produto produto)
             {
-                string? relPath = null;
-                if (capa != null && capa.Length >0)
-            {
-                var ext = Path.GetExtension(capa.FileName);
-                var fileName = $"{Guid.NewGuid()}{ext}";
-                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "capas");
-                Directory.CreateDirectory(saveDir);
-                var absPath = Path.Combine(saveDir, fileName);
-                using var fs = new FileStream(absPath, FileMode.Create);
-                capa.CopyTo(fs);
-                relPath = Path.Combine("capas", fileName).Replace("\\", "/");
-            }
-
-            using var conn2 = db.GetConnection();
-            using (var conexao = _dataBase.GetConnection())
+                using (var conexao = _dataBase.GetConnection())
                 {
                     conexao.Open();
                     
@@ -44,7 +34,6 @@ namespace Lustrious.Repositorio
                         cmd.ExecuteNonQuery();
                     }
                 }
-
             }
             public Produto AcharProduto(int id)
             {
@@ -71,9 +60,9 @@ namespace Lustrious.Repositorio
                             {
                                 CodigoBarras = Convert.ToInt32(dr["IdProduto"]),
                                 NomeProd = (string)dr["Nome"],
-                                qtd = (int)dr["Email"],
-                                Descricao = (string)dr["Senha"],
-                                ValorUnitario = (decimal)dr["Senha"],
+                                qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) :0,
+                                Descricao = dr.Table.Columns.Contains("descricao") && dr["descricao"] != DBNull.Value ? dr["descricao"].ToString() : string.Empty,
+                                ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) :0m,
                             };
                         }
                     }
@@ -102,10 +91,10 @@ namespace Lustrious.Repositorio
                             Produtos.Add(new Produto
                             {
                                 CodigoBarras = Convert.ToInt32(dr["IdProduto"]),
-                                NomeProd = (string)dr["Nome"],
-                                qtd = (int)dr["Email"],
-                                Descricao = (string)dr["Senha"],
-                                ValorUnitario = (decimal)dr["Senha"],
+                                NomeProd = dr.Table.Columns.Contains("Nome") ? dr["Nome"].ToString() : string.Empty,
+                                qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) :0,
+                                Descricao = dr.Table.Columns.Contains("descricao") ? dr["descricao"].ToString() : string.Empty,
+                                ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) :0m,
                             }
                             );
                         }

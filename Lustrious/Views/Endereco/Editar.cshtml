@@ -1,9 +1,9 @@
 @model Lustrious.Models.Endereco
 @{
- ViewData["Title"] = "Adicionar Endereço";
+ ViewData["Title"] = "Editar Endereço";
 }
-<h2>Adicionar Endereço</h2>
-<form method="post" asp-action="Criar">
+<h2>Editar Endereço</h2>
+<form method="post" asp-action="Editar">
  @Html.AntiForgeryToken()
  <div asp-validation-summary="ModelOnly" class="text-danger"></div>
  <div>
@@ -38,11 +38,7 @@
  <input asp-for="complemento" />
  <span asp-validation-for="complemento" class="text-danger"></span>
  </div>
- <!-- Hidden numeric IDs (will be0 unless you map them server-side) -->
- <input type="hidden" asp-for="Idbairro" value="0" />
- <input type="hidden" asp-for="Idcidade" value="0" />
- <input type="hidden" asp-for="Idestado" value="0" />
-
+ <input type="hidden" asp-for="IdEndereco" />
  <div>
  <button type="submit">Salvar</button>
  </div>

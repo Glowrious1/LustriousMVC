@@ -1,4 +1,4 @@
-Instruções rápidas para configurar a API key do Maps (recomendado: User Secrets para dev)
+wInstruções rápidas para configurar a API key do Maps (recomendado: User Secrets para dev)
 
 1) Obter a chave (Google / ORS)
 - Para Google Distance Matrix: https://console.cloud.google.com/apis/credentials

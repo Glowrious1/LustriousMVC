@@ -4,6 +4,10 @@ using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
 using System.Data;
 using System.Net.Sockets;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System;
+using System.Collections.Generic;
 
 namespace Lustrious.Repositorio
 {
@@ -29,7 +33,8 @@ namespace Lustrious.Repositorio
                 var absPath = Path.Combine(saveDir, fileName);
                 using var fs = new FileStream(absPath, FileMode.Create);
                 foto.CopyTo(fs);
-                relPath = Path.Combine("fotoUsuario", fileName).Replace("\\", "/");
+                relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
+                cliente.Foto = relPath;
             }
 
             using (var conexao = _dataBase.GetConnection())
@@ -42,9 +47,9 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vEmail", cliente.Email);
                     cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
                     cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
-                    cmd.Parameters.AddWithValue("vRole", "Cliente");
+                    cmd.Parameters.AddWithValue("vRole", string.IsNullOrWhiteSpace(cliente.Role) ? "Cliente" : cliente.Role);
                     cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
-                    cmd.Parameters.AddWithValue("vFoto", cliente.Foto);
+                    cmd.Parameters.AddWithValue("vFoto", cliente.Foto ?? string.Empty);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -112,7 +117,7 @@ namespace Lustrious.Repositorio
                                 Sexo = (string)dr["Sexo"],
                                 CPF = (string)dr["CPF"],
                                 Role = (string)dr["Role"],
-                                CEP = (int)dr["CEP"]
+                                CEP = dr.Table.Columns.Contains("CEP") && dr["CEP"] != DBNull.Value ? Convert.ToInt32(dr["CEP"]) :0
                         });
                     }
                 }
@@ -153,9 +158,10 @@ namespace Lustrious.Repositorio
             }
         }
 
+        // Implement interface method without photo for controllers that don't upload files
         public void CadastrarCliente(Usuario cliente)
         {
-            throw new NotImplementedException();
+            CadastrarCliente(cliente, null);
         }
     }
 }
