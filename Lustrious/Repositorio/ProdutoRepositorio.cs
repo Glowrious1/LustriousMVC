@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿ using MySql.Data.MySqlClient;
 using Lustrious.Models;
 using Lustrious.Data;
 using System.Data;
@@ -69,39 +69,7 @@ namespace Lustrious.Repositorio
                 }
                 return Produto;
             }
-            public IEnumerable<Produto> ListarProdutos()
-            {
-                List<Produto> Produtos = new List<Produto>();
-                using (var conexao = _dataBase.GetConnection())
-                {
-                    conexao.Open();
-                    using (var cmd = new MySqlCommand("selectProdutos", conexao))
-                    {
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-
-                        DataTable dt = new DataTable();
-
-                        da.Fill(dt);
-
-                        conexao.Close();
-
-                        foreach (DataRow dr in dt.Rows)
-                        {
-                            Produtos.Add(new Produto
-                            {
-                                CodigoBarras = Convert.ToInt32(dr["IdProduto"]),
-                                NomeProd = dr.Table.Columns.Contains("Nome") ? dr["Nome"].ToString() : string.Empty,
-                                qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) :0,
-                                Descricao = dr.Table.Columns.Contains("descricao") ? dr["descricao"].ToString() : string.Empty,
-                                ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) :0m,
-                            }
-                            );
-                        }
-                    }
-                }
-                return Produtos;
-            }
+     
             public void AlterarProduto(Produto produto)
             {
                 using (var conexao = _dataBase.GetConnection())
@@ -134,5 +102,41 @@ namespace Lustrious.Repositorio
                     }
                 }
             }
+
+        public IEnumerable<Produto> ListarProdutos(int codTipoProduto = 0)
+        {
+
+            List<Produto> Produtos = new List<Produto>();
+            using (var conexao = _dataBase.GetConnection())
+            {
+                conexao.Open();
+                using (var cmd = new MySqlCommand("selectProdutos", conexao))
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+
+                    DataTable dt = new DataTable();
+
+                    da.Fill(dt);
+
+                    conexao.Close();
+
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        Produtos.Add(new Produto
+                        {
+                            CodigoBarras = Convert.ToInt32(dr["IdProduto"]),
+                            NomeProd = dr.Table.Columns.Contains("Nome") ? dr["Nome"].ToString() : string.Empty,
+                            qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) : 0,
+                            Descricao = dr.Table.Columns.Contains("descricao") ? dr["descricao"].ToString() : string.Empty,
+                            ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) : 0m,
+                        }
+                        );
+                    }
+                }
+            }
+            return Produtos;
         }
     }
+    }
+    
