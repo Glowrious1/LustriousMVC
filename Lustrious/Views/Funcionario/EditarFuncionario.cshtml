@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Editar Funcionario";
+}
+
+<style>
+    <!-- body -->
+    body {
+        font-family: Arial, sans-serif;
+        background: #c7b99a;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 70%;
+        margin: 40px auto;
+        background: #fff9d6;
+        border: 4px solid #b8995e;
+        border-radius: 20px;
+        padding: 30px;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #3a2f1b;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 60%;
+        padding: 10px;
+        border: 2px solid #ccb27a;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .foto-container {
+        width: 230px;
+        height: 260px;
+        background: #fffefa;
+        border: 3px solid #c6a96b;
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .foto-preview {
+        width: 150px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .button-row {
+        margin-top: 20px;
+        display: flex;
+        gap: 20px;
+    }
+
+    button {
+        padding: 10px 25px;
+        border-radius: 10px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    <!-- Editar -->
+    .editar {
+        background: #c5bca2;
+    }
+
+    .cancelar {
+        background: #b34747;
+        color: white;
+    }
+
+    .select-sexo {
+        width: 150px;
+        padding: 10px;
+        border: 2px solid #ccb27a;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+</style>
+
+<div class="container">
+    <h2>EDITAR FUNCIONARIO</h2>
+
+    <div class="row">
+
+        <div>
+            <div class="form-group">NOME DO CLIENTE:</div>
+            <input type="text" placeholder="Digite o nome aqui..." />
+
+            <div class="form-group">EMAIL:</div>
+            <input type="email" placeholder="Digite o email aqui..." />
+
+            <div class="form-group">SENHA:</div>
+            <input type="password" placeholder="Digite a senha aqui..." />
+
+            <div class="form-group">CPF:</div>
+            <input type="text" placeholder="Digite o CPF aqui..." />
+
+            <div class="form-group">SEXO:</div>
+            <select class="select-sexo">
+                <option>Masculino</option>
+                <option>Feminino</option>
+                <option>Outro</option>
+            </select>
+        </div>
+
+        <!-- FOTO -->
+        <label class="foto-container" for="fotoInput">
+            <img src="~/imagens/capa_foto.png" class="foto-preview" />
+        </label>
+        <input type="file" id="fotoInput" style="display:none;" />
+    </div>
+
+    <!-- Botões -->
+    <div class="button-row">
+        <button class="editar">EDITAR</button>
+        <button class="cancelar">CANCELAR</button>
+    </div>
+</div>
