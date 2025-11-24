@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<Lustrious.Models.Usuario>
+
+@{
     ViewData["Title"] = "Clientes";
 }
 
@@ -22,7 +24,7 @@
     <div class="card">
         <div class="card-header">
             <h2>CLIENTES</h2>
-            <a class="new-btn" href="/Cliente/Criar">NOVO CLIENTE</a>
+            <a class="new-btn" href="/Cliente/CriarCliente">NOVO CLIENTE</a>
         </div>
 
         <table class="table-clientes">
@@ -45,8 +47,8 @@
                         <td>@cliente.Senha</td>
 
                         <td>
-                            <a class="edit-btn" href="/Cliente/Editar/@cliente.Id">EDITAR</a>
-                            <a class="delete-btn" href="/Cliente/Deletar/@cliente.Id">EXCLUIR</a>
+                            <a class="edit-btn" href="/Cliente/Editar/@cliente.IdUser">EDITAR</a>
+                            <a class="delete-btn" href="/Cliente/Deletar/@cliente.IdUser">EXCLUIR</a>
                         </td>
                     </tr>
                 }

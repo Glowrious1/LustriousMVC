@@ -1,0 +1,19 @@
+@model IEnumerable<Lustrious.Models.Venda>
+@{
+ ViewData["Title"] = "Vendas";
+}
+<h2>Vendas (teste)</h2>
+@if (!Model?.Any() ?? true)
+{
+ <p>Nenhuma venda encontrada.</p>
+}
+else
+{
+ <ul>
+ @foreach(var v in Model)
+ {
+ <li>@v.IdVenda - @v.DataVenda - @v.ValorTotal</li>
+ }
+ </ul>
+}
+<p><a href="/">Voltar</a></p>

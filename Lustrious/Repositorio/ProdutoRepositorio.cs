@@ -69,7 +69,7 @@ namespace Lustrious.Repositorio
                 }
                 return Produto;
             }
-            public IEnumerable<Produto> ListarProdutos()
+            public IEnumerable<Produto> ListarProdutos(int codTipoProduto =0)
             {
                 List<Produto> Produtos = new List<Produto>();
                 using (var conexao = _dataBase.GetConnection())
@@ -78,6 +78,9 @@ namespace Lustrious.Repositorio
                     using (var cmd = new MySqlCommand("selectProdutos", conexao))
                     {
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        // passa o parâmetro opcional para a procedure, caso ela aceite
+                        cmd.Parameters.AddWithValue("vCodTipoProduto", codTipoProduto);
+
                         MySqlDataAdapter da = new MySqlDataAdapter(cmd);
 
                         DataTable dt = new DataTable();
