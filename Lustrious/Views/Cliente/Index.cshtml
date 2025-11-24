@@ -48,7 +48,7 @@
 
                         <td>
                             <a class="edit-btn"  asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
-                            <a asp-controller="Cliente" asp-action="ExcluirCliente" asp-route-id="@cliente.IdUser" class="delete-btn" ">EXCLUIR</a>
+                            <a asp-controller="Cliente" asp-action="ExcluirCliente" asp-route-id="@cliente.IdUser" onclick="return confirm('Deseja realmente Excluir este item?');" class="delete-btn">EXCLUIR</a>
                         </td>
                     </tr>
                 }
