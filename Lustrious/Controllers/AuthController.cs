@@ -31,6 +31,8 @@ namespace Lustrious.Controllers
             }
 
             using var conexao = _db.GetConnection();
+            conexao.Open(); // <<-- ensure connection is open before executing commands
+
             using var cmd = new MySqlCommand("ObterUsuarioEmail", conexao);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("p_email", email);

@@ -42,11 +42,13 @@ namespace Lustrious.Repositorio
                 conexao.Open();
                 using(var cmd = new MySqlCommand("insertUsuario", conexao))
                 {
+                    var senhaHash = BCrypt.Net.BCrypt.HashPassword(cliente.Senha, workFactor: 12);
+
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", cliente.Nome);
                     cmd.Parameters.AddWithValue("vEmail", cliente.Email);
                     cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
-                    cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
+                    cmd.Parameters.AddWithValue("vSenha", senhaHash);
                     cmd.Parameters.AddWithValue("vRole", string.IsNullOrWhiteSpace(cliente.Role) ? "Cliente" : cliente.Role);
                     cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
                     cmd.Parameters.AddWithValue("vFoto", cliente.Foto ?? string.Empty);
