@@ -1,0 +1,19 @@
+@model IEnumerable<Lustrious.Models.Carrinho>
+@{
+ ViewData["Title"] = "Carrinho";
+}
+<h2>Carrinho (teste)</h2>
+@if (!Model?.Any() ?? true)
+{
+ <p>Carrinho vazio.</p>
+}
+else
+{
+ <ul>
+ @foreach(var c in Model)
+ {
+ <li>Produto: @c.IdProd - Qtd: @c.Qtd</li>
+ }
+ </ul>
+}
+<p><a href="/">Voltar</a></p>
