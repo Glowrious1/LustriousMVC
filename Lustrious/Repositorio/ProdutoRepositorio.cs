@@ -69,7 +69,7 @@ namespace Lustrious.Repositorio
                 }
                 return Produto;
             }
-     
+
             public void AlterarProduto(Produto produto)
             {
                 using (var conexao = _dataBase.GetConnection())
@@ -138,5 +138,5 @@ namespace Lustrious.Repositorio
             return Produtos;
         }
     }
-    }
+}
     

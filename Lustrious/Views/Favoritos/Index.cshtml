@@ -1,0 +1,19 @@
+@model IEnumerable<Lustrious.Models.Favoritos>
+@{
+ ViewData["Title"] = "Favoritos";
+}
+<h2>Favoritos (teste)</h2>
+@if (!Model?.Any() ?? true)
+{
+ <p>Nenhum favorito cadastrado.</p>
+}
+else
+{
+ <ul>
+ @foreach(var f in Model)
+ {
+ <li>@f.IdFav - Produto: @f.IdProd</li>
+ }
+ </ul>
+}
+<p><a href="/">Voltar</a></p>
