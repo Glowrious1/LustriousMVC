@@ -100,6 +100,7 @@ namespace Lustrious.Repositorio
                 using (var cmd = new MySqlCommand("selectUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("p_role", "Cliente");
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
 
                     DataTable dt = new DataTable();
