@@ -115,7 +115,7 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("updateFuncionario", conexao))
+                using (var cmd = new MySqlCommand("updateUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);

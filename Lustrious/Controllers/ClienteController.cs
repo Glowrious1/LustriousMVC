@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using Microsoft.Net.Http.Headers;
 using Lustrious.Repositorio;
+using Microsoft.AspNetCore.Http;
 
 namespace Lustrious.Controllers
 {
@@ -24,9 +25,9 @@ namespace Lustrious.Controllers
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult CriarCliente(Usuario cliente)
+        public IActionResult CriarCliente(Usuario cliente, IFormFile foto)
         {
-            _clienteRepositorio.CadastrarCliente(cliente);
+            _clienteRepositorio.CadastrarCliente(cliente, foto);
             TempData["ok"] = "Cliente Cadastrado!";
             return RedirectToAction(nameof(Index));
         }

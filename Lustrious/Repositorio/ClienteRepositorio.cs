@@ -24,7 +24,7 @@ namespace Lustrious.Repositorio
 
             string? relPath = null;
 
-            if (foto != null && foto.Length > 0)
+            if(foto != null && foto.Length >0)
             {
                 var ext = Path.GetExtension(foto.FileName);
                 var fileName = $"{Guid.NewGuid()}{ext}";
@@ -34,15 +34,17 @@ namespace Lustrious.Repositorio
                 using var fs = new FileStream(absPath, FileMode.Create);
                 foto.CopyTo(fs);
                 relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
+
+                // Assign the relative path to the cliente object so it's available for later use
                 cliente.Foto = relPath;
             }
 
-            using (var conexao = _dataBase.GetConnection())
-            {
+            using var conexao = _dataBase.GetConnection();
+            
                 conexao.Open();
-                using(var cmd = new MySqlCommand("insertUsuario", conexao))
-                {
-                    var senhaHash = BCrypt.Net.BCrypt.HashPassword(cliente.Senha, workFactor: 12);
+               using var cmd = new MySqlCommand("insertUsuario", conexao);
+                
+                    var senhaHash = BCrypt.Net.BCrypt.HashPassword(cliente.Senha, workFactor:12);
 
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", cliente.Nome);
@@ -51,10 +53,10 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vSenha", senhaHash);
                     cmd.Parameters.AddWithValue("vRole", string.IsNullOrWhiteSpace(cliente.Role) ? "Cliente" : cliente.Role);
                     cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
-                    cmd.Parameters.AddWithValue("vFoto", cliente.Foto ?? string.Empty);
+                    cmd.Parameters.AddWithValue("vFoto", (object?)relPath ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
-                }
-            }
+                
+            
         }
         public Usuario AcharCliente(int id)
         {
@@ -100,6 +102,7 @@ namespace Lustrious.Repositorio
                 using (var cmd = new MySqlCommand("selectUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("p_role", "Cliente");
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
 
                     DataTable dt = new DataTable();
