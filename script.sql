@@ -181,6 +181,14 @@ ADD CONSTRAINT fk_Produto_TipoProduto FOREIGN KEY (codTipoProduto) REFERENCES ti
  
  
  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  -- Criando as Procedures
  delimiter $$
  create  procedure InsertCidade(
@@ -341,23 +349,10 @@ IdUser int not null
    
    delimiter ;
  
- call insertEndereco ('06340250','Rua Do Jão','Lapa','Morro Salgado','sp');
+ call insertEndereco ('06340250','Rua Do Jão','54','','Lapa','Morro Salgado','sp');
  delimiter $$
- create procedure InsertFuncionario(
- in vNome varchar(250),
- in vEmail varchar(150),
- in vSenha varchar(2250)
- )
- begin
-    if not exists (select IdFun from funcionario where Email = vEmail) then
-    insert into Funcionario (Nome,Email,Senha)values (vNome,vEmail,vSenha);
-    else select("Este Funcionario já está registrado, por favor use outro email não registrado");
-    end if ;
- end ;
- $$
  
- call InsertFuncionario ('Daniel','Daniel.Admin@email.com','1234');
- select * from Funcionario ;
+ select * from Endereco ;
  
  
 
@@ -384,10 +379,10 @@ begin
 end ;
 $$
 
-call insertCliente("Daniel","Daniel@email.com","124-574-242-21","12345","Admin","Masculino");
+call insertUsuario("Daniel","Daniel@email.com","124574242-21","12345","Admin","Masculino","");
 
 
-Usuario
+
 delimiter $$
 create procedure selectUsuario()
 begin
@@ -398,9 +393,9 @@ end $$
 call selectUsuario;
 
 delimiter $$
-Create procedure ObterUsuarioEmail(IN p_email varchar(100))
+Create  procedure ObterUsuarioEmail(IN p_email varchar(100))
 begin
-select IdUser,Nome,Email, Senha,role,ativo,Sexo,CPF from usuarios where email= p_email
+select IdUser,Nome,Email, Senha,role,ativo,Sexo,CPF from usuario where email= p_email
 limit 1;
 end $$
 
@@ -413,15 +408,15 @@ begin
   select IdUser,Nome,Email,Senha,Sexo,CPF from Usuario where IdUser = vId;
 end $$	
 
-	
+call obterUsuario(1);
+
+delimiter $$
 create procedure updateUsuario(
 in vIdUser int, in vNome varchar(200), in vEmail varchar(150),in vSenha varchar(250),vSexo varchar(20),vCEP int
 )
 begin
     update Usuario set Nome = vNome, Email = vEmail, Senha = vSenha, Sexo = vSexo, CPF = vCPF,CEP = vCEP  where IdUser = vIdUser;
 end $$
-
-
 
 
 create procedure DeleteUsuario(in vIdUser int)
@@ -431,7 +426,7 @@ begin
      else select('Não existe este Usuario');
      end if ;
 end $$
-
+delimiter ;
 -- Produtos
 
 delimiter $$
@@ -440,10 +435,11 @@ begin
   select 
     p.CodigoBarras,
     p.NomeProd,
+    p.Foto,
     p.qtd,
     p.Descricao,
     p.ValorUnitario,
-    p.Role,
+    p.Genero,
     c.Categoria as NomeCategoria,
     t.TipoProduto as NomeTipoProduto
   from Produto p
@@ -452,6 +448,7 @@ begin
   order by p.NomeProd;
 end$$
 delimiter ;
+call selectProdutos
 
 delimiter $$ 
 create  procedure updateProduto(
@@ -462,7 +459,8 @@ create  procedure updateProduto(
   in vValor decimal(9,2),
   in vRole enum('Masculino','Feminino','Unissex'),
   in vCodCategoria int,
-  in vCodTipoProduto int
+  in vCodTipoProduto int,
+  in vFoto varchar(255)
 )
 begin
   if exists(select CodigoBarras from Produto where CodigoBarras = vCodigo) then
@@ -472,7 +470,8 @@ begin
         qtd = vQtd,
         Descricao = vDesc,
         ValorUnitario = vValor,
-        Role = vRole,
+        Foto = vFoto,
+        Genero = vRole,
         codCategoria = vCodCategoria,
         codTipoProduto = vCodTipoProduto
     where CodigoBarras = vCodigo;
@@ -482,6 +481,7 @@ begin
   end if;
 end$$
 delimiter ;
+call insertProduto (254932837248,'Pergume Lavuar',25,'Perfume mais que demais é lavuar',12.2,'Masculino',3,5);
 
 
 delimiter $$
@@ -499,7 +499,7 @@ delimiter $$
 create  procedure selectProdutosPorCategoria(in vCodCategoria int)
 begin
   select 
-    p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario, p.Role,
+    p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario,p.Foto, p.Genero,
     c.Categoria, t.TipoProduto
   from Produto p
   join Categoria c on p.codCategoria = c.codCategoria
@@ -513,7 +513,7 @@ delimiter $$
 create  procedure selectProdutosPorTipo(in vCodTipoProduto int)
 begin
   select 
-    p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario, p.Role,
+    p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario,p.Foto, p.Genero,
     c.Categoria, t.TipoProduto
   from Produto p
   join Categoria c on p.codCategoria = c.codCategoria
@@ -528,7 +528,7 @@ delimiter ;
 
 
 delimiter $$ 
-create  procedure insertProduto(
+create   procedure insertProduto(
   in vCodigoBarras bigint,
   in vNomeProd varchar(200),
   in vQtd int,
@@ -536,7 +536,8 @@ create  procedure insertProduto(
   in vValorUnitario decimal(7,2),
   in vRole enum('Masculino','Feminino','Unissex'),
   in vCodCategoria int,
-  in vCodTipoProduto int
+  in vCodTipoProduto int,
+  in vFoto varchar(255)
 )
 begin
   if not exists(select CodigoBarras from Produto where CodigoBarras = vCodigoBarras) then
@@ -545,9 +546,9 @@ begin
        and exists(select codTipoProduto from tipoProduto where codTipoProduto = vCodTipoProduto) then
     
       insert into Produto 
-      (CodigoBarras, NomeProd, qtd, Descricao, ValorUnitario, Role, codCategoria, codTipoProduto)
+      (CodigoBarras, NomeProd, qtd, Descricao, ValorUnitario, Genero, codCategoria, codTipoProduto,foto)
       values 
-      (vCodigoBarras, vNomeProd, vQtd, vDescricao, vValorUnitario, vRole, vCodCategoria, vCodTipoProduto);
+      (vCodigoBarras, vNomeProd, vQtd, vDescricao, vValorUnitario, vRole, vCodCategoria, vCodTipoProduto,vFoto);
       
     else 
       select 'Categoria ou Tipo de Produto inválido' as Mensagem;
@@ -559,7 +560,7 @@ begin
 end$$
 delimiter ;
 
-call insertProduto (254932837248,'Pergume Lavuar',25,'Pergume lAVOUAR',12.2)
+call insertProduto (254932835248,'Perfume Maria',155,'Quer que sua princesa sinta o poder do bigode, use Pergume Maria',12.2,'Masculino',4,3,"foto");
 
 
 delimiter $$
@@ -585,7 +586,7 @@ delimiter ;
 delimiter $$
 create procedure selectCarrinho(in vIdUser int)
 begin
-  select c.IdCarrinho, p.NomeProd, c.Qtd, p.ValorUnitario, (p.ValorUnitario * c.Qtd) as Subtotal
+  select c.IdCarrinho, p.NomeProd,p.foto, c.Qtd, p.ValorUnitario, (p.ValorUnitario * c.Qtd) as Subtotal
   from Carrinho c
   join Produto p on c.IdProd = p.CodigoBarras
   where c.IdUser = vIdUser;
@@ -601,3 +602,205 @@ delimiter ;
 
 
  use dbilumina ;
+ 
+ 
+ -- Procedures adicionadas para compatibilizar com o código C# do projeto
+-- Execute este script no banco `dbilumina` (mysql)
+
+DELIMITER $$
+
+-- Ajuste: selectProdutos com filtro por tipo (parâmetro opcional: passe  para todos)
+DROP PROCEDURE IF EXISTS selectProdutos$$
+CREATE PROCEDURE selectProdutos(IN vCodTipoProduto INT)
+BEGIN
+ IF vCodTipoProduto IS NULL OR vCodTipoProduto =0 THEN
+ SELECT 
+ p.CodigoBarras,
+ p.NomeProd,
+ p.qtd,
+ p.Descricao,
+ p.ValorUnitario,
+ p.Genero,
+ c.Categoria AS NomeCategoria,
+ t.TipoProduto AS NomeTipoProduto
+ FROM Produto p
+ LEFT JOIN Categoria c ON p.codCategoria = c.codCategoria
+ LEFT JOIN tipoProduto t ON p.codTipoProduto = t.codTipoProduto
+ ORDER BY p.NomeProd;
+ ELSE
+ SELECT 
+ p.CodigoBarras,
+ p.NomeProd,
+ p.qtd,
+ p.Descricao,
+ p.ValorUnitario,
+ p.Genero,
+ c.Categoria AS NomeCategoria,
+ t.TipoProduto AS NomeTipoProduto
+ FROM Produto p
+ LEFT JOIN Categoria c ON p.codCategoria = c.codCategoria
+ LEFT JOIN tipoProduto t ON p.codTipoProduto = t.codTipoProduto
+ WHERE p.codTipoProduto = vCodTipoProduto
+ ORDER BY p.NomeProd;
+ END IF;
+END$$
+
+-- 2) obterEnderecosPorUsuario
+DROP PROCEDURE IF EXISTS obterEnderecosPorUsuario$$
+CREATE PROCEDURE obterEnderecosPorUsuario(IN vUserId INT)
+BEGIN
+ SELECT 
+ IdEndereco,
+ CEP AS Cep,
+ Logradouro AS logradouro,
+ numero,
+ complemento,
+ IdBairro AS Idbairro,
+ IdCidade AS Idcidade,
+ IdEstado AS Idestado,
+ IdUser
+ FROM Endereco
+ WHERE IdUser = vUserId;
+END$$
+
+-- 3) updateEndereco
+DROP PROCEDURE IF EXISTS updateEndereco$$
+CREATE PROCEDURE updateEndereco(
+ IN vIdEndereco INT,
+ IN vCep VARCHAR(9),
+ IN vLogradouro VARCHAR(200),
+ IN vNumero VARCHAR(11),
+ IN vComplemento VARCHAR(155),
+ IN vIdBairro INT,
+ IN vIdCidade INT,
+ IN vIdEstado INT,
+ IN vIdUser INT
+)
+BEGIN
+ IF EXISTS (SELECT vIdEndereco FROM Endereco WHERE IdEndereco = vIdEndereco) THEN
+ UPDATE Endereco
+ SET CEP = vCep,
+ Logradouro = vLogradouro,
+ numero = vNumero,
+ complemento = vComplemento,
+ IdBairro = vIdBairro,
+ IdCidade = vIdCidade,
+ IdEstado = vIdEstado,
+ IdUser = vIdUser
+ WHERE IdEndereco = vIdEndereco;
+ ELSE
+ SELECT 'Endereço não encontrado' AS Mensagem;
+ END IF;
+END$$
+
+-- 4) insertCarrinho (compatível com a lógica addCarrinho)
+DROP PROCEDURE IF EXISTS insertCarrinho$$
+CREATE PROCEDURE insertCarrinho(
+ IN vUserId INT,
+ IN vCodigo BIGINT,
+ IN vQtd INT
+)
+BEGIN
+ IF EXISTS(SELECT CodigoBarras FROM Produto WHERE CodigoBarras = vCodigo) THEN
+ IF EXISTS(SELECT * FROM Carrinho WHERE IdUser = vUserId AND IdProd = vCodigo) THEN
+ UPDATE Carrinho SET Qtd = Qtd + vQtd
+ WHERE IdUser = vUserId AND IdProd = vCodigo;
+ ELSE
+ INSERT INTO Carrinho (IdUser, IdProd, Qtd) VALUES (vUserId, vCodigo, vQtd);
+ END IF;
+ ELSE
+ SELECT 'Produto inexistente' AS Mensagem;
+ END IF;
+END$$
+
+-- 5) insertVenda (insere venda e não precisa do NomeProd vindo do C#)
+DROP PROCEDURE IF EXISTS insertVenda$$
+CREATE PROCEDURE insertVenda(
+ IN vIdUser INT,
+ IN vDataVenda DATETIME,
+ IN vValorTotal DECIMAL(9,2),
+ IN vNF INT,
+ IN vIdEntrega INT
+)
+BEGIN
+ -- Insere com NomeProd vazio (o campo existe na tabela)
+ INSERT INTO Venda (NomeProd, ValorTotal, DataVenda, IdUser, NF, IdEntrega)
+ VALUES ('', vValorTotal, vDataVenda, vIdUser, vNF, vIdEntrega);
+END$$
+
+-- 6) insertVendaProduto
+DROP PROCEDURE IF EXISTS insertVendaProduto$$
+CREATE PROCEDURE insertVendaProduto(
+ IN vIdVenda INT,
+ IN vCodigoBarras BIGINT,
+ IN vQtd INT,
+ IN vValorItem DECIMAL(9,2)
+)
+BEGIN
+ INSERT INTO VendaProduto (valorItem, Qtd, CodigoBarras, IdVenda)
+ VALUES (vValorItem, vQtd, vCodigoBarras, vIdVenda);
+END$$
+
+-- 7) insertEntrega
+DROP PROCEDURE IF EXISTS insertEntrega$$
+CREATE PROCEDURE insertEntrega(
+ IN vIdEndereco INT,
+ IN vDataEntrega DATETIME,
+ IN vValorFrete DECIMAL(7,2),
+ IN vDataPrevista DATE,
+ IN vStatus VARCHAR(100)
+)
+BEGIN
+ INSERT INTO Entrega (IdEndereco, DataEntrega, ValorFrete, DataPrevista, Status)
+ VALUES (vIdEndereco, vDataEntrega, vValorFrete, vDataPrevista, vStatus);
+END$$
+
+-- 8) obterVenda
+DROP PROCEDURE IF EXISTS obterVenda$$
+CREATE PROCEDURE obterVenda(IN vId INT)
+BEGIN
+ SELECT IdVenda, NomeProd, ValorTotal, DataVenda, IdUser, NF, IdEntrega
+ FROM Venda
+ WHERE IdVenda = vId;
+END$$
+
+-- 9) obterVendasPorUsuario
+DROP PROCEDURE IF EXISTS obterVendasPorUsuario$$
+CREATE PROCEDURE obterVendasPorUsuario(IN vUserId INT)
+BEGIN
+ SELECT IdVenda, NomeProd, ValorTotal, DataVenda, IdUser, NF, IdEntrega
+ FROM Venda
+ WHERE IdUser = vUserId
+ ORDER BY DataVenda DESC;
+END$$
+
+-- 10) Corrigir/atualizar updateUsuario (existente no seu script aparenta ter inconsistência com vCPF)
+DROP PROCEDURE IF EXISTS updateUsuario$$
+CREATE PROCEDURE updateUsuario(
+ IN vIdUser INT,
+ IN vNome VARCHAR(200),
+ IN vEmail VARCHAR(150),
+ IN vSenha VARCHAR(250),
+ IN vCPF VARCHAR(14),
+ IN vSexo VARCHAR(20),
+ IN vCEP INT
+)
+BEGIN
+ IF EXISTS(SELECT * FROM Usuario WHERE IdUser = vIdUser) THEN
+ UPDATE Usuario
+ SET Nome = vNome,
+ Email = vEmail,
+ Senha = vSenha,
+ CPF = vCPF,
+ Sexo = vSexo,
+ CEP = vCEP
+ WHERE IdUser = vIdUser;
+ ELSE
+ SELECT 'Usuario não encontrado' AS Mensagem;
+ END IF;
+END$$
+
+DELIMITER ;
+
+-- FIM
+
