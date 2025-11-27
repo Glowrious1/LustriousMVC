@@ -86,7 +86,8 @@ namespace Lustrious.Repositorio
                             Email = (string)dr["Email"],
                             Senha = (string)dr["Senha"],
                             Sexo = (string)dr["Sexo"],
-                            CPF = (string)dr["CPF"]
+                            CPF = (string)dr["CPF"],
+                            Foto = dr.Table.Columns.Contains("Foto") && dr["Foto"] != DBNull.Value ? (string)dr["Foto"] : null
                         };
                     }
                 }
@@ -121,29 +122,49 @@ namespace Lustrious.Repositorio
                                 Senha = (string)dr["Senha"],
                                 Sexo = (string)dr["Sexo"],
                                 CPF = (string)dr["CPF"],
-                                Role = (string)dr["Role"]
+                                Role = (string)dr["Role"],
+                                Foto = dr.Table.Columns.Contains("Foto") && dr["Foto"] != DBNull.Value ? (string)dr["Foto"] : null
                         });
                     }
                 }
             }
             return clientes;
         }
-        public void AlterarCliente(Usuario cliente)
+        public void AlterarCliente(Usuario cliente, IFormFile? foto)
         {
+            string? relPath = null;
+
+            if (foto != null && foto.Length >0)
+            {
+                var ext = Path.GetExtension(foto.FileName);
+                var fileName = $"{Guid.NewGuid()}{ext}";
+                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosUsuario");
+                Directory.CreateDirectory(saveDir);
+                var absPath = Path.Combine(saveDir, fileName);
+                using var fs = new FileStream(absPath, FileMode.Create);
+                foto.CopyTo(fs);
+                relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
+                cliente.Foto = relPath;
+            }
+
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
+                // Call stored procedure that updates user fields (expects vIdUser, vNome, vEmail, vSenha, vCPF, vSexo, vFoto)
                 using (var cmd = new MySqlCommand("updateUsuario", conexao))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("vIdUser", cliente.IdUser);
                     cmd.Parameters.AddWithValue("vNome", cliente.Nome);
                     cmd.Parameters.AddWithValue("vEmail", cliente.Email);
-                    cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
                     cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
+                    cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
                     cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
+                    cmd.Parameters.AddWithValue("vFoto", (object?)cliente.Foto ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
-                    conexao.Close();
                 }
+
+                conexao.Close();
             }
         }
         public void ExcluirCliente(int id)

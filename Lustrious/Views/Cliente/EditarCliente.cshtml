@@ -1,9 +1,11 @@
-﻿@{
+﻿@model Lustrious.Models.Usuario
+
+@{
     ViewData["Title"] = "Editar Cliente";
 }
 
 <style>
-    <!-- body -->
+    /* body */
     body {
         font-family: Arial, sans-serif;
         background: #c7b99a;
@@ -52,10 +54,13 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        position: relative;
+        overflow: hidden;
     }
 
     .foto-preview {
         width: 150px;
+        object-fit: cover;
     }
 
     .row {
@@ -76,9 +81,15 @@
         font-weight: bold;
         cursor: pointer;
     }
-    <!-- Editar -->
+    /* Editar */
     .editar {
-        background: #c5bca2;
+        border-radius: 10px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
     }
 
     .cancelar {
@@ -95,42 +106,68 @@
     }
 </style>
 
-<div class="container">
+<form class="container" asp-action="EditarCliente" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
     <h2>EDITAR CLIENTE</h2>
 
     <div class="row">
 
         <div>
+            <input asp-for="IdUser" type="hidden" />
+
             <div class="form-group">NOME DO CLIENTE:</div>
-            <input type="text" placeholder="Digite o nome aqui..." />
+            <input asp-for="Nome" type="text" placeholder="Digite o nome aqui..." />
+            <span asp-validation-for="Nome" class="text-danger"></span>
 
             <div class="form-group">EMAIL:</div>
-            <input type="email" placeholder="Digite o email aqui..." />
+            <input asp-for="Email" type="email" placeholder="Digite o email aqui..." />
+            <span asp-validation-for="Email" class="text-danger"></span>
 
             <div class="form-group">SENHA:</div>
-            <input type="password" placeholder="Digite a senha aqui..." />
+            <input asp-for="Senha" type="password" placeholder="Digite a senha aqui..." />
+            <span asp-validation-for="Senha" class="text-danger"></span>
 
             <div class="form-group">CPF:</div>
-            <input type="text" placeholder="Digite o CPF aqui..." />
+            <input asp-for="CPF" type="text" placeholder="Digite o CPF aqui..." />
+            <span asp-validation-for="CPF" class="text-danger"></span>
 
             <div class="form-group">SEXO:</div>
-            <select class="select-sexo">
-                <option>Masculino</option>
-                <option>Feminino</option>
-                <option>Outro</option>
+            <select asp-for="Sexo" class="select-sexo">
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outro">Outro</option>
             </select>
         </div>
 
         <!-- FOTO -->
         <label class="foto-container" for="fotoInput">
-            <img src="~/imagens/capa_foto.png" class="foto-preview" />
+            <img src="@(string.IsNullOrWhiteSpace(Model?.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + Model.Foto))" class="foto-preview" id="fotoPreview" />
+            <input type="file" id="fotoInput" name="foto" accept="image/*" style="opacity:0;position:absolute;left:0;top:0;width:100%;height:100%;cursor:pointer;" />
         </label>
-        <input type="file" id="fotoInput" style="display:none;" />
+
     </div>
 
     <!-- Botões -->
     <div class="button-row">
-        <button class="editar">EDITAR</button>
-        <button class="cancelar">CANCELAR</button>
+        <button type="submit" class="editar">EDITAR</button>
+        <a asp-action="Index" asp-controller="Cliente" class="cancelar">CANCELAR</a>
     </div>
-</div>
+</form>
+
+<script>
+    (function(){
+        var input = document.getElementById('fotoInput');
+        var preview = document.getElementById('fotoPreview');
+        if(!input) return;
+        input.addEventListener('change', function(e){
+            var file = input.files && input.files[0];
+            if(!file) return;
+            var reader = new FileReader();
+            reader.onload = function(ev){
+                preview.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    })();
+</script>

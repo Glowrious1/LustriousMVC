@@ -17,8 +17,9 @@
                 <tr>
                     <th>NOME</th>
                     <th>EMAIL</th>
-                    <th>SENHA</th>
-                    <th>AÇÕES</th>
+                    <th>Sexo</th>
+                    <th>CPF</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
 
@@ -29,8 +30,8 @@
                     <tr>
                         <td>@cliente.Nome</td>
                         <td>@cliente.Email</td>
-                        <td>@cliente.Senha</td>
-
+                        <td>@cliente.Sexo</td>
+                        <td>@cliente.CPF</td>
                         <td>
                             <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
                             <a asp-controller="Cliente" asp-action="ExcluirCliente" asp-route-id="@cliente.IdUser" onclick="return confirm('Deseja realmente Excluir este item?');" class="delete-btn">EXCLUIR</a>
