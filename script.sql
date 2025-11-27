@@ -387,7 +387,7 @@ delimiter $$
 create procedure selectUsuario()
 begin
  
-select IdUser, Nome,Email,Senha,Sexo,CPF,Role,CEP from Usuario order by Nome; 
+select IdUser, Nome,Email,Senha,Sexo,CPF,Role from Usuario order by Nome; 
 end $$
 
 call selectUsuario;
@@ -410,13 +410,17 @@ end $$
 
 call obterUsuario(1);
 
-delimiter $$
-create procedure updateUsuario(
-in vIdUser int, in vNome varchar(200), in vEmail varchar(150),in vSenha varchar(250),vSexo varchar(20),vCEP int
-)
-begin
-    update Usuario set Nome = vNome, Email = vEmail, Senha = vSenha, Sexo = vSexo, CPF = vCPF,CEP = vCEP  where IdUser = vIdUser;
-end $$
+DELIMITER $$ DROP PROCEDURE IF EXISTS updateUsuario$$ 
+CREATE PROCEDURE updateUsuario( 
+IN vIdUser INT, IN vNome VARCHAR(200), IN vEmail VARCHAR(150), 
+IN vSenha VARCHAR(250), IN vCPF VARCHAR(14), IN vSexo VARCHAR(20), IN vFoto VARCHAR(255) ) 
+BEGIN 
+	IF EXISTS(SELECT * FROM Usuario WHERE IdUser = vIdUser) THEN 
+		UPDATE Usuario SET Nome = vNome, Email = vEmail, Senha = vSenha, CPF = vCPF, Sexo = vSexo, Foto = vFoto WHERE IdUser = vIdUser; 
+	ELSE SELECT 'Usuario não encontrado' AS Mensagem;
+ END IF ; 
+end $$ 
+
 
 
 create procedure DeleteUsuario(in vIdUser int)
@@ -782,8 +786,7 @@ CREATE PROCEDURE updateUsuario(
  IN vEmail VARCHAR(150),
  IN vSenha VARCHAR(250),
  IN vCPF VARCHAR(14),
- IN vSexo VARCHAR(20),
- IN vCEP INT
+ IN vSexo VARCHAR(20)
 )
 BEGIN
  IF EXISTS(SELECT * FROM Usuario WHERE IdUser = vIdUser) THEN
@@ -792,8 +795,7 @@ BEGIN
  Email = vEmail,
  Senha = vSenha,
  CPF = vCPF,
- Sexo = vSexo,
- CEP = vCEP
+ Sexo = vSexo
  WHERE IdUser = vIdUser;
  ELSE
  SELECT 'Usuario não encontrado' AS Mensagem;
