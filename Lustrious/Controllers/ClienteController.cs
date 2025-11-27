@@ -38,9 +38,9 @@ namespace Lustrious.Controllers
             return View(_clienteRepositorio.AcharCliente(id));
         }
         [HttpPost, ValidateAntiForgeryToken]
-         public IActionResult EditarCliente(Usuario model)
+        public IActionResult EditarCliente(Usuario model, IFormFile? foto)
         {
-            _clienteRepositorio.AlterarCliente(model);
+            _clienteRepositorio.AlterarCliente(model, foto);
             TempData["ok"] = "Cliente Atualizado!";
             return RedirectToAction(nameof(Index));
         }

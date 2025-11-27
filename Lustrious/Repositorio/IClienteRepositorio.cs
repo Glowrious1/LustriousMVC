@@ -1,4 +1,5 @@
 ﻿using Lustrious.Models;
+using Microsoft.AspNetCore.Http;
 namespace Lustrious.Repositorio
 {
     public interface IClienteRepositorio
@@ -6,7 +7,7 @@ namespace Lustrious.Repositorio
         public void CadastrarCliente(Usuario cliente, IFormFile? foto);
         public Usuario AcharCliente(int id);
         public IEnumerable<Usuario> ListarClientes();
-        public void AlterarCliente(Usuario cliente);
+        public void AlterarCliente(Usuario cliente, IFormFile? foto);
         public void ExcluirCliente(int id);
     }
 }
