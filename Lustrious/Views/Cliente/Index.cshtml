@@ -4,22 +4,7 @@
     ViewData["Title"] = "Clientes";
 }
 
-<!-- NAVBAR -->
-<header class="navbar-container">
-    <div class="navbar">
-        <div class="logo">
-            <img src="~/imagens/lustrious2.png" alt="Lustrious" style="height:32px; margin-right:8px;" />
-            LUSTRIOUS
-        </div>
 
-        <nav>
-            <a href="/Funcionario">FUNCIONÁRIO</a>
-            <a href="/Cliente">CLIENTE</a>
-        </nav>
-    </div>
-</header>
-
-<!-- CONTEÚDO PRINCIPAL -->
 <main class="main-content">
     <div class="card">
         <div class="card-header">
@@ -47,7 +32,7 @@
                         <td>@cliente.Senha</td>
 
                         <td>
-                            <a class="edit-btn"  asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
+                            <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
                             <a asp-controller="Cliente" asp-action="ExcluirCliente" asp-route-id="@cliente.IdUser" onclick="return confirm('Deseja realmente Excluir este item?');" class="delete-btn">EXCLUIR</a>
                         </td>
                     </tr>
@@ -61,7 +46,7 @@
     body {
         margin: 0;
         padding: 0;
-        background-color: #3d3d3d;
+        background-color: #FFEFCC;
         font-family: 'Times New Roman', serif;
     }
 
@@ -127,7 +112,14 @@
         text-decoration: none;
         font-weight: bold;
         font-size: 14px;
+        transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
     }
+
+        .new-btn:hover {
+            background-color: #CCAC66; /* Cor de fundo ao passar o mouse */
+            color: #FFFFFF; /* Cor do texto ao passar o mouse */
+        }
+
 
     /* TABELA */
     .table-clientes {
