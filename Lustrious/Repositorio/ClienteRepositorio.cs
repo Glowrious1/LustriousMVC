@@ -122,8 +122,6 @@ namespace Lustrious.Repositorio
                                 Senha = (string)dr["Senha"],
                                 Sexo = (string)dr["Sexo"],
                                 CPF = (string)dr["CPF"],
-                                Role = (string)dr["Role"],
-                                Foto = dr.Table.Columns.Contains("Foto") && dr["Foto"] != DBNull.Value ? (string)dr["Foto"] : null
                         });
                     }
                 }
