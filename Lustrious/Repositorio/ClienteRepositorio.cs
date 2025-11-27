@@ -141,7 +141,6 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vCPF", cliente.CPF);
                     cmd.Parameters.AddWithValue("vSenha", cliente.Senha);
                     cmd.Parameters.AddWithValue("vSexo", cliente.Sexo);
-                    cmd.Parameters.AddWithValue("vCEP", cliente.CEP);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }

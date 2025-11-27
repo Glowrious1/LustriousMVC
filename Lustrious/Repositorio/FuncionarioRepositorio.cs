@@ -99,8 +99,7 @@ namespace Lustrious.Repositorio
                             Senha = (string)dr["Senha"],
                             Sexo = (string)dr["Sexo"],
                             CPF = (string)dr["CPF"],
-                            Role = (string)dr["Role"],
-                            CEP = (int)dr["CEP"]
+                            Role = (string)dr["Role"]
                         }
                         );
                     }
@@ -123,7 +122,6 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
                     cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
-                    cmd.Parameters.AddWithValue("vCEP", funcionario.CEP);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }
