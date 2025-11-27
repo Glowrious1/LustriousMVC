@@ -15,67 +15,121 @@
     </div>
 </main>
 
+</div>
+
+<!-- 🔻 🔻 🔻 AQUI COMEÇA A PARTE DE BAIXO DA TELA 🔻 🔻 🔻 -->
+
+<section class="destaques-mes">
+    <p>veja nossos destaques do mês</p>
+</section>
+
+<!-- Banner -->
+<div class="banner-longo">
+    <!-- COLOQUE A IMAGEM DO BANNER AQUI (banner_azul.png) -->
+    <img src="../Imagens/LustrativaP.png" alt="Banner Lustrious" />
+</div>
+
+<!-- DESTAQUE -->
+<h2 class="titulo-destaque">DESTAQUE</h2>
+
+<div class="box-destaque">
+    <!-- COLOQUE SUAS IMAGENS DE PRODUTOS DESTACADOS AQUI -->
+    <img src="../Imagens/P1.png" />
+    <img src="../Imagens/P2.png" />
+    <img src="../Imagens/P3.png" />
+</div>
+
+<!-- PRODUTOS -->
+<h2 class="titulo-produtos">PRODUTOS</h2>
+
+<div class="linha-produtos">
+
+    <div class="produto-card">
+        <img src="../Imagens/LustrativaP2.png" />
+        <p class="nome">LUSTROUS - Glow</p>
+        <p class="preco">R$ 70,00</p>
+
+        <button class="btn-comprar" onclick="comprar('LUSTROUS - Glow')">COMPRAR</button>
+        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Glow')">Carrinho</button>
+    </div>
+
+    <div class="produto-card">
+        <img src="../Imagens/p4.png" />
+        <p class="nome">LUX PRIME</p>
+        <p class="preco">R$ 106,00</p>
+
+        <button class="btn-comprar" onclick="comprar('LUX PRIME')">COMPRAR</button>
+        <button class="btn-carrinho" onclick="adicionarCarrinho('LUX PRIME')">Carrinho</button>
+    </div>
+
+    <div class="produto-card">
+        <img src="../Imagens/P5.png" />
+        <p class="nome">LUSTROUS - Pink</p>
+        <p class="preco">R$ 70,00</p>
+
+        <button class="btn-comprar" onclick="comprar('LUSTROUS - Pink')">COMPRAR</button>
+        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Pink')">Carrinho</button>
+    </div>
+
+</div>
+
+<!-- Segunda linha -->
+<div class="linha-produtos">
+
+    <div class="produto-card">
+        <img src="../Imagens/P6.png" />
+        <p class="nome">LUSTROUS - Gloss</p>
+        <p class="preco">R$ 70,00</p>
+
+        <button class="btn-comprar" onclick="comprar('LUSTROUS - Gloss')">COMPRAR</button>
+        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Gloss')">Carrinho</button>
+    </div>
+
+    <div class="produto-card">
+        <img src="../Imagens/P1.png" />
+        <p class="nome">LUX PRIME GOLD</p>
+        <p class="preco">R$ 106,00</p>
+
+        <button class="btn-comprar" onclick="comprar('LUX PRIME GOLD')">COMPRAR</button>
+        <button class="btn-carrinho" onclick="adicionarCarrinho('LUX PRIME GOLD')">Carrinho</button>
+    </div>
+
+    <div class="produto-card">
+        <img src="../Imagens/P2.png" />
+        <p class="nome">LUSTROUS - Rose</p>
+        <p class="preco">R$ 70,00</p>
+
+        <button class="btn-comprar" onclick="comprar('LUSTROUS - Rose')">COMPRAR</button>
+        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Rose')">Carrinho</button>
+    </div>
+
+</div>
+
+
+<!-- Rodapé -->
+<footer class="rodape">
+
+    <div class="icones">
+        <!-- COLOQUE OS ÍCONES DO RODAPÉ AQUI -->
+        <img src="../Imagens/Inst.jfif" />
+        <img src="../Imagens/link.jfif" />
+        <img src="../Imagens/what.png" />
+    </div>
+</footer>
+
+</main>
+
 <style>
+
+    /* ----------- CONFIGURAÇÕES GERAIS ----------- */
     body {
         margin: 0;
         padding: 0;
-        font-family: 'Times New Roman', serif;
-        background-color: #fff;
+        font-family: "Times New Roman", serif;
+        background-color: #ffffff;
     }
 
-    header {
-        z-index: 10;
-        box-sizing: border-box;
-        padding: 20px 60px;
-    }
-
-    .navbar {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 40px;
-    }
-
-    /* LOGO */
-    .logo {
-        font-size: 18px;
-        color: #b5954b;
-        text-align: center;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-    }
-
-    .bar {
-        color: #d6b36a; /* dourado mais claro */
-        margin-left: 10px;
-        font-weight: normal;
-    }
-
-    nav {
-        display: flex;
-        align-items: center;
-    }
-
-        nav a {
-            text-decoration: none;
-            color: #000;
-            margin: 0 25px;
-            font-weight: 500;
-            position: relative;
-        }
-
-            nav a:not(:last-child)::after {
-                content: "";
-                position: absolute;
-                right: -25px;
-                top: 0;
-                height: 100%;
-                width: 1px;
-                background-color: #d6b36a;
-            }
-
-    /* HERO */
+    /* ----------- HERO (PARTE DE CIMA) ----------- */
     .hero {
         position: fixed;
         top: 0;
@@ -83,8 +137,6 @@
         width: 100vw;
         height: 100vh;
         overflow: hidden;
-        margin: 0;
-        padding: 0;
         z-index: -1;
     }
 
@@ -92,8 +144,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
-            display: block;
         }
 
     .hero-text {
@@ -102,11 +152,162 @@
         left: 50%;
         transform: translate(-50%, -50%);
         color: white;
-        font-size: 90px;
+        font-size: 95px;
         font-weight: 400;
-        letter-spacing: 6px;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        text-align: center;
-        font-family: 'Times New Roman', serif;
+        letter-spacing: 8px;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
     }
+
+    /* ----------- TÍTULO: DESTAQUES DO MÊS ----------- */
+    .destaques-mes {
+        margin-top: 100vh;
+        text-align: center;
+        padding: 25px 0;
+    }
+
+        .destaques-mes p {
+            font-size: 25px;
+            color: #b5954b;
+            font-weight: 500;
+            border: 2px solid #b5954b;
+            padding: 10px 30px;
+            display: inline-block;
+            border-radius: 40px;
+        }
+
+    /* ----------- BANNER LONGO ----------- */
+    .banner-longo img {
+        width: 100%;
+        display: block;
+    }
+
+    /* ----------- TÍTULOS DOURADOS ----------- */
+    .titulo-destaque,
+    .titulo-produtos {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 22px;
+        background: #b5954b;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 12px;
+        width: fit-content;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        letter-spacing: 1px;
+    }
+
+    /* ----------- DESTAQUE (CAIXA PRETA) ----------- */
+    .box-destaque {
+        width: 90%;
+        margin: 20px auto;
+        background: #000;
+        border-radius: 20px;
+        padding: 30px;
+        display: flex;
+        justify-content: space-around;
+        border: 4px solid #d9b56b;
+    }
+
+        .box-destaque img {
+            width: 150px;
+            border-radius: 10px;
+        }
+
+    /* ----------- PRODUTOS ----------- */
+
+    /* Botão Comprar */
+    .btn-comprar {
+        width: 100%;
+        background: #2c8a36;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: 0.2s;
+    }
+
+        .btn-comprar:hover {
+            background: #1f6a27;
+        }
+
+    /* Botão Carrinho */
+    .btn-carrinho {
+        width: 100%;
+        background: #d1c29a;
+        color: #5c4b20;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 8px;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+        .btn-carrinho:hover {
+            background: #bda87f;
+        }
+
+    .linha-produtos {
+        width: 90%;
+        margin: 40px auto;
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .produto-card {
+        width: 180px;
+        background: #fff;
+        border-radius: 15px;
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        text-align: center;
+        border: 1px solid #e0d6c0;
+    }
+
+        .produto-card img {
+            width: 125px;
+            height: 165px;
+            object-fit: contain;
+        }
+
+    /* Nome do produto */
+    .nome {
+        margin-top: 8px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    /* Preço */
+    .preco {
+        color: #2c8a36;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    /* ----------- RODAPÉ ----------- */
+    .rodape {
+        background: #e8d9b7;
+        padding: 35px;
+        margin-top: 60px;
+        text-align: center;
+    }
+
+    .logo-footer {
+        width: 130px;
+        opacity: 0.75;
+    }
+
+    .icones img {
+        width: 38px;
+        margin: 10px;
+        cursor: pointer;
+    }
+
 </style>
