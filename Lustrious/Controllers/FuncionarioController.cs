@@ -44,7 +44,7 @@ namespace Lustrious.Controllers
             return RedirectToAction(nameof(Index));
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult ExcluirFunciario(int id)
+        public IActionResult ExcluirFuncionario(int id)
         {
             _funcionarioRepositorio.ExcluirFuncionario(id);
             TempData["ok"] = "Funcionario Excluído!";

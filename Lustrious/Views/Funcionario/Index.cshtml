@@ -1,5 +1,7 @@
+@model IEnumerable<Lustrious.Models.Usuario>
+
 @{
-    ViewData["Title"] = "Clientes";
+    ViewData["Title"] = "Funcionários";
 }
 
 <!-- NAVBAR -->
@@ -11,7 +13,7 @@
         </div>
 
         <nav>
-            <a href="/Funcionario">FUNCIONÁRIO</a>
+            <a asp-controller="Funcionario" asp-action="Index">FUNCIONÁRIO</a>
             <a href="/Cliente">CLIENTE</a>
         </nav>
     </div>
@@ -21,8 +23,13 @@
 <main class="main-content">
     <div class="card">
         <div class="card-header">
-            <h2>CLIENTES</h2>
-            <a class="new-btn" href="/Cliente/Criar">NOVO CLIENTE</a>
+            <h2>FUNCIONÁRIOS</h2>
+
+            <a class="new-btn"
+               asp-controller="Funcionario"
+               asp-action="CriarFuncionario">
+                NOVO FUNCIONARIO
+            </a>
         </div>
 
         <table class="table-clientes">
@@ -36,17 +43,32 @@
             </thead>
 
             <tbody>
-                <!-- Vai repetir os clientes -->
-                @foreach (var cliente in Model)
+                @foreach (var funcionario in Model)
                 {
                     <tr>
-                        <td>@cliente.Nome</td>
-                        <td>@cliente.Email</td>
-                        <td>@cliente.Senha</td>
+                        <td>@funcionario.Nome</td>
+                        <td>@funcionario.Email</td>
+                        <td>@funcionario.Senha</td>
 
                         <td>
-                            <a class="edit-btn" href="/Cliente/Editar/@cliente.Id">EDITAR</a>
-                            <a class="delete-btn" href="/Cliente/Deletar/@cliente.Id">EXCLUIR</a>
+                            <!-- EDITAR -->
+                            <a class="edit-btn"
+                               asp-controller="Funcionario"
+                               asp-action="EditarFuncionario"
+                               asp-route-id="@funcionario.IdUser">
+                                EDITAR
+                            </a>
+
+                            <!-- EXCLUIR -->
+                            <form asp-controller="Funcionario"
+                                  asp-action="ExcluirFunciario"
+                                  asp-route-id="@funcionario.IdUser"
+                                  method="post"
+                                  style="display:inline;">
+                                <button type="submit" class="delete-btn">
+                                    EXCLUIR
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 }
@@ -160,5 +182,7 @@
         padding: 5px 12px;
         border-radius: 8px;
         text-decoration: none;
+        border: none;
+        cursor: pointer;
     }
 </style>
