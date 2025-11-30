@@ -185,7 +185,7 @@ ADD CONSTRAINT fk_Produto_TipoProduto FOREIGN KEY (codTipoProduto) REFERENCES ti
  
  
  
- 
+ 000.000.000-12
  
  
  
@@ -364,7 +364,7 @@ IdUser int not null
  create  procedure insertUsuario (
  in vNome varchar(250),
  in vEmail varchar(150),
- in vCPF varchar(12),
+ in vCPF varchar(14),
  in vSenha varchar(250),
  in vRole varchar(20),
  in vSexo varchar(20),
@@ -529,6 +529,10 @@ begin
 end$$
 delimiter ;
 
+
+
+INSERT INTO Usuario (Nome, Email, Senha, CPF, Role)
+VALUES ('Administrador Master', 'admin@site.com', 'admin123', '000.000.000-00', 'Admin');
 
 
 

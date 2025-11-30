@@ -25,10 +25,12 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
                     cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
-                    cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
+                    // Hash password before saving
+                    var senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor:12);
+                    cmd.Parameters.AddWithValue("vSenha", senhaHash);
                     cmd.Parameters.AddWithValue("vRole", funcionario.Role);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
-                    cmd.Parameters.AddWithValue("vFoto", funcionario.Foto ?? string.Empty);
+                    cmd.Parameters.AddWithValue("vFoto", (object?)funcionario.Foto ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -105,9 +107,15 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
                     cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
-                    cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
+                    // Hash password if provided
+                    var senhaHash = funcionario.Senha;
+                    if (!string.IsNullOrWhiteSpace(funcionario.Senha))
+                    {
+                        senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor:12);
+                    }
+                    cmd.Parameters.AddWithValue("vSenha", senhaHash);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
-                    cmd.Parameters.AddWithValue("vFoto", funcionario.Foto ?? string.Empty);
+                    cmd.Parameters.AddWithValue("vFoto", (object?)funcionario.Foto ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }

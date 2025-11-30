@@ -30,6 +30,27 @@
                         </li>
 
                     </ul>
+
+                    <ul class="navbar-nav">
+                        @if (Context.Session.GetInt32("UserId") != null)
+                        {
+                            <li class="nav-item nav-link">Olá, @Context.Session.GetString("UserName")</li>
+                            <li class="nav-item nav-link">(@Context.Session.GetString("UserRole"))</li>
+                            <li class="nav-item">
+                                <form asp-controller="Auth" asp-action="Logout" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-link nav-link" style="display:inline;padding:0;">Sair</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Entrar</a>
+                            </li>
+                        }
+                    </ul>
+
                 </div>
             </div>
         </nav>
