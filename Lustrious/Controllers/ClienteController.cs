@@ -6,6 +6,7 @@ using System.Data;
 using Microsoft.Net.Http.Headers;
 using Lustrious.Repositorio;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace Lustrious.Controllers
 {
@@ -16,9 +17,21 @@ namespace Lustrious.Controllers
         {
             _clienteRepositorio = clienteRepositorio;
         }
-        public IActionResult Index()
+        public IActionResult Index(string q = null, int page =1)
         {
-            return View(_clienteRepositorio.ListarClientes());
+            const int pageSize =10;
+            var result = _clienteRepositorio.ListarClientes(q, page, pageSize);
+            var items = result.Items.ToList();
+            var total = result.TotalCount;
+            var totalPages = (int)System.Math.Ceiling(total / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = total;
+            ViewBag.FilterQ = q;
+
+            return View(items);
         }
         public IActionResult CriarCliente()
         {
@@ -44,11 +57,48 @@ namespace Lustrious.Controllers
             TempData["ok"] = "Cliente Atualizado!";
             return RedirectToAction(nameof(Index));
         }
+
+
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult ExcluirCliente(int id)
         {
-            _clienteRepositorio.ExcluirCliente(id);
-            TempData["ok"] = "Cliente Excluído!";
+            try
+            {
+                _clienteRepositorio.ExcluirCliente(id);
+
+                TempData["ok"] = "Cliente Desativado!";
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Number ==1451)
+                {
+                    TempData["erro"] = "Erro: Este cliente não pode ser excluído, pois possui pedidos ou dados associados em outras tabelas. Exclua as dependências primeiro.";
+                }
+                else
+                {
+                    TempData["erro"] = $"Erro ao excluir no banco de dados: {ex.Message}";
+                }
+            }
+            catch (Exception)
+            {
+                TempData["erro"] = "Não foi possível excluir o cliente. Ocorreu um erro inesperado.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult ReativarCliente(int id)
+        {
+            try
+            {
+                _clienteRepositorio.ReativarCliente(id);
+                TempData["ok"] = "Cliente reativado!";
+            }
+            catch (Exception ex)
+            {
+                TempData["erro"] = "Erro ao reativar cliente: " + ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

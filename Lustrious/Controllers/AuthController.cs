@@ -55,14 +55,45 @@ namespace Lustrious.Controllers
                 ViewBag.Erro = "Usuário inativo. Contate o administrador.";
                 return View();
             }
-            bool ok;
+            
+            bool credentialsOk = false;
+
+            // If stored password is a bcrypt hash it typically starts with "$2" (e.g. $2a$, $2b$, $2y$
+            var isBcrypt = !string.IsNullOrEmpty(senhaHash) && senhaHash.StartsWith("$2");
+
             try
             {
-                ok = BCrypt.Net.BCrypt.Verify(senha, senhaHash);
+                if (isBcrypt)
+                {
+                    credentialsOk = BCrypt.Net.BCrypt.Verify(senha, senhaHash);
+                }
+                else
+                {
+                    // Legacy plain-text password in DB: compare directly
+                    if (senha == senhaHash)
+                    {
+                        credentialsOk = true;
+                        // upgrade to bcrypt: hash and update DB
+                        var newHash = BCrypt.Net.BCrypt.HashPassword(senha, workFactor:12);
+                        reader.Close(); // close reader before executing another command on same connection
+                        using var upd = new MySqlCommand("UPDATE Usuario SET Senha = @senha WHERE IdUser = @id", conexao);
+                        upd.Parameters.AddWithValue("@senha", newHash);
+                        upd.Parameters.AddWithValue("@id", id);
+                        upd.ExecuteNonQuery();
+                        senhaHash = newHash;
+                    }
+                    else
+                    {
+                        credentialsOk = false;
+                    }
+                }
             }
             catch
-            { ok = false; }
-            if(!ok)
+            {
+                credentialsOk = false;
+            }
+
+            if (!credentialsOk)
             {
                 ViewBag.Erro = "Email ou senha inválidos.";
                 return View();
@@ -76,7 +107,17 @@ namespace Lustrious.Controllers
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
 
-            return RedirectToAction("Index", "Home");
+            // Redirect based on role
+            var roleLower = (role ?? string.Empty).ToLower();
+            if (roleLower == "cliente")
+            {
+                return RedirectToAction("Index", "Produto");
+            }
+            else
+            {
+                // Admin or Funcionario -> dashboard
+                return RedirectToAction("Index", "Funcionario");
+            }
         }
 
         [HttpPost,ValidateAntiForgeryToken]

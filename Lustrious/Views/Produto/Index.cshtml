@@ -1,44 +1,158 @@
 ﻿@model IEnumerable<Lustrious.Models.Produto>
 @{
  ViewData["Title"] = "Produtos";
+ int currentPage = ViewBag.CurrentPage ??1;
+ int totalPages = ViewBag.TotalPages ??1;
+ string filterQ = ViewBag.FilterQ as string ?? string.Empty;
+ int filterCategoria = ViewBag.FilterCategoria ??0;
+ int filterTipo = ViewBag.FilterTipo ??0;
+ var categorias = ViewBag.Categorias as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+ var tipos = ViewBag.Tipos as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
 }
-<h2>Produtos</h2>
-<p><a href="/Produto/CriarProduto">Novo Produto</a></p>
-@if (!Model.Any())
-{
- <p>Nenhum produto cadastrado.</p>
-}
-else
-{
- <table border="1" cellpadding="6">
+
+<style>
+ body { background: #f6f0e6; font-family: Arial, sans-serif; }
+ .container { width:90%; margin:30px auto; }
+ .filters { display:flex; gap:10px; align-items:center; margin-bottom:12px; }
+ .filters input, .filters select { padding:8px; border-radius:6px; border:1px solid #ccc; }
+ table { width:100%; border-collapse: collapse; background:#fff; }
+ th, td { padding:12px; border-bottom:1px solid #ddd; text-align:left; }
+ th { background:#c9a55b; color:#fff; }
+ .acoes button, .acoes form { display:inline-block; }
+ .btn { padding:8px12px; border-radius:6px; border:none; cursor:pointer; }
+ .btn-edit { background:#4caf50; color:#fff; }
+ .btn-delete { background:#a04444; color:#fff; }
+ .top-row { margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; }
+ .criar { background:#00fe64; color:#fff; padding:10px15px; border-radius:6px; text-decoration:none; }
+ .foto-thumb { width:60px; height:60px; object-fit:cover; border-radius:6px; }
+ .pagination { margin-top:12px; text-align:center; }
+ .page-btn { display:inline-block; margin:4px; padding:6px10px; background:#f0f0f0; border-radius:6px; text-decoration:none; color:#333; }
+ .page-current { display:inline-block; margin:4px; padding:6px10px; background:#d6b36a; border-radius:6px; color:#fff; font-weight:700; }
+</style>
+
+<div class="container">
+ <div class="top-row">
+ <h2>Produtos</h2>
+ <a asp-action="CriarProduto" asp-controller="Produto" class="criar">Novo Produto</a>
+ </div>
+
+ <form method="get" asp-action="Index" class="filters">
+ <input type="text" name="q" value="@filterQ" placeholder="Pesquisar nome ou descrição..." />
+ <select name="codCategoria" id="categoriaFilter">
+ <option value="0">Todas Categorias</option>
+ @foreach(var c in categorias)
+ {
+ var isSelected = (filterCategoria.ToString() == c.Value) || (c.Selected);
+ if(isSelected)
+ {
+ <option value="@c.Value" selected>@c.Text</option>
+ }
+ else
+ {
+ <option value="@c.Value">@c.Text</option>
+ }
+ }
+ </select>
+ <select name="codTipoProduto" id="tipoFilter">
+ <option value="0">Todos os Tipos</option>
+ @foreach(var t in tipos)
+ {
+ var isSel = (filterTipo.ToString() == t.Value) || (t.Selected);
+ if(isSel)
+ {
+ <option value="@t.Value" selected>@t.Text</option>
+ }
+ else
+ {
+ <option value="@t.Value">@t.Text</option>
+ }
+ }
+ </select>
+ <button type="submit" class="btn">Filtrar</button>
+ </form>
+
+ <table>
  <thead>
  <tr>
+ <th>Foto</th>
  <th>Código</th>
  <th>Nome</th>
  <th>Qtd</th>
- <th>Gênero</th>
  <th>Valor</th>
+ <th>Categoria</th>
+ <th>Tipo</th>
  <th>Ações</th>
  </tr>
  </thead>
  <tbody>
- @foreach(var p in Model)
+ @foreach(var item in Model)
  {
  <tr>
- <td>@p.CodigoBarras</td>
- <td>@p.NomeProd</td>
- <td>@p.qtd</td>
- <td>@p.Genero</td>
- <td>@p.ValorUnitario.ToString("C")</td>
  <td>
- <a href="/Produto/EditarProduto/@p.CodigoBarras">Editar</a> |
- <form asp-action="ExcluirProduto" method="post" style="display:inline;">
- <input type="hidden" name="id" value="@p.CodigoBarras" />
- <button type="submit" onclick="return confirm('Deseja excluir este produto?');">Excluir</button>
+ <img src="@(string.IsNullOrEmpty(item.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + item.Foto.TrimStart('/')))" class="foto-thumb" />
+ </td>
+ <td>@item.CodigoBarras</td>
+ <td>@item.NomeProd</td>
+ <td>@item.Qtd</td>
+ <td>@item.ValorUnitario.ToString("C")</td>
+ <td>@item.NomeCategoria</td>
+ <td>@item.NomeTipoProduto</td>
+ <td class="acoes">
+ <a asp-action="EditarProduto" asp-route-id="@item.CodigoBarras" class="btn btn-edit">Editar</a>
+ <form asp-action="ExcluirProduto" method="post" style="display:inline; margin-left:6px">
+ @Html.AntiForgeryToken()
+ <input type="hidden" name="id" value="@item.CodigoBarras" />
+ <button type="submit" class="btn btn-delete" onclick="return confirm('Confirma exclusão?');">Excluir</button>
  </form>
  </td>
  </tr>
  }
  </tbody>
  </table>
-}
+
+ <div class="pagination">
+ @if (totalPages >1)
+ {
+ if (currentPage >1)
+ {
+ <a class="page-btn" asp-action="Index" asp-route-page="@(currentPage -1)" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">&laquo; Anterior</a>
+ }
+ for (int i =1; i <= totalPages; i++)
+ {
+ if (i == currentPage)
+ {
+ <span class="page-current">@i</span>
+ }
+ else
+ {
+ <a class="page-btn" asp-action="Index" asp-route-page="@i" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">@i</a>
+ }
+ }
+ if (currentPage < totalPages)
+ {
+ <a class="page-btn" asp-action="Index" asp-route-page="@(currentPage +1)" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">Próximo &raquo;</a>
+ }
+ }
+ </div>
+</div>
+
+<script>
+ (function(){
+ var cat = document.getElementById('categoriaFilter');
+ var tipo = document.getElementById('tipoFilter');
+ if(!cat) return;
+ cat.addEventListener('change', function(){
+ fetch('/Produto/GetTiposPorCategoria?codCategoria=' + cat.value)
+ .then(r => r.json())
+ .then(data => {
+ tipo.innerHTML = '<option value="0">Todos os Tipos</option>';
+ data.forEach(function(i){
+ var opt = document.createElement('option');
+ opt.value = i.value; opt.text = i.text;
+ tipo.appendChild(opt);
+ });
+ })
+ .catch(()=>{});
+ });
+ })();
+</script>

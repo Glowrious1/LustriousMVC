@@ -82,7 +82,7 @@ namespace Lustrious.Repositorio
                 {
                     CodigoBarras = reader["CodigoBarras"] == DBNull.Value ? 0 : Convert.ToInt32(reader["CodigoBarras"]),
                     NomeProd = reader["NomeProd"] == DBNull.Value ? string.Empty : reader["NomeProd"].ToString(),
-                    qtd = reader["qtd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["qtd"]),
+                    Qtd = reader["qtd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["qtd"]),
                     Genero = reader["Genero"] == DBNull.Value ? string.Empty : reader["Genero"].ToString(),
                     Descricao = reader["Descricao"] == DBNull.Value ? string.Empty : reader["Descricao"].ToString(),
                     ValorUnitario = reader["ValorUnitario"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorUnitario"])

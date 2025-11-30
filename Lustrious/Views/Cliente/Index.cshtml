@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Clientes";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string filterQ = ViewBag.FilterQ as string ?? string.Empty;
 }
 
 <main class="main-content">
@@ -11,6 +14,24 @@
             <a class="new-btn" href="/Cliente/CriarCliente">NOVO CLIENTE</a>
         </div>
 
+        @if (TempData["ok"] != null)
+        {
+            <div class="alert-success" style="padding:10px; margin-top:15px; border-radius:8px; background-color: #d4edda; color: #155724; border:1px solid #c3e6cb;">
+                <strong>Sucesso:</strong> @TempData["ok"]
+            </div>
+        }
+        @if (TempData["erro"] != null)
+        {
+            <div class="alert-danger" style="padding:10px; margin-top:15px; border-radius:8px; background-color: #f8d7da; color: #721c24; border:1px solid #f5c6cb;">
+                <strong>Erro:</strong> @TempData["erro"]
+            </div>
+        }
+
+        <form method="get" asp-action="Index" class="filters" style="margin-top:12px;">
+            <input type="text" name="q" value="@filterQ" placeholder="Pesquisar por nome, email ou CPF..." />
+            <button type="submit" class="btn">Pesquisar</button>
+        </form>
+
         <table class="table-clientes">
             <thead>
                 <tr>
@@ -19,177 +40,239 @@
                     <th>EMAIL</th>
                     <th>Sexo</th>
                     <th>CPF</th>
+                    <th>ATIVO</th>
                     <th>Ações</th>
                 </tr>
             </thead>
 
             <tbody>
-                <!-- Vai repetir os clientes -->
                 @foreach (var cliente in Model)
                 {
- 
-                    // Build a safe URL for the image. Extract just the filename in case the DB stores a full path or backslashes.
                     var fotoVal = cliente.Foto ?? string.Empty;
-                    string fotoPath;
-
-                    if (string.IsNullOrWhiteSpace(fotoVal))
-                    {
-                        fotoPath = Url.Content("~/imagens/capa_foto.png");
-                    }
-                    else
-                    {
-                        // Normalize separators and take filename
-                        var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\', '/'));
-                        if (string.IsNullOrWhiteSpace(fileName))
-                        {
-                            fotoPath = Url.Content("~/imagens/capa_foto.png");
-                        }
-                        else
-                        {
-                            fotoPath = Url.Content("~/fotosUsuario/" + fileName);
-                        }
-                    }
+                    var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\', '/'));
+                    var imgSrc = string.IsNullOrWhiteSpace(fileName)
+                    ? Url.Content("~/imagens/capa_foto.png")
+                    : Url.Content("~/fotosUsuario/" + fileName);
 
                     <tr>
                         <td>
-                            <img src="@fotoPath" alt="Foto do cliente" class="cliente-foto" />
+                            <div style="width:60px;height:60px;overflow:hidden;border-radius:8px;">
+                                <img src="@imgSrc" alt="Foto do cliente" class="cliente-foto" />
+                            </div>
                         </td>
                         <td>@cliente.Nome</td>
                         <td>@cliente.Email</td>
                         <td>@cliente.Sexo</td>
                         <td>@cliente.CPF</td>
+                        <td>@(cliente.Ativo == "0" ? "Não" : "Sim")</td>
                         <td>
                             <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
-                            <a asp-controller="Cliente" asp-action="ExcluirCliente" asp-route-id="@cliente.IdUser" onclick="return confirm('Deseja realmente Excluir este item?');" class="delete-btn">EXCLUIR</a>
+
+                            @if (cliente.Ativo == "1" || string.IsNullOrEmpty(cliente.Ativo))
+                            {
+                                <form asp-controller="Cliente" asp-action="ExcluirCliente" method="post"
+                                                   asp-route-id="@cliente.IdUser" style="display:inline;">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="delete-btn"
+                                                            onclick="return confirm('Deseja realmente desativar este cliente?');">
+                                    DESATIVAR
+                                </button>
+                            </form>
+                            }
+                            else
+                            {
+                                <form asp-controller="Cliente" asp-action="ReativarCliente" method="post"
+                                                   asp-route-id="@cliente.IdUser" style="display:inline;">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="edit-btn" onclick="return confirm('Reativar este cliente?');">REATIVAR</button>
+                            </form>
+                            }
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+
+        <!-- Paginação -->
+        <div class="pagination" style="margin-top:12px; text-align:center;">
+            @if (totalPages > 1)
+            {
+                if (currentPage > 1)
+                {
+                    <a asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-q="@filterQ" class="page-btn">&laquo; Anterior</a>
+                }
+                for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <span class="page-current">@i</span>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" asp-route-page="@i" asp-route-q="@filterQ" class="page-btn">@i</a>
+                    }
+                }
+                if (currentPage < totalPages)
+                {
+                    <a asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-q="@filterQ" class="page-btn">Próximo &raquo;</a>
+                }
+            }
+        </div>
     </div>
 </main>
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #FFEFCC;
-        font-family: 'Times New Roman', serif;
+        body {
+                margin: 0;
+                padding: 0;
+                background-color: #FFEFCC;
+                font-family: 'Times New Roman', serif;
+
     }
+
 
     /* NAVBAR */
-    .navbar-container {
-        background: white;
-        border-bottom: 5px solid #b5954b;
-        padding: 15px 50px;
+        .navbar-container {
+                background: white;
+                border-bottom: 5px solid #b5954b;
+                padding: 15px 50px;
+
     }
 
-    .navbar {
-        display: flex;
-        align-items: center;
-        gap: 40px;
+        .navbar {
+                display: flex;
+                align-items: center;
+                gap: 40px;
+
     }
 
-    .logo {
-        color: #b5954b;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        font-size: 18px;
+        .logo {
+                color: #b5954b;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                font-size: 18px;
+
     }
 
-    nav a {
-        text-decoration: none;
-        color: #363636;
-        margin-right: 25px;
-        font-weight: 500;
+        nav a {
+                text-decoration: none;
+                color: #363636;
+                margin-right: 25px;
+                font-weight: 500;
+
     }
+
 
     /* CARD CENTRAL */
-    .main-content {
-        display: flex;
-        justify-content: center;
-        padding: 40px 0;
+        .main-content {
+                display: flex;
+                justify-content: center;
+                padding: 40px 0;
+
     }
 
-    .card {
-        background: #fff6c6;
-        width: 70%;
-        border-radius: 15px;
-        padding: 25px;
-        border: 4px solid #d6b36a;
+        .card {
+                background: #fff6c6;
+                width: 70%;
+                border-radius: 15px;
+                padding: 25px;
+                border: 4px solid #d6b36a;
+
     }
 
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
     }
 
-        .card-header h2 {
-            margin: 0;
-            font-size: 24px;
-        }
+            .card-header h2 {
+                    margin: 0;
+                    font-size: 24px;
 
-    .new-btn {
-        background: #d6b36a;
-        color: white;
-        padding: 8px 18px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-        transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
     }
 
-        .new-btn:hover {
-            background-color: #CCAC66; /* Cor de fundo ao passar o mouse */
-            color: #FFFFFF; /* Cor do texto ao passar o mouse */
-        }
+        .new-btn {
+                background: #d6b36a;
+                color: white;
+                padding: 8px 18px;
+                border-radius: 10px;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 14px;
+                transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+
+    }
+
+            .new-btn:hover {
+                    background-color: #CCAC66; /* Cor de fundo ao passar o mouse */
+                    color: #FFFFFF; /* Cor do texto ao passar o mouse */
+
+    }
+
 
 
     /* TABELA */
-    .table-clientes {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+        .table-clientes {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+
     }
 
-        .table-clientes th {
-            text-align: left;
-            padding: 12px 0;
-            font-weight: bold;
-            border-bottom: 2px solid #d6b36a;
+                .table-clientes th {
+                        text-align: left;
+                        padding: 12px 0;
+                        font-weight: bold;
+                        border-bottom: 2px solid #d6b36a;
+
         }
 
-        .table-clientes td {
-            padding: 12px 0;
-            vertical-align: middle;
+                .table-clientes td {
+                        padding: 12px 0;
+                        vertical-align: middle;
+
         }
 
-    .edit-btn {
-        background: #8a8a8a;
-        color: white;
-        padding: 5px 12px;
-        border-radius: 8px;
-        text-decoration: none;
-        margin-right: 8px;
+        .edit-btn {
+                background: #8a8a8a;
+                color: white;
+                padding: 5px 12px;
+                border-radius: 8px;
+                text-decoration: none;
+                margin-right: 8px;
+
     }
 
-    .delete-btn {
-        background: #b54845;
-        color: white;
-        padding: 5px 12px;
-        border-radius: 8px;
-        text-decoration: none;
+        .delete-btn {
+                background: #b54845;
+                color: white;
+                padding: 5px 12px;
+                border-radius: 8px;
+                text-decoration: none;
+                border: none; /* Adicionado para garantir que se pareça com o link EDITAR */
+
     }
+
+        .filters input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+        .pagination { margin-top: 16px; }
+        .page-btn { display: inline-block; margin: 4px; padding: 6px 10px; background: #f0f0f0; border-radius: 6px; text-decoration: none; color: #333; }
+        .page-current { display: inline-block; margin: 4px; padding: 6px 10px; background: #d6b36a; border-radius: 6px; color: #fff; font-weight: 700; }
+
 
     /* Foto padrão tamanho */
-    .cliente-foto {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid #e6d6a8;
+        .cliente-foto {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 2px solid #e6d6a8;
+
     }
 </style>

@@ -22,6 +22,7 @@ IdEndereco  int null,
 Ativo char(1)  default '1'
 );
 
+select * from Usuario ;
 
 /*
 create table Funcionario (
@@ -109,7 +110,7 @@ foreign key (IdProd) references Produto(CodigoBarras) on delete cascade
 
 create table Carrinho(
 IdCarrinho int primary key auto_increment,
-IdProd int not null,
+IdProd bigint not null,
 Qtd int not null,
 ValorUnitario decimal(9,2),
 ValorTotal decimal(9,2),
@@ -184,7 +185,7 @@ ADD CONSTRAINT fk_Produto_TipoProduto FOREIGN KEY (codTipoProduto) REFERENCES ti
  
  
  
- 
+ 000.000.000-12
  
  
  
@@ -363,7 +364,7 @@ IdUser int not null
  create  procedure insertUsuario (
  in vNome varchar(250),
  in vEmail varchar(150),
- in vCPF varchar(12),
+ in vCPF varchar(14),
  in vSenha varchar(250),
  in vRole varchar(20),
  in vSexo varchar(20),
@@ -387,7 +388,7 @@ delimiter $$
 create procedure selectUsuario()
 begin
  
-select IdUser, Nome,Email,Senha,Sexo,CPF,Role from Usuario order by Nome; 
+select IdUser, Nome,Email,Senha,Sexo,CPF,Role,Foto from Usuario order by Nome; 
 end $$
 
 call selectUsuario;
@@ -399,9 +400,11 @@ select IdUser,Nome,Email, Senha,role,ativo,Sexo,CPF from usuario where email= p_
 limit 1;
 end $$
 
-
-
-
+use dbilumina ; 
+create procedure obterProduto (in vCodigoBarras bigint)
+begin
+  select CodigoBarras,NomeProd,Qtd,Foto,Descricao,ValorUnitario,codCategoria,codTipoProduto from Produto where CodigoBarras = vCodigoBarras;
+end $$	
 
 create procedure obterUsuario (in vId int)
 begin
@@ -410,8 +413,8 @@ end $$
 
 call obterUsuario(1);
 
-DELIMITER $$ DROP PROCEDURE IF EXISTS updateUsuario$$ 
-CREATE PROCEDURE updateUsuario( 
+DELIMITER $$ 
+CREATE  PROCEDURE updateUsuario( 
 IN vIdUser INT, IN vNome VARCHAR(200), IN vEmail VARCHAR(150), 
 IN vSenha VARCHAR(250), IN vCPF VARCHAR(14), IN vSexo VARCHAR(20), IN vFoto VARCHAR(255) ) 
 BEGIN 
@@ -421,8 +424,7 @@ BEGIN
  END IF ; 
 end $$ 
 
-
-
+call DeleteUsuario(4);
 create procedure DeleteUsuario(in vIdUser int)
 begin
   if exists (select IdUser from Usuario where IdUser = vIdUser)then
@@ -527,6 +529,10 @@ begin
 end$$
 delimiter ;
 
+
+
+INSERT INTO Usuario (Nome, Email, Senha, CPF, Role)
+VALUES ('Administrador Master', 'admin@site.com', 'admin123', '000.000.000-00', 'Admin');
 
 
 
@@ -779,30 +785,157 @@ BEGIN
 END$$
 
 -- 10) Corrigir/atualizar updateUsuario (existente no seu script aparenta ter inconsistência com vCPF)
-DROP PROCEDURE IF EXISTS updateUsuario$$
-CREATE PROCEDURE updateUsuario(
- IN vIdUser INT,
- IN vNome VARCHAR(200),
- IN vEmail VARCHAR(150),
- IN vSenha VARCHAR(250),
- IN vCPF VARCHAR(14),
- IN vSexo VARCHAR(20)
+
+
+DELIMITER ;
+
+-- FIM
+
+
+USE dbilumina;
+
+-- Criar categorias necessárias se não existirem
+INSERT INTO Categoria (Categoria)
+SELECT 'Maquiagem' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM Categoria WHERE Categoria = 'Maquiagem');
+
+INSERT INTO Categoria (Categoria)
+SELECT 'Cabelo' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM Categoria WHERE Categoria = 'Cabelo');
+
+-- Opcional: outras categorias usadas pelo projeto
+INSERT INTO Categoria (Categoria)
+SELECT 'Skincare' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM Categoria WHERE Categoria = 'Skincare');
+
+-- Inserir produtos (CodigoBarras é a PK). Ajuste os valores se já existirem.
+-- Observação: ValorUnitario usa ponto decimal. Foto armazena o caminho relativo conforme as imagens em /public
+
+INSERT INTO Produto (CodigoBarras, NomeProd, qtd, foto, Genero, Descricao, ValorUnitario, codCategoria)
+VALUES
+(1, 'Blush Compacto 4g - pêssego-terroso', 50, '/blush.png', 'Unissex', 'Um tom pêssego-terroso sofisticado que ilumina naturalmente a pele. Sua textura ultrafina desliza com suavidade, garantindo um esfumado impecável e acabamento aveludado.', 39.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(2, 'Creme Facial', 50, '/cremefacial.jpg', 'Unissex', 'Creme facial hidratante e restaurador.', 130.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(3, 'Prime', 50, '/Prime1.png', 'Unissex', 'Prime para preparação da pele, melhora a durabilidade da maquiagem.', 120.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(4, 'Rouge Royale – 6 ml', 50, '/gloss1.png', 'Unissex', 'Rouge Royale é um gloss criado para quem deseja dominar os holofotes. Seu tom vermelho profundo e acabamento luminoso.', 49.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(5, 'Crystal Frost – 6 ml', 50, '/gloss2.png', 'Unissex', 'Crystal Frost com microbrilhos prateados para um reflexo espelhado.', 49.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(6, 'Pink Velvet – 6 ml', 50, '/gloss3.png', 'Unissex', 'Pink Velvet tom rosa vibrante com acabamento luminoso.', 47.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(7, 'Bronze Amour – 6 ml', 50, '/gloss4.png', 'Unissex', 'Bronze Amour tonalidade bronze quente com partículas douradas.', 47.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(8, 'Cocoa Glow – 6 ml', 50, '/gloss5.png', 'Unissex', 'Cocoa Glow tom marrom suave com acabamento sofisticado.', 54.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(10, '15N – Ivory Glow', 50, '/base1.png', 'Unissex', 'Base 15N – Ivory Glow com cobertura média e acabamento aveludado.', 89.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(11, '20W – Golden Radiance', 50, '/base2.png', 'Unissex', 'Base 20W – Golden Radiance com acabamento radiante.', 89.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(12, '10N – Pearl Porcelain', 50, '/base3.png', 'Unissex', 'Base 10N – Pearl Porcelain entrega luminosidade e acabamento impecável.', 89.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(13, '40W – Caramel Essence', 50, '/base4.png', 'Unissex', 'Base 40W – Caramel Essence tonalidade caramelizada e acabamento luminoso.', 89.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(14, '30N – Nude Harmony', 50, '/base5.png', 'Unissex', 'Base 30N – Nude Harmony equilíbrio entre naturalidade e cobertura.', 89.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(15, '50C – Mocha Deep', 50, '/base6.png', 'Unissex', 'Base 50C – Mocha Deep formulada para peles profundas.', 89.90, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Maquiagem')),
+(17, 'Shampoo de Banana', 100, '/Shampoo.png', 'Unissex', 'Hidratação suave e maciez imediata para fios radiantes.', 40.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Cabelo')),
+(18, 'Condicionador de Banana', 100, '/Condicionador.png', 'Unissex', 'Hidratação profunda e nutrição imediata para fios mais fortes e macios.', 40.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Cabelo')),
+(19, 'Hidratante Capilar de Banana', 100, '/Capilar.png', 'Unissex', 'Hidratação profunda e nutrição imediata.', 40.00, (SELECT codCategoria FROM Categoria WHERE Categoria = 'Cabelo'));
+
+-- Commit explícito
+COMMIT;
+
+select * from Produto;
+
+USE dbilumina;
+
+DELIMITER $$
+
+-- selectUsuario
+DROP PROCEDURE IF EXISTS selectUsuario$$
+CREATE PROCEDURE selectUsuario(IN p_role VARCHAR(20))
+BEGIN
+ SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto
+ FROM Usuario
+ WHERE Role = p_role
+ ORDER BY Nome;
+END$$
+
+delimiter $$
+create procedure selectFuncionario()
+begin
+ 
+select IdUser, Nome,Email,Senha,Sexo,CPF,Role,Foto from Usuario where not role = "Cliente" order by Nome; 
+end $$
+
+
+-- insertProduto
+DROP PROCEDURE IF EXISTS insertProduto$$
+CREATE PROCEDURE insertProduto(
+ IN vCodigoBarras BIGINT,
+ IN vNomeProd VARCHAR(200),
+ IN vQtd INT,
+ IN vDescricao VARCHAR(250),
+ IN vValorUnitario DECIMAL(9,2),
+ IN vRole ENUM('Masculino','Feminino','Unissex'),
+ IN vCodCategoria INT,
+ IN vCodTipoProduto INT,
+ IN vFoto VARCHAR(255)
 )
 BEGIN
- IF EXISTS(SELECT * FROM Usuario WHERE IdUser = vIdUser) THEN
- UPDATE Usuario
- SET Nome = vNome,
- Email = vEmail,
- Senha = vSenha,
- CPF = vCPF,
- Sexo = vSexo
- WHERE IdUser = vIdUser;
+ IF NOT EXISTS(SELECT CodigoBarras FROM Produto WHERE CodigoBarras = vCodigoBarras) THEN
+ INSERT INTO Produto (CodigoBarras, NomeProd, qtd, Descricao, ValorUnitario, Genero, codCategoria, codTipoProduto, foto)
+ VALUES (vCodigoBarras, vNomeProd, vQtd, vDescricao, vValorUnitario, vRole, vCodCategoria, vCodTipoProduto, vFoto);
  ELSE
- SELECT 'Usuario não encontrado' AS Mensagem;
+ SELECT 'Produto já está registrado' AS Mensagem;
+ END IF;
+END$$
+
+-- updateProduto
+DROP PROCEDURE IF EXISTS updateProduto$$
+CREATE PROCEDURE updateProduto(
+ IN vCodigo BIGINT,
+ IN vNome VARCHAR(200),
+ IN vQtd INT,
+ IN vDesc VARCHAR(250),
+ IN vValor DECIMAL(9,2),
+ IN vRole ENUM('Masculino','Feminino','Unissex'),
+ IN vCodCategoria INT,
+ IN vCodTipoProduto INT,
+ IN vFoto VARCHAR(255)
+)
+BEGIN
+ IF EXISTS(SELECT CodigoBarras FROM Produto WHERE CodigoBarras = vCodigo) THEN
+ UPDATE Produto
+ SET NomeProd = vNome,
+ qtd = vQtd,
+ Descricao = vDesc,
+ ValorUnitario = vValor,
+ Foto = vFoto,
+ Genero = vRole,
+ codCategoria = vCodCategoria,
+ codTipoProduto = vCodTipoProduto
+ WHERE CodigoBarras = vCodigo;
+ ELSE
+ SELECT 'Produto não encontrado' AS Mensagem;
+ END IF;
+END$$
+
+-- selectProdutos
+DROP PROCEDURE IF EXISTS selectProdutos$$
+CREATE PROCEDURE selectProdutos(IN vCodTipoProduto INT)
+BEGIN
+ IF vCodTipoProduto IS NULL OR vCodTipoProduto =0 THEN
+ SELECT p.CodigoBarras AS IdProduto,
+ p.NomeProd AS Nome,
+ p.qtd,
+ p.Descricao AS descricao,
+ p.ValorUnitario AS valor_unitario,
+ p.foto AS foto,
+ p.Genero
+ FROM Produto p
+ ORDER BY p.NomeProd;
+ ELSE
+ SELECT p.CodigoBarras AS IdProduto,
+ p.NomeProd AS Nome,
+ p.qtd,
+ p.Descricao AS descricao,
+ p.ValorUnitario AS valor_unitario,
+ p.foto AS foto,
+ p.Genero
+ FROM Produto p
+ WHERE p.codTipoProduto = vCodTipoProduto
+ ORDER BY p.NomeProd;
  END IF;
 END$$
 
 DELIMITER ;
 
--- FIM
+SELECT * FROM Produto where not CodigoBarras =  1;
 

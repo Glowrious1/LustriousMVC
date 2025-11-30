@@ -2,31 +2,124 @@
 @{
  ViewData["Title"] = "Editar Produto";
 }
-<h2>Editar Produto</h2>
-<form asp-action="EditarProduto" method="post">
- <input type="hidden" name="CodigoBarras" value="@Model.CodigoBarras" />
- <div>
- <label>Nome</label>
- <input type="text" name="NomeProd" value="@Model.NomeProd" />
+
+<style>
+ body { background: #b8ab93; font-family: Arial, sans-serif; }
+ .cadastrar{ border-radius:5px; height:38px; color:white; background-color:rgb(0,254,100); border:none; }
+ .container-card { width:65%; margin:40px auto; background: #f6eec9; padding:40px; border-radius:20px; border:8px solid #c9a55b; }
+ .container-card h2 { text-align: center; margin-bottom:25px; }
+ .row { display: flex; justify-content: space-between; }
+ .left-side { width:55%; }
+ .form-group { margin-top:10px; font-size:12px; font-weight: bold; }
+ .left-side input, .sexo-box select, .left-side textarea, .left-side select { width:90%; padding:8px; margin-top:3px; margin-bottom:10px; border-radius:6px; border:1px solid #9b8968; }
+ .foto-container { width:200px; height:200px; border:4px solid #c9a55b; border-radius:16px; overflow: hidden; cursor: pointer; position: relative; }
+ .foto-preview { width:100%; height:100%; object-fit: cover; }
+ .foto-input { position: absolute; opacity:0; cursor: pointer; width:100%; height:100%; top:0; left:0; }
+ .button-row { text-align: center; margin-top:35px; }
+ .btn-editar { background: #c7c0ae; padding:10px25px; border: none; border-radius:6px; cursor: pointer; margin-right:10px; }
+ .cancelar { background: #a04444; color: white; padding:10px25px; border-radius:6px; text-decoration: none; }
+ .btn-editar:hover { background: #b3aa96; color: white; transition:0.3s; }
+ .cancelar:hover { background: #7d3232; color: #fff; transition:0.3s; }
+ .alert { padding:12px; border-radius:8px; margin-bottom:12px; }
+ .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+ .alert-ok { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+</style>
+
+<form class="container-card" asp-action="EditarProduto" method="post" enctype="multipart/form-data">
+ @Html.AntiForgeryToken()
+
+ <h2>EDITAR PRODUTO</h2>
+
+ @if(TempData["Erro"] != null) {
+ <div class="alert alert-error">@TempData["Erro"]</div>
+ }
+ @if(TempData["Ok"] != null) {
+ <div class="alert alert-ok">@TempData["Ok"]</div>
+ }
+
+ <div class="row">
+ <div class="left-side">
+ <div class="form-group">CÓDIGO DE BARRAS:</div>
+ <input asp-for="CodigoBarras" type="number" readonly />
+ <span asp-validation-for="CodigoBarras" class="text-danger"></span>
+
+ <div class="form-group">NOME DO PRODUTO:</div>
+ <input asp-for="NomeProd" type="text" />
+ <span asp-validation-for="NomeProd" class="text-danger"></span>
+
+ <div class="form-group">QUANTIDADE:</div>
+ <input asp-for="Qtd" type="number" />
+ <span asp-validation-for="Qtd" class="text-danger"></span>
+
+ <div class="form-group">DESCRIÇÃO:</div>
+ <textarea asp-for="Descricao" rows="3"></textarea>
+ <span asp-validation-for="Descricao" class="text-danger"></span>
+
+ <div class="form-group">VALOR UNITÁRIO:</div>
+ <input asp-for="ValorUnitario" type="number" step="0.01" />
+ <span asp-validation-for="ValorUnitario" class="text-danger"></span>
+
+ <div class="form-group">GÊNERO:</div>
+ <div class="sexo-box">
+ <select asp-for="Genero">
+ <option value="Masculino">Masculino</option>
+ <option value="Feminino">Feminino</option>
+ <option value="Unissex">Unissex</option>
+ </select>
  </div>
- <div>
- <label>Quantidade</label>
- <input type="number" name="qtd" value="@Model.qtd" />
+
+ <div class="form-group">CATEGORIA:</div>
+ <select id="categoriaSelect" asp-for="CodCategoria" asp-items="Model.CategoriaNome"></select>
+
+ <div class="form-group">TIPO DE PRODUTO:</div>
+ <select id="tipoSelect" asp-for="CodTipoProduto" asp-items="Model.TipoProdutoNome"></select>
  </div>
- <div>
- <label>Genero</label>
- <input type="text" name="Genero" value="@Model.Genero" />
+
+ <label class="foto-container" for="fotoInput">
+ <img src="@(string.IsNullOrEmpty(Model.Foto) ? "~/imagens/capa_foto.png" : Url.Content("~/" + Model.Foto.TrimStart('/')))" class="foto-preview" id="fotoPreview" />
+ <input type="file" id="fotoInput" name="foto" accept="image/*" class="foto-input" />
+ </label>
  </div>
- <div>
- <label>Descrição</label>
- <textarea name="Descricao">@Model.Descricao</textarea>
- </div>
- <div>
- <label>Valor Unitário</label>
- <input type="number" step="0.01" name="ValorUnitario" value="@Model.ValorUnitario" />
- </div>
- <div style="margin-top:10px;">
- <button type="submit">Salvar</button>
- <a href="/Produto">Cancelar</a>
+
+ <div class="button-row">
+ <button class="cadastrar" type="submit">SALVAR</button>
+ <a asp-action="Index" asp-controller="Produto" class="cancelar">CANCELAR</a>
  </div>
 </form>
+
+<script>
+ (function(){
+ var input = document.getElementById('fotoInput');
+ var preview = document.getElementById('fotoPreview');
+ if(input){
+ input.addEventListener('change', function(e){
+ var file = input.files && input.files[0];
+ if(!file) return;
+ var reader = new FileReader();
+ reader.onload = function(ev){ preview.src = ev.target.result; };
+ reader.readAsDataURL(file);
+ });
+ }
+
+ var categoria = document.getElementById('categoriaSelect');
+ var tipo = document.getElementById('tipoSelect');
+ if(categoria){
+ categoria.addEventListener('change', function(){
+ var val = categoria.value;
+ fetch('/Produto/GetTiposPorCategoria?codCategoria=' + val)
+ .then(function(r){ return r.json(); })
+ .then(function(data){
+ tipo.innerHTML = '';
+ data.forEach(function(i){
+ var opt = document.createElement('option');
+ opt.value = i.value; opt.text = i.text;
+ tipo.appendChild(opt);
+ });
+ })
+ .catch(function(){
+ alert('Erro ao carregar tipos');
+ });
+ });
+ }
+ })();
+</script>
