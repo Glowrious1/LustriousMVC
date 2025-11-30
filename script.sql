@@ -401,8 +401,10 @@ limit 1;
 end $$
 
 use dbilumina ; 
-
-
+create procedure obterProduto (in vCodigoBarras bigint)
+begin
+  select CodigoBarras,NomeProd,Qtd,Foto,Descricao,ValorUnitario,codCategoria,codTipoProduto from Produto where CodigoBarras = vCodigoBarras;
+end $$	
 
 create procedure obterUsuario (in vId int)
 begin
@@ -422,8 +424,7 @@ BEGIN
  END IF ; 
 end $$ 
 
-
-
+call DeleteUsuario(4);
 create procedure DeleteUsuario(in vIdUser int)
 begin
   if exists (select IdUser from Usuario where IdUser = vIdUser)then
@@ -780,28 +781,7 @@ BEGIN
 END$$
 
 -- 10) Corrigir/atualizar updateUsuario (existente no seu script aparenta ter inconsistência com vCPF)
-DROP PROCEDURE IF EXISTS updateUsuario$$
-CREATE PROCEDURE updateUsuario(
- IN vIdUser INT,
- IN vNome VARCHAR(200),
- IN vEmail VARCHAR(150),
- IN vSenha VARCHAR(250),
- IN vCPF VARCHAR(14),
- IN vSexo VARCHAR(20)
-)
-BEGIN
- IF EXISTS(SELECT * FROM Usuario WHERE IdUser = vIdUser) THEN
- UPDATE Usuario
- SET Nome = vNome,
- Email = vEmail,
- Senha = vSenha,
- CPF = vCPF,
- Sexo = vSexo
- WHERE IdUser = vIdUser;
- ELSE
- SELECT 'Usuario não encontrado' AS Mensagem;
- END IF;
-END$$
+
 
 DELIMITER ;
 
@@ -849,4 +829,109 @@ COMMIT;
 
 select * from Produto;
 
-inser
+USE dbilumina;
+
+DELIMITER $$
+
+-- selectUsuario
+DROP PROCEDURE IF EXISTS selectUsuario$$
+CREATE PROCEDURE selectUsuario(IN p_role VARCHAR(20))
+BEGIN
+ SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto
+ FROM Usuario
+ WHERE Role = p_role
+ ORDER BY Nome;
+END$$
+
+delimiter $$
+create procedure selectFuncionario()
+begin
+ 
+select IdUser, Nome,Email,Senha,Sexo,CPF,Role,Foto from Usuario where not role = "Cliente" order by Nome; 
+end $$
+
+
+-- insertProduto
+DROP PROCEDURE IF EXISTS insertProduto$$
+CREATE PROCEDURE insertProduto(
+ IN vCodigoBarras BIGINT,
+ IN vNomeProd VARCHAR(200),
+ IN vQtd INT,
+ IN vDescricao VARCHAR(250),
+ IN vValorUnitario DECIMAL(9,2),
+ IN vRole ENUM('Masculino','Feminino','Unissex'),
+ IN vCodCategoria INT,
+ IN vCodTipoProduto INT,
+ IN vFoto VARCHAR(255)
+)
+BEGIN
+ IF NOT EXISTS(SELECT CodigoBarras FROM Produto WHERE CodigoBarras = vCodigoBarras) THEN
+ INSERT INTO Produto (CodigoBarras, NomeProd, qtd, Descricao, ValorUnitario, Genero, codCategoria, codTipoProduto, foto)
+ VALUES (vCodigoBarras, vNomeProd, vQtd, vDescricao, vValorUnitario, vRole, vCodCategoria, vCodTipoProduto, vFoto);
+ ELSE
+ SELECT 'Produto já está registrado' AS Mensagem;
+ END IF;
+END$$
+
+-- updateProduto
+DROP PROCEDURE IF EXISTS updateProduto$$
+CREATE PROCEDURE updateProduto(
+ IN vCodigo BIGINT,
+ IN vNome VARCHAR(200),
+ IN vQtd INT,
+ IN vDesc VARCHAR(250),
+ IN vValor DECIMAL(9,2),
+ IN vRole ENUM('Masculino','Feminino','Unissex'),
+ IN vCodCategoria INT,
+ IN vCodTipoProduto INT,
+ IN vFoto VARCHAR(255)
+)
+BEGIN
+ IF EXISTS(SELECT CodigoBarras FROM Produto WHERE CodigoBarras = vCodigo) THEN
+ UPDATE Produto
+ SET NomeProd = vNome,
+ qtd = vQtd,
+ Descricao = vDesc,
+ ValorUnitario = vValor,
+ Foto = vFoto,
+ Genero = vRole,
+ codCategoria = vCodCategoria,
+ codTipoProduto = vCodTipoProduto
+ WHERE CodigoBarras = vCodigo;
+ ELSE
+ SELECT 'Produto não encontrado' AS Mensagem;
+ END IF;
+END$$
+
+-- selectProdutos
+DROP PROCEDURE IF EXISTS selectProdutos$$
+CREATE PROCEDURE selectProdutos(IN vCodTipoProduto INT)
+BEGIN
+ IF vCodTipoProduto IS NULL OR vCodTipoProduto =0 THEN
+ SELECT p.CodigoBarras AS IdProduto,
+ p.NomeProd AS Nome,
+ p.qtd,
+ p.Descricao AS descricao,
+ p.ValorUnitario AS valor_unitario,
+ p.foto AS foto,
+ p.Genero
+ FROM Produto p
+ ORDER BY p.NomeProd;
+ ELSE
+ SELECT p.CodigoBarras AS IdProduto,
+ p.NomeProd AS Nome,
+ p.qtd,
+ p.Descricao AS descricao,
+ p.ValorUnitario AS valor_unitario,
+ p.foto AS foto,
+ p.Genero
+ FROM Produto p
+ WHERE p.codTipoProduto = vCodTipoProduto
+ ORDER BY p.NomeProd;
+ END IF;
+END$$
+
+DELIMITER ;
+
+SELECT * FROM Produto where not CodigoBarras =  1;
+

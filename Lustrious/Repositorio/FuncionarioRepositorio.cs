@@ -1,9 +1,8 @@
-﻿    using Lustrious.Data;
+﻿using Lustrious.Data;
 using Lustrious.Models;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI;
 using System.Data;
-using System.Net.Sockets;
+using System.Collections.Generic;
 
 namespace Lustrious.Repositorio
 {
@@ -17,22 +16,19 @@ namespace Lustrious.Repositorio
         }
         public void CadastrarFuncionario(Usuario funcionario)
         {
-
-            
-
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
                 using (var cmd = new MySqlCommand("insertUsuario", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
                     cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
                     cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
                     cmd.Parameters.AddWithValue("vRole", funcionario.Role);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
-                    cmd.Parameters.AddWithValue("vFoto", funcionario.Foto);
+                    cmd.Parameters.AddWithValue("vFoto", funcionario.Foto ?? string.Empty);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -43,29 +39,22 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("obterUsuario", conexao))
+                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto FROM Usuario WHERE IdUser = @id", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("vId", id);
-
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-
-                    DataTable dt = new DataTable();
-
-                    da.Fill(dt);
-
-                    conexao.Close();
-
-                    foreach (DataRow dr in dt.Rows)
+                    cmd.Parameters.AddWithValue("@id", id);
+                    using var reader = cmd.ExecuteReader();
+                    if (reader.Read())
                     {
                         funcionario = new Usuario()
                         {
-                            IdUser = Convert.ToInt32(dr["IdUser"]),
-                            Nome = (string)dr["Nome"],
-                            Email = (string)dr["Email"],
-                            Senha = (string)dr["Senha"],
-                            Sexo = (string)dr["Sexo"],
-                            CPF = (string)dr["CPF"]
+                            IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                            Nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString(),
+                            Email = reader["Email"] == DBNull.Value ? string.Empty : reader["Email"].ToString(),
+                            Senha = reader["Senha"] == DBNull.Value ? string.Empty : reader["Senha"].ToString(),
+                            Sexo = reader["Sexo"] == DBNull.Value ? string.Empty : reader["Sexo"].ToString(),
+                            CPF = reader["CPF"] == DBNull.Value ? string.Empty : reader["CPF"].ToString(),
+                            Role = reader["Role"] == DBNull.Value ? string.Empty : reader["Role"].ToString(),
+                            Foto = reader["Foto"] == DBNull.Value ? string.Empty : reader["Foto"].ToString()
                         };
                     }
                 }
@@ -74,38 +63,31 @@ namespace Lustrious.Repositorio
         }
         public IEnumerable<Usuario> ListarFuncionario()
         {
-            List<Usuario> funcionario = new List<Usuario>();
+            var funcionarios = new List<Usuario>();
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("selectUsuario", conexao))
+                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto FROM Usuario WHERE not Role = 'Cliente' ORDER BY Nome", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-
-                    DataTable dt = new DataTable();
-
-                    da.Fill(dt);
-
-                    conexao.Close();
-
-                    foreach (DataRow dr in dt.Rows)
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
-                        funcionario.Add(new Usuario
+                        funcionarios.Add(new Usuario
                         {
-                            IdUser = Convert.ToInt32(dr["IdUser"]),
-                            Nome = (string)dr["Nome"],
-                            Email = (string)dr["Email"],
-                            Senha = (string)dr["Senha"],
-                            Sexo = (string)dr["Sexo"],
-                            CPF = (string)dr["CPF"],
-                            Role = (string)dr["Role"]
-                        }
-                        );
+                            IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                            Nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString(),
+                            Email = reader["Email"] == DBNull.Value ? string.Empty : reader["Email"].ToString(),
+                            Senha = reader["Senha"] == DBNull.Value ? string.Empty : reader["Senha"].ToString(),
+                            Sexo = reader["Sexo"] == DBNull.Value ? string.Empty : reader["Sexo"].ToString(),
+                            CPF = reader["CPF"] == DBNull.Value ? string.Empty : reader["CPF"].ToString(),
+                            Role = reader["Role"] == DBNull.Value ? string.Empty : reader["Role"].ToString(),
+                            Foto = reader["Foto"] == DBNull.Value ? string.Empty : reader["Foto"].ToString()
+                        });
                     }
                 }
+                conexao.Close();
             }
-            return funcionario;
+            return funcionarios;
         }
 
 
@@ -116,12 +98,14 @@ namespace Lustrious.Repositorio
                 conexao.Open();
                 using (var cmd = new MySqlCommand("updateUsuario", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("vIdUser", funcionario.IdUser);
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
                     cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
                     cmd.Parameters.AddWithValue("vSenha", funcionario.Senha);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
+                    cmd.Parameters.AddWithValue("vFoto", funcionario.Foto ?? string.Empty);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }
@@ -134,8 +118,8 @@ namespace Lustrious.Repositorio
                 conexao.Open();
                 using (var cmd = new MySqlCommand("DeleteUsuario", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("vId", id);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("vIdUser", id);
                     cmd.ExecuteNonQuery();
                     conexao.Close();
                 }

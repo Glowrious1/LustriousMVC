@@ -2,43 +2,64 @@
 @{
  ViewData["Title"] = "Produtos";
 }
-<h2>Produtos</h2>
-<p><a href="/Produto/CriarProduto">Novo Produto</a></p>
-@if (!Model.Any())
-{
- <p>Nenhum produto cadastrado.</p>
-}
-else
-{
- <table border="1" cellpadding="6">
+
+<style>
+ body { background: #f6f0e6; font-family: Arial, sans-serif; }
+ .container { width:90%; margin:30px auto; }
+ table { width:100%; border-collapse: collapse; background:#fff; }
+ th, td { padding:12px; border-bottom:1px solid #ddd; text-align:left; }
+ th { background:#c9a55b; color:#fff; }
+ .acoes button, .acoes form { display:inline-block; }
+ .btn { padding:8px12px; border-radius:6px; border:none; cursor:pointer; }
+ .btn-edit { background:#4caf50; color:#fff; }
+ .btn-delete { background:#a04444; color:#fff; }
+ .top-row { margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; }
+ .criar { background:#00fe64; color:#fff; padding:10px15px; border-radius:6px; text-decoration:none; }
+ .foto-thumb { width:60px; height:60px; object-fit:cover; border-radius:6px; }
+</style>
+
+<div class="container">
+ <div class="top-row">
+ <h2>Produtos</h2>
+ <a asp-action="CriarProduto" asp-controller="Produto" class="criar">Novo Produto</a>
+ </div>
+
+ <table>
  <thead>
  <tr>
+ <th>Foto</th>
  <th>Código</th>
  <th>Nome</th>
  <th>Qtd</th>
- <th>Gênero</th>
  <th>Valor</th>
+ <th>Categoria</th>
+ <th>Tipo</th>
  <th>Ações</th>
  </tr>
  </thead>
  <tbody>
- @foreach(var p in Model)
+ @foreach(var item in Model)
  {
  <tr>
- <td>@p.CodigoBarras</td>
- <td>@p.NomeProd</td>
- <td>@p.Qtd</td>
- <td>@p.Genero</td>
- <td>@p.ValorUnitario.ToString("C")</td>
  <td>
- <a href="/Produto/EditarProduto/@p.CodigoBarras">Editar</a> |
- <form asp-action="ExcluirProduto" method="post" style="display:inline;">
- <input type="hidden" name="id" value="@p.CodigoBarras" />
- <button type="submit" onclick="return confirm('Deseja excluir este produto?');">Excluir</button>
+ <img src="@(string.IsNullOrEmpty(item.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + item.Foto.TrimStart('/')))" class="foto-thumb" />
+ </td>
+ <td>@item.CodigoBarras</td>
+ <td>@item.NomeProd</td>
+ <td>@item.Qtd</td>
+ <td>@item.ValorUnitario.ToString("C")</td>
+ <td>@item.NomeCategoria</td>
+ <td>@item.NomeTipoProduto</td>
+ <td class="acoes">
+ <a asp-action="EditarProduto" asp-route-id="@item.CodigoBarras" class="btn btn-edit">Editar</a>
+ <form asp-action="ExcluirProduto" method="post" style="display:inline;"> 
+ @Html.AntiForgeryToken()
+ <input type="hidden" name="id" value="@item.CodigoBarras" />
+ <button type="submit" class="btn btn-delete" onclick="return confirm('Confirma exclusão?');">Excluir</button>
  </form>
  </td>
  </tr>
  }
  </tbody>
  </table>
-}
+</div>S
