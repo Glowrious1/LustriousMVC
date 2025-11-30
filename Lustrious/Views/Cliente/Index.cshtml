@@ -27,32 +27,17 @@
                 <!-- Vai repetir os clientes -->
                 @foreach (var cliente in Model)
                 {
- 
-                    // Build a safe URL for the image. Extract just the filename in case the DB stores a full path or backslashes.
                     var fotoVal = cliente.Foto ?? string.Empty;
-                    string fotoPath;
-
-                    if (string.IsNullOrWhiteSpace(fotoVal))
-                    {
-                        fotoPath = Url.Content("~/imagens/capa_foto.png");
-                    }
-                    else
-                    {
-                        // Normalize separators and take filename
-                        var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\', '/'));
-                        if (string.IsNullOrWhiteSpace(fileName))
-                        {
-                            fotoPath = Url.Content("~/imagens/capa_foto.png");
-                        }
-                        else
-                        {
-                            fotoPath = Url.Content("~/fotosUsuario/" + fileName);
-                        }
-                    }
+                    var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\','/'));
+                    var imgSrc = string.IsNullOrWhiteSpace(fileName)
+                        ? Url.Content("~/imagens/capa_foto.png")
+                        : Url.Content("~/fotosUsuario/" + fileName);
 
                     <tr>
                         <td>
-                            <img src="@fotoPath" alt="Foto do cliente" class="cliente-foto" />
+                            <div style="width:60px;height:60px;overflow:hidden;border-radius:8px;">
+                                <img src="@imgSrc" alt="Foto do cliente" class="cliente-foto" />
+                            </div>
                         </td>
                         <td>@cliente.Nome</td>
                         <td>@cliente.Email</td>

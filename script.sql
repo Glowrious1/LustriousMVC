@@ -22,6 +22,7 @@ IdEndereco  int null,
 Ativo char(1)  default '1'
 );
 
+select * from Usuario ;
 
 /*
 create table Funcionario (
@@ -387,7 +388,7 @@ delimiter $$
 create procedure selectUsuario()
 begin
  
-select IdUser, Nome,Email,Senha,Sexo,CPF,Role from Usuario order by Nome; 
+select IdUser, Nome,Email,Senha,Sexo,CPF,Role,Foto from Usuario order by Nome; 
 end $$
 
 call selectUsuario;
@@ -399,7 +400,7 @@ select IdUser,Nome,Email, Senha,role,ativo,Sexo,CPF from usuario where email= p_
 limit 1;
 end $$
 
-
+use dbilumina ; 
 
 
 
@@ -410,8 +411,8 @@ end $$
 
 call obterUsuario(1);
 
-DELIMITER $$ DROP PROCEDURE IF EXISTS updateUsuario$$ 
-CREATE PROCEDURE updateUsuario( 
+DELIMITER $$ 
+CREATE  PROCEDURE updateUsuario( 
 IN vIdUser INT, IN vNome VARCHAR(200), IN vEmail VARCHAR(150), 
 IN vSenha VARCHAR(250), IN vCPF VARCHAR(14), IN vSexo VARCHAR(20), IN vFoto VARCHAR(255) ) 
 BEGIN 
