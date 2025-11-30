@@ -53,11 +53,11 @@ namespace Lustrious.Controllers
             {
                 _clienteRepositorio.ExcluirCliente(id);
 
-                TempData["ok"] = "Cliente Excluído!";
+                TempData["ok"] = "Cliente Desativado!";
             }
             catch (MySqlException ex)
             {
-                if (ex.Number == 1451)
+                if (ex.Number ==1451)
                 {
                     TempData["erro"] = "Erro: Este cliente não pode ser excluído, pois possui pedidos ou dados associados em outras tabelas. Exclua as dependências primeiro.";
                 }
@@ -71,6 +71,21 @@ namespace Lustrious.Controllers
                 TempData["erro"] = "Não foi possível excluir o cliente. Ocorreu um erro inesperado.";
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult ReativarCliente(int id)
+        {
+            try
+            {
+                _clienteRepositorio.ReativarCliente(id);
+                TempData["ok"] = "Cliente reativado!";
+            }
+            catch (Exception ex)
+            {
+                TempData["erro"] = "Erro ao reativar cliente: " + ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

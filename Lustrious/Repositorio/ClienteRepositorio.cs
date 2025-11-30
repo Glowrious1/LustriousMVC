@@ -123,33 +123,27 @@ namespace Lustrious.Repositorio
             {
                 conexao.Open();
 
-                using (var cmd = new MySqlCommand("selectUsuario", conexao))
+                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto, Ativo FROM Usuario WHERE Role = 'Cliente' ORDER BY Nome", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    // p_role is required by your stored procedure
-                    cmd.Parameters.AddWithValue("p_role", "Cliente");
-
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-
-                    da.Fill(dt);
-                    conexao.Close();
-
-                    foreach (DataRow dr in dt.Rows)
+                    using var reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
                         clientes.Add(new Usuario
                         {
-                            IdUser = GetIntFromRow(dr, "IdUser"),
-                            Nome = GetStringFromRow(dr, "Nome") ?? string.Empty,
-                            Email = GetStringFromRow(dr, "Email") ?? string.Empty,
-                            Senha = GetStringFromRow(dr, "Senha") ?? string.Empty,
-                            Sexo = GetStringFromRow(dr, "Sexo") ?? string.Empty,
-                            CPF = GetStringFromRow(dr, "CPF") ?? string.Empty,
-                            Role = GetStringFromRow(dr, "Role") ?? string.Empty,
-                            Foto = GetStringFromRow(dr, "Foto")
+                            IdUser = reader["IdUser"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdUser"]),
+                            Nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString(),
+                            Email = reader["Email"] == DBNull.Value ? string.Empty : reader["Email"].ToString(),
+                            Senha = reader["Senha"] == DBNull.Value ? string.Empty : reader["Senha"].ToString(),
+                            Sexo = reader["Sexo"] == DBNull.Value ? string.Empty : reader["Sexo"].ToString(),
+                            CPF = reader["CPF"] == DBNull.Value ? string.Empty : reader["CPF"].ToString(),
+                            Role = reader["Role"] == DBNull.Value ? string.Empty : reader["Role"].ToString(),
+                            Foto = reader["Foto"] == DBNull.Value ? null : reader["Foto"].ToString(),
+                            Ativo = reader["Ativo"] == DBNull.Value ? "1" : reader["Ativo"].ToString()
                         });
                     }
                 }
+
+                conexao.Close();
             }
 
             return clientes;
@@ -203,10 +197,25 @@ namespace Lustrious.Repositorio
             {
                 conexao.Open();
 
-                using (var cmd = new MySqlCommand("DeleteUsuario", conexao))
+                using (var cmd = new MySqlCommand("UPDATE Usuario SET Ativo = '0' WHERE IdUser = @id", conexao))
                 {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("vId", id);
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+
+                conexao.Close();
+            }
+        }
+
+        public void ReativarCliente(int id)
+        {
+            using (var conexao = _dataBase.GetConnection())
+            {
+                conexao.Open();
+
+                using (var cmd = new MySqlCommand("UPDATE Usuario SET Ativo = '1' WHERE IdUser = @id", conexao))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
                 }
 

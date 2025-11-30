@@ -1,136 +1,106 @@
-﻿@{
-    ViewData["Title"] = "Editar Funcionario";
+﻿@model Lustrious.Models.Usuario
+
+@{
+ ViewData["Title"] = "Editar Funcionario";
 }
 
+<div class="container-card">
+ <form asp-action="EditarFuncionario" method="post" enctype="multipart/form-data">
+ @Html.AntiForgeryToken()
+
+ <h2>EDITAR FUNCIONÁRIO</h2>
+
+ @if (TempData["ok"] != null)
+ {
+ <div class="alert-success">@TempData["ok"]</div>
+ }
+ @if (TempData["erro"] != null)
+ {
+ <div class="alert-danger">@TempData["erro"]</div>
+ }
+
+ <div class="row">
+ <div class="left-side">
+ <input asp-for="IdUser" type="hidden" />
+ <div class="form-group">NOME DO FUNCIONÁRIO:</div>
+ <input asp-for="Nome" type="text" />
+ <span asp-validation-for="Nome" class="text-danger"></span>
+
+ <div class="form-group">EMAIL:</div>
+ <input asp-for="Email" type="email" />
+ <span asp-validation-for="Email" class="text-danger"></span>
+
+ <div class="form-group">SENHA:</div>
+ <input asp-for="Senha" type="password" />
+ <span asp-validation-for="Senha" class="text-danger"></span>
+
+ <div class="form-group">CPF:</div>
+ <input asp-for="CPF" type="text" />
+ <span asp-validation-for="CPF" class="text-danger"></span>
+
+ <div class="form-group">SEXO:</div>
+ <div class="sexo-box">
+ <select asp-for="Sexo">
+ <option value="Masculino">Masculino</option>
+ <option value="Feminino">Feminino</option>
+ <option value="Outro">Outro</option>
+ </select>
+ </div>
+
+ <div class="form-group">PERFIL (ROLE):</div>
+ <select asp-for="Role">
+ <option value="Funcionario">Funcionario</option>
+ <option value="Admin">Admin</option>
+ <option value="Cliente">Cliente</option>
+ </select>
+ 
+ </div>
+
+ <div class="foto-container" id="fotoContainer">
+ <img src="@(string.IsNullOrEmpty(Model.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + Model.Foto.TrimStart('/')))" class="foto-preview" id="fotoPreview" />
+ <input type="file" id="fotoInput" name="foto" accept="image/*" class="foto-input" />
+ </div>
+ </div>
+
+ <div class="button-row">
+ <button class="cadastrar" type="submit">SALVAR</button>
+ <a asp-action="Index" asp-controller="Funcionario" class="cancelar">CANCELAR</a>
+ </div>
+ </form>
+</div>
+
 <style>
-    <!-- body -->
-    body {
-        font-family: Arial, sans-serif;
-        background: #c7b99a;
-        margin: 0;
-        padding: 0;
-    }
-
-    .container {
-        width: 70%;
-        margin: 40px auto;
-        background: #fff9d6;
-        border: 4px solid #b8995e;
-        border-radius: 20px;
-        padding: 30px;
-    }
-
-    h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        color: #3a2f1b;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-        width: 60%;
-        padding: 10px;
-        border: 2px solid #ccb27a;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-
-    .foto-container {
-        width: 230px;
-        height: 260px;
-        background: #fffefa;
-        border: 3px solid #c6a96b;
-        border-radius: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    .foto-preview {
-        width: 150px;
-    }
-
-    .row {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .button-row {
-        margin-top: 20px;
-        display: flex;
-        gap: 20px;
-    }
-
-    button {
-        padding: 10px 25px;
-        border-radius: 10px;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    <!-- Editar -->
-    .editar {
-        background: #c5bca2;
-    }
-
-    .cancelar {
-        background: #b34747;
-        color: white;
-    }
-
-    .select-sexo {
-        width: 150px;
-        padding: 10px;
-        border: 2px solid #ccb27a;
-        border-radius: 6px;
-        font-size: 14px;
-    }
+ body { background: #FFEFCC; font-family: 'Times New Roman', serif; }
+ .container-card { width:70%; margin:40px auto; background: #fff6c6; padding:25px; border-radius:15px; border:4px solid #d6b36a; }
+ h2 { text-align:center; margin-bottom:20px; }
+ .row { display:flex; justify-content:space-between; }
+ .left-side { width:65%; }
+ .form-group { margin-top:10px; font-size:13px; font-weight:bold; }
+ .left-side input, .left-side select { width:90%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #d6b36a; }
+ .foto-container { position:relative; width:200px; height:200px; border:4px solid #c9a55b; border-radius:12px; overflow:hidden; cursor:pointer; display:inline-block; }
+ .foto-preview { width:100%; height:100%; object-fit:cover; display:block; }
+ .foto-input { display:none; }
+ .button-row { text-align:center; margin-top:25px; }
+ .cadastrar { background:#d6b36a; color:#fff; padding:10px18px; border-radius:8px; border:none; }
+ .cancelar { background:#a04444; color:#fff; padding:10px18px; border-radius:8px; text-decoration:none; }
+ .alert-success { padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:6px; margin-bottom:10px; }
+ .alert-danger { padding:10px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; margin-bottom:10px; }
 </style>
 
-<div class="container">
-    <h2>EDITAR FUNCIONARIO</h2>
-
-    <div class="row">
-
-        <div>
-            <div class="form-group">NOME DO CLIENTE:</div>
-            <input type="text" placeholder="Digite o nome aqui..." />
-
-            <div class="form-group">EMAIL:</div>
-            <input type="email" placeholder="Digite o email aqui..." />
-
-            <div class="form-group">SENHA:</div>
-            <input type="password" placeholder="Digite a senha aqui..." />
-
-            <div class="form-group">CPF:</div>
-            <input type="text" placeholder="Digite o CPF aqui..." />
-
-            <div class="form-group">SEXO:</div>
-            <select class="select-sexo">
-                <option>Masculino</option>
-                <option>Feminino</option>
-                <option>Outro</option>
-            </select>
-        </div>
-
-        <!-- FOTO -->
-        <label class="foto-container" for="fotoInput">
-            <img src="~/imagens/capa_foto.png" class="foto-preview" />
-        </label>
-        <input type="file" id="fotoInput" style="display:none;" />
-    </div>
-
-    <!-- Botões -->
-    <div class="button-row">
-        <button class="editar">EDITAR</button>
-        <button class="cancelar">CANCELAR</button>
-    </div>
-</div>
+<script>
+ (function(){
+ var input = document.getElementById('fotoInput');
+ var preview = document.getElementById('fotoPreview');
+ var container = document.getElementById('fotoContainer');
+ if(input && preview && container){
+ container.addEventListener('click', function(){ input.click(); });
+ input.addEventListener('change', function(){
+ var file = input.files && input.files[0];
+ if(!file) return;
+ var reader = new FileReader();
+ reader.onload = function(ev){ preview.src = ev.target.result; };
+ reader.readAsDataURL(file);
+ });
+ }
+ })();
+</script>

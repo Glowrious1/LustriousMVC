@@ -13,13 +13,13 @@
 
         @if (TempData["ok"] != null)
         {
-            <div class="alert-success" style="padding: 10px; margin-top: 15px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+            <div class="alert-success" style="padding:10px; margin-top:15px; border-radius:8px; background-color: #d4edda; color: #155724; border:1px solid #c3e6cb;">
                 <strong>Sucesso:</strong> @TempData["ok"]
             </div>
         }
         @if (TempData["erro"] != null)
         {
-            <div class="alert-danger" style="padding: 10px; margin-top: 15px; border-radius: 8px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
+            <div class="alert-danger" style="padding:10px; margin-top:15px; border-radius:8px; background-color: #f8d7da; color: #721c24; border:1px solid #f5c6cb;">
                 <strong>Erro:</strong> @TempData["erro"]
             </div>
         }
@@ -32,6 +32,7 @@
                     <th>EMAIL</th>
                     <th>Sexo</th>
                     <th>CPF</th>
+                    <th>ATIVO</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -55,20 +56,33 @@
                         <td>@cliente.Email</td>
                         <td>@cliente.Sexo</td>
                         <td>@cliente.CPF</td>
+                        <td>@(cliente.Ativo == "0" ? "Não" : "Sim")</td>
                         <td>
                             <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
 
-                            <form asp-controller="Cliente" asp-action="ExcluirCliente" method="post"
+                            @if (cliente.Ativo == "1" || string.IsNullOrEmpty(cliente.Ativo))
+                            {
+                                <form asp-controller="Cliente" asp-action="ExcluirCliente" method="post"
                                                    asp-route-id="@cliente.IdUser" style="display:inline;">
 
-                                @* ESSENCIAL: Adiciona o token de segurança *@
                                 @Html.AntiForgeryToken()
 
                                 <button type="submit" class="delete-btn"
-                                                            onclick="return confirm('Deseja realmente Excluir este item?');">
-                                    EXCLUIR
+                                                            onclick="return confirm('Deseja realmente desativar este cliente?');">
+                                    DESATIVAR
                                 </button>
                             </form>
+                            }
+                            else
+                            {
+                                <form asp-controller="Cliente" asp-action="ReativarCliente" method="post"
+                                                   asp-route-id="@cliente.IdUser" style="display:inline;">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="edit-btn" onclick="return confirm('Reativar este cliente?');">REATIVAR</button>
+                            </form>
+                            }
                         </td>
                     </tr>
                 }

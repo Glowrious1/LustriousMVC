@@ -9,5 +9,6 @@ namespace Lustrious.Repositorio
         public IEnumerable<Usuario> ListarClientes();
         public void AlterarCliente(Usuario cliente, IFormFile? foto);
         public void ExcluirCliente(int id);
+        public void ReativarCliente(int id);
     }
 }

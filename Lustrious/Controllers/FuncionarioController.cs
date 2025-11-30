@@ -46,8 +46,16 @@ namespace Lustrious.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult ExcluirFuncionario(int id)
         {
-            _funcionarioRepositorio.ExcluirFuncionario(id);
-            TempData["ok"] = "Funcionario Excluído!";
+            try
+            {
+                _funcionarioRepositorio.ExcluirFuncionario(id);
+                TempData["ok"] = "Funcionario Excluído!";
+            }
+            catch (System.Exception ex)
+            {
+                // Possível falha por restrição de FK — informar usuário e sugerir ação
+                TempData["erro"] = "Não foi possível excluir o usuário. Verifique dependências (vendas, endereços, registros relacionados). Erro: " + ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

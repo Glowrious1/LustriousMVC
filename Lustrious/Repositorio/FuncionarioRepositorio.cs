@@ -39,7 +39,7 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto FROM Usuario WHERE IdUser = @id", conexao))
+                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto, Ativo FROM Usuario WHERE IdUser = @id", conexao))
                 {
                     cmd.Parameters.AddWithValue("@id", id);
                     using var reader = cmd.ExecuteReader();
@@ -54,7 +54,8 @@ namespace Lustrious.Repositorio
                             Sexo = reader["Sexo"] == DBNull.Value ? string.Empty : reader["Sexo"].ToString(),
                             CPF = reader["CPF"] == DBNull.Value ? string.Empty : reader["CPF"].ToString(),
                             Role = reader["Role"] == DBNull.Value ? string.Empty : reader["Role"].ToString(),
-                            Foto = reader["Foto"] == DBNull.Value ? string.Empty : reader["Foto"].ToString()
+                            Foto = reader["Foto"] == DBNull.Value ? string.Empty : reader["Foto"].ToString(),
+                            Ativo = reader["Ativo"] == DBNull.Value ? "1" : reader["Ativo"].ToString()
                         };
                     }
                 }
@@ -67,7 +68,7 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto FROM Usuario WHERE not Role = 'Cliente' ORDER BY Nome", conexao))
+                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto, Ativo FROM Usuario WHERE not Role = 'Cliente' ORDER BY Nome", conexao))
                 {
                     using var reader = cmd.ExecuteReader();
                     while (reader.Read())
@@ -81,7 +82,8 @@ namespace Lustrious.Repositorio
                             Sexo = reader["Sexo"] == DBNull.Value ? string.Empty : reader["Sexo"].ToString(),
                             CPF = reader["CPF"] == DBNull.Value ? string.Empty : reader["CPF"].ToString(),
                             Role = reader["Role"] == DBNull.Value ? string.Empty : reader["Role"].ToString(),
-                            Foto = reader["Foto"] == DBNull.Value ? string.Empty : reader["Foto"].ToString()
+                            Foto = reader["Foto"] == DBNull.Value ? string.Empty : reader["Foto"].ToString(),
+                            Ativo = reader["Ativo"] == DBNull.Value ? "1" : reader["Ativo"].ToString()
                         });
                     }
                 }
@@ -116,13 +118,12 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("DeleteUsuario", conexao))
+                using (var cmd = new MySqlCommand("UPDATE Usuario SET Ativo = '0' WHERE IdUser = @id", conexao))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("vIdUser", id);
+                    cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
-                    conexao.Close();
                 }
+                conexao.Close();
             }
         }
     }
