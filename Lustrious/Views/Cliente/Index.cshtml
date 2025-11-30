@@ -11,6 +11,19 @@
             <a class="new-btn" href="/Cliente/CriarCliente">NOVO CLIENTE</a>
         </div>
 
+        @if (TempData["ok"] != null)
+        {
+            <div class="alert-success" style="padding: 10px; margin-top: 15px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+                <strong>Sucesso:</strong> @TempData["ok"]
+            </div>
+        }
+        @if (TempData["erro"] != null)
+        {
+            <div class="alert-danger" style="padding: 10px; margin-top: 15px; border-radius: 8px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
+                <strong>Erro:</strong> @TempData["erro"]
+            </div>
+        }
+
         <table class="table-clientes">
             <thead>
                 <tr>
@@ -24,14 +37,13 @@
             </thead>
 
             <tbody>
-                <!-- Vai repetir os clientes -->
                 @foreach (var cliente in Model)
                 {
                     var fotoVal = cliente.Foto ?? string.Empty;
-                    var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\','/'));
+                    var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\', '/'));
                     var imgSrc = string.IsNullOrWhiteSpace(fileName)
-                        ? Url.Content("~/imagens/capa_foto.png")
-                        : Url.Content("~/fotosUsuario/" + fileName);
+                    ? Url.Content("~/imagens/capa_foto.png")
+                    : Url.Content("~/fotosUsuario/" + fileName);
 
                     <tr>
                         <td>
@@ -45,7 +57,18 @@
                         <td>@cliente.CPF</td>
                         <td>
                             <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
-                            <a asp-controller="Cliente" asp-action="ExcluirCliente" asp-route-id="@cliente.IdUser" onclick="return confirm('Deseja realmente Excluir este item?');" class="delete-btn">EXCLUIR</a>
+
+                            <form asp-controller="Cliente" asp-action="ExcluirCliente" method="post"
+                                                   asp-route-id="@cliente.IdUser" style="display:inline;">
+
+                                @* ESSENCIAL: Adiciona o token de segurança *@
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="delete-btn"
+                                                            onclick="return confirm('Deseja realmente Excluir este item?');">
+                                    EXCLUIR
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 }
@@ -55,126 +78,148 @@
 </main>
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #FFEFCC;
-        font-family: 'Times New Roman', serif;
+        body {
+                margin: 0;
+                padding: 0;
+                background-color: #FFEFCC;
+                font-family: 'Times New Roman', serif;
+
     }
+
 
     /* NAVBAR */
-    .navbar-container {
-        background: white;
-        border-bottom: 5px solid #b5954b;
-        padding: 15px 50px;
+        .navbar-container {
+                background: white;
+                border-bottom: 5px solid #b5954b;
+                padding: 15px 50px;
+
     }
 
-    .navbar {
-        display: flex;
-        align-items: center;
-        gap: 40px;
+        .navbar {
+                display: flex;
+                align-items: center;
+                gap: 40px;
+
     }
 
-    .logo {
-        color: #b5954b;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        font-size: 18px;
+        .logo {
+                color: #b5954b;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                font-size: 18px;
+
     }
 
-    nav a {
-        text-decoration: none;
-        color: #363636;
-        margin-right: 25px;
-        font-weight: 500;
+        nav a {
+                text-decoration: none;
+                color: #363636;
+                margin-right: 25px;
+                font-weight: 500;
+
     }
+
 
     /* CARD CENTRAL */
-    .main-content {
-        display: flex;
-        justify-content: center;
-        padding: 40px 0;
+        .main-content {
+                display: flex;
+                justify-content: center;
+                padding: 40px 0;
+
     }
 
-    .card {
-        background: #fff6c6;
-        width: 70%;
-        border-radius: 15px;
-        padding: 25px;
-        border: 4px solid #d6b36a;
+        .card {
+                background: #fff6c6;
+                width: 70%;
+                border-radius: 15px;
+                padding: 25px;
+                border: 4px solid #d6b36a;
+
     }
 
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
     }
 
-        .card-header h2 {
-            margin: 0;
-            font-size: 24px;
-        }
+            .card-header h2 {
+                    margin: 0;
+                    font-size: 24px;
 
-    .new-btn {
-        background: #d6b36a;
-        color: white;
-        padding: 8px 18px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-        transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
     }
 
-        .new-btn:hover {
-            background-color: #CCAC66; /* Cor de fundo ao passar o mouse */
-            color: #FFFFFF; /* Cor do texto ao passar o mouse */
-        }
+        .new-btn {
+                background: #d6b36a;
+                color: white;
+                padding: 8px 18px;
+                border-radius: 10px;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 14px;
+                transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+
+    }
+
+            .new-btn:hover {
+                    background-color: #CCAC66; /* Cor de fundo ao passar o mouse */
+                    color: #FFFFFF; /* Cor do texto ao passar o mouse */
+
+    }
+
 
 
     /* TABELA */
-    .table-clientes {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+        .table-clientes {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+
     }
 
-        .table-clientes th {
-            text-align: left;
-            padding: 12px 0;
-            font-weight: bold;
-            border-bottom: 2px solid #d6b36a;
+                .table-clientes th {
+                        text-align: left;
+                        padding: 12px 0;
+                        font-weight: bold;
+                        border-bottom: 2px solid #d6b36a;
+
         }
 
-        .table-clientes td {
-            padding: 12px 0;
-            vertical-align: middle;
+                .table-clientes td {
+                        padding: 12px 0;
+                        vertical-align: middle;
+
         }
 
-    .edit-btn {
-        background: #8a8a8a;
-        color: white;
-        padding: 5px 12px;
-        border-radius: 8px;
-        text-decoration: none;
-        margin-right: 8px;
+        .edit-btn {
+                background: #8a8a8a;
+                color: white;
+                padding: 5px 12px;
+                border-radius: 8px;
+                text-decoration: none;
+                margin-right: 8px;
+
     }
 
-    .delete-btn {
-        background: #b54845;
-        color: white;
-        padding: 5px 12px;
-        border-radius: 8px;
-        text-decoration: none;
+        .delete-btn {
+                background: #b54845;
+                color: white;
+                padding: 5px 12px;
+                border-radius: 8px;
+                text-decoration: none;
+                border: none; /* Adicionado para garantir que se pareça com o link EDITAR */
+
     }
+
 
     /* Foto padrão tamanho */
-    .cliente-foto {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid #e6d6a8;
+        .cliente-foto {
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 2px solid #e6d6a8;
+
     }
 </style>
