@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Clientes";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string filterQ = ViewBag.FilterQ as string ?? string.Empty;
 }
 
 <main class="main-content">
@@ -23,6 +26,11 @@
                 <strong>Erro:</strong> @TempData["erro"]
             </div>
         }
+
+        <form method="get" asp-action="Index" class="filters" style="margin-top:12px;">
+            <input type="text" name="q" value="@filterQ" placeholder="Pesquisar por nome, email ou CPF..." />
+            <button type="submit" class="btn">Pesquisar</button>
+        </form>
 
         <table class="table-clientes">
             <thead>
@@ -88,6 +96,32 @@
                 }
             </tbody>
         </table>
+
+        <!-- Paginação -->
+        <div class="pagination" style="margin-top:12px; text-align:center;">
+            @if (totalPages > 1)
+            {
+                if (currentPage > 1)
+                {
+                    <a asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-q="@filterQ" class="page-btn">&laquo; Anterior</a>
+                }
+                for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <span class="page-current">@i</span>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" asp-route-page="@i" asp-route-q="@filterQ" class="page-btn">@i</a>
+                    }
+                }
+                if (currentPage < totalPages)
+                {
+                    <a asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-q="@filterQ" class="page-btn">Próximo &raquo;</a>
+                }
+            }
+        </div>
     </div>
 </main>
 
@@ -225,6 +259,11 @@
                 border: none; /* Adicionado para garantir que se pareça com o link EDITAR */
 
     }
+
+        .filters input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+        .pagination { margin-top: 16px; }
+        .page-btn { display: inline-block; margin: 4px; padding: 6px 10px; background: #f0f0f0; border-radius: 6px; text-decoration: none; color: #333; }
+        .page-current { display: inline-block; margin: 4px; padding: 6px 10px; background: #d6b36a; border-radius: 6px; color: #fff; font-weight: 700; }
 
 
     /* Foto padrão tamanho */

@@ -19,10 +19,31 @@ namespace Lustrious.Controllers
             //Atribuindo o repositório à variável _produtoRepositorio
             _produtoRepositorio = produtoRepostorio;
         }
-        public IActionResult Index()
+
+        public IActionResult Index(string q = null, int codCategoria =0, int codTipoProduto =0, int page =1)
         {
-            return View(_produtoRepositorio.ListarProdutos());
+            const int pageSize =10;
+            var result = _produtoRepositorio.ListarProdutos(q, codCategoria, codTipoProduto, page, pageSize);
+            var items = result.Items.ToList();
+            var total = result.TotalCount;
+            var totalPages = (int)System.Math.Ceiling(total / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = total;
+
+            ViewBag.FilterQ = q;
+            ViewBag.FilterCategoria = codCategoria;
+            ViewBag.FilterTipo = codTipoProduto;
+
+            // supply categories and tipos for filter selects, set selected flags
+            ViewBag.Categorias = _produtoRepositorio.GetCategorias(codCategoria).ToList();
+            ViewBag.Tipos = _produtoRepositorio.GetTipos(codTipoProduto, codCategoria).ToList();
+
+            return View(items);
         }
+
         public IActionResult CriarProduto()
         {
             var model = new Produto();

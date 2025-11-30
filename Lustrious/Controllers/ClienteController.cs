@@ -6,6 +6,7 @@ using System.Data;
 using Microsoft.Net.Http.Headers;
 using Lustrious.Repositorio;
 using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace Lustrious.Controllers
 {
@@ -16,9 +17,21 @@ namespace Lustrious.Controllers
         {
             _clienteRepositorio = clienteRepositorio;
         }
-        public IActionResult Index()
+        public IActionResult Index(string q = null, int page =1)
         {
-            return View(_clienteRepositorio.ListarClientes());
+            const int pageSize =10;
+            var result = _clienteRepositorio.ListarClientes(q, page, pageSize);
+            var items = result.Items.ToList();
+            var total = result.TotalCount;
+            var totalPages = (int)System.Math.Ceiling(total / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = total;
+            ViewBag.FilterQ = q;
+
+            return View(items);
         }
         public IActionResult CriarCliente()
         {

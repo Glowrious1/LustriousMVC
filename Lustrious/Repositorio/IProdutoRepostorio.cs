@@ -9,8 +9,8 @@ namespace Lustrious.Repositorio
     {
         public void CadastrarProduto(Produto produto, IFormFile? foto);
         public Produto AcharProduto(long id);
-        // Ajustado para permitir filtro por tipo de produto; padrão0 retorna todos dependendo da procedure
-        public IEnumerable<Produto> ListarProdutos(int codTipoProduto =0);
+        // Server-side filtering and pagination: returns items and total count
+        public (IEnumerable<Produto> Items, int TotalCount) ListarProdutos(string? q = null, int codCategoria =0, int codTipoProduto =0, int page =1, int pageSize =10);
         public void AlterarProduto(Produto produto, IFormFile? foto);
         public void ExcluirProduto(long id);
 

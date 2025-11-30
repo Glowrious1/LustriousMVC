@@ -145,43 +145,80 @@ WHERE p.CodigoBarras = @codigo", conexao))
             }
         }
 
-        public IEnumerable<Produto> ListarProdutos(int codTipoProduto =0)
+        public (IEnumerable<Produto> Items, int TotalCount) ListarProdutos(string? q = null, int codCategoria =0, int codTipoProduto =0, int page =1, int pageSize =10)
         {
-            List<Produto> produtos = new List<Produto>();
-            using (var conexao = _dataBase.GetConnection())
+            var produtos = new List<Produto>();
+            using var conexao = _dataBase.GetConnection();
+            conexao.Open();
+
+            // Build WHERE clauses
+            var where = new List<string>();
+            if (!string.IsNullOrWhiteSpace(q))
             {
-                conexao.Open();
-                // Use direct query with joins to ensure category and tipo names are always returned
-                using (var cmd = new MySqlCommand(@"SELECT p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario, p.foto, p.Genero,
+                where.Add("(p.NomeProd LIKE @q OR p.Descricao LIKE @q)");
+            }
+            if (codCategoria >0)
+            {
+                where.Add("p.codCategoria = @codCategoria");
+            }
+            if (codTipoProduto >0)
+            {
+                where.Add("p.codTipoProduto = @codTipoProduto");
+            }
+
+            var whereClause = where.Count >0 ? "WHERE " + string.Join(" AND ", where) : string.Empty;
+
+            // Total count
+            using (var cmdCount = new MySqlCommand($"SELECT COUNT(*) FROM Produto p {whereClause}", conexao))
+            {
+                if (!string.IsNullOrWhiteSpace(q)) cmdCount.Parameters.AddWithValue("@q", "%" + q.Trim() + "%");
+                if (codCategoria >0) cmdCount.Parameters.AddWithValue("@codCategoria", codCategoria);
+                if (codTipoProduto >0) cmdCount.Parameters.AddWithValue("@codTipoProduto", codTipoProduto);
+
+                var totalObj = cmdCount.ExecuteScalar();
+                var total = totalObj == DBNull.Value ?0 : Convert.ToInt32(totalObj);
+
+                // Calculate paging
+                if (page <1) page =1;
+                if (pageSize <1) pageSize =10;
+                var offset = (page -1) * pageSize;
+
+                // Query page of items with joins
+                using var cmd = new MySqlCommand($@"SELECT p.CodigoBarras, p.NomeProd, p.qtd, p.Descricao, p.ValorUnitario, p.foto, p.Genero,
 c.Categoria AS NomeCategoria, t.TipoProduto AS NomeTipoProduto
 FROM Produto p
 LEFT JOIN Categoria c ON p.codCategoria = c.codCategoria
 LEFT JOIN tipoProduto t ON p.codTipoProduto = t.codTipoProduto
-" + (codTipoProduto >0 ? "WHERE p.codTipoProduto = @codTipoProduto\n" : string.Empty) + "ORDER BY p.NomeProd", conexao))
-                {
-                    if (codTipoProduto >0)
-                        cmd.Parameters.AddWithValue("@codTipoProduto", codTipoProduto);
+{whereClause}
+ORDER BY p.NomeProd
+LIMIT @limit OFFSET @offset", conexao);
 
-                    using var reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                if (!string.IsNullOrWhiteSpace(q)) cmd.Parameters.AddWithValue("@q", "%" + q.Trim() + "%");
+                if (codCategoria >0) cmd.Parameters.AddWithValue("@codCategoria", codCategoria);
+                if (codTipoProduto >0) cmd.Parameters.AddWithValue("@codTipoProduto", codTipoProduto);
+                cmd.Parameters.AddWithValue("@limit", pageSize);
+                cmd.Parameters.AddWithValue("@offset", offset);
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    produtos.Add(new Produto
                     {
-                        produtos.Add(new Produto
-                        {
-                            CodigoBarras = reader["CodigoBarras"] == DBNull.Value ?0L : Convert.ToInt64(reader["CodigoBarras"]),
-                            NomeProd = reader["NomeProd"] == DBNull.Value ? string.Empty : reader["NomeProd"].ToString()!,
-                            Qtd = reader["qtd"] == DBNull.Value ?0 : Convert.ToInt32(reader["qtd"]),
-                            Descricao = reader["Descricao"] == DBNull.Value ? string.Empty : reader["Descricao"].ToString()!,
-                            ValorUnitario = reader["ValorUnitario"] == DBNull.Value ?0m : Convert.ToDecimal(reader["ValorUnitario"]),
-                            Foto = reader["foto"] == DBNull.Value ? null : reader["foto"].ToString(),
-                            Genero = reader["Genero"] == DBNull.Value ? string.Empty : reader["Genero"].ToString()!,
-                            NomeCategoria = reader["NomeCategoria"] == DBNull.Value ? null : reader["NomeCategoria"].ToString(),
-                            NomeTipoProduto = reader["NomeTipoProduto"] == DBNull.Value ? null : reader["NomeTipoProduto"].ToString()
-                        });
-                    }
+                        CodigoBarras = reader["CodigoBarras"] == DBNull.Value ?0L : Convert.ToInt64(reader["CodigoBarras"]),
+                        NomeProd = reader["NomeProd"] == DBNull.Value ? string.Empty : reader["NomeProd"].ToString()!,
+                        Qtd = reader["qtd"] == DBNull.Value ?0 : Convert.ToInt32(reader["qtd"]),
+                        Descricao = reader["Descricao"] == DBNull.Value ? string.Empty : reader["Descricao"].ToString()!,
+                        ValorUnitario = reader["ValorUnitario"] == DBNull.Value ?0m : Convert.ToDecimal(reader["ValorUnitario"]),
+                        Foto = reader["foto"] == DBNull.Value ? null : reader["foto"].ToString(),
+                        Genero = reader["Genero"] == DBNull.Value ? string.Empty : reader["Genero"].ToString()!,
+                        NomeCategoria = reader["NomeCategoria"] == DBNull.Value ? null : reader["NomeCategoria"].ToString(),
+                        NomeTipoProduto = reader["NomeTipoProduto"] == DBNull.Value ? null : reader["NomeTipoProduto"].ToString()
+                    });
                 }
+
                 conexao.Close();
+                return (produtos, total);
             }
-            return produtos;
         }
 
         // Novos métodos para popular selects
