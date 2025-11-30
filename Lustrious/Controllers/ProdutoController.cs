@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Lustrious.Models;
 using MySql.Data.MySqlClient;
 using Lustrious.Repositorio;
+using Microsoft.AspNetCore.Http;
 
 
 namespace Lustrious.Controllers
@@ -27,9 +28,9 @@ namespace Lustrious.Controllers
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult CriarProduto(Produto produto)
+        public IActionResult CriarProduto(Produto produto, IFormFile? foto)
         {
-            _produtoRepositorio.CadastrarProduto(produto);
+            _produtoRepositorio.CadastrarProduto(produto, foto);
             TempData["Ok"] = "Produto Cadastrado!";
             return RedirectToAction(nameof(Index));
         }
@@ -41,9 +42,9 @@ namespace Lustrious.Controllers
             return View(produto);
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult EditarProduto(Produto model)
+        public IActionResult EditarProduto(Produto model, IFormFile? foto)
         {
-            _produtoRepositorio.AlterarProduto(model);
+            _produtoRepositorio.AlterarProduto(model, foto);
             TempData["Ok"] = "Produto atualizado";
             return RedirectToAction(nameof(Index));
         }

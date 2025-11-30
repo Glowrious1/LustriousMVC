@@ -1,4 +1,4 @@
-﻿ using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using Lustrious.Models;
 using Lustrious.Data;
 using System.Data;
@@ -17,8 +17,22 @@ namespace Lustrious.Repositorio
             {
                 _dataBase = dataBase;
             }
-            public void CadastrarProduto(Produto produto)
+            public void CadastrarProduto(Produto produto, IFormFile? foto)
             {
+                string? relPath = null;
+                if (foto != null && foto.Length >0)
+                {
+                    var ext = Path.GetExtension(foto.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosProduto");
+                    Directory.CreateDirectory(saveDir);
+                    var absPath = Path.Combine(saveDir, fileName);
+                    using var fs = new FileStream(absPath, FileMode.Create);
+                    foto.CopyTo(fs);
+                    relPath = Path.Combine("fotosProduto", fileName).Replace("\\", "/");
+                    produto.Foto = relPath;
+                }
+
                 using (var conexao = _dataBase.GetConnection())
                 {
                     conexao.Open();
@@ -28,16 +42,17 @@ namespace Lustrious.Repositorio
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("vCodigoBarras", produto.CodigoBarras);
                         cmd.Parameters.AddWithValue("vNomeProd", produto.NomeProd);
-                        cmd.Parameters.AddWithValue("vQtd", produto.qtd);
+                        cmd.Parameters.AddWithValue("vQtd", produto.Qtd);
                         cmd.Parameters.AddWithValue("vDescricao", produto.Descricao);
                         cmd.Parameters.AddWithValue("vValorUnitario", produto.ValorUnitario);
+                        cmd.Parameters.AddWithValue("vFoto", (object?)relPath ?? DBNull.Value);
                         cmd.ExecuteNonQuery();
                     }
                 }
             }
             public Produto AcharProduto(int id)
             {
-                Produto Produto = new Produto();
+                Produto produto = new Produto();
                 using (var conexao = _dataBase.GetConnection())
                 {
                     conexao.Open();
@@ -56,22 +71,37 @@ namespace Lustrious.Repositorio
 
                         foreach (DataRow dr in dt.Rows)
                         {
-                            Produto = new Produto()
+                            produto = new Produto()
                             {
-                                CodigoBarras = Convert.ToInt32(dr["IdProduto"]),
-                                NomeProd = (string)dr["Nome"],
-                                qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) :0,
-                                Descricao = dr.Table.Columns.Contains("descricao") && dr["descricao"] != DBNull.Value ? dr["descricao"].ToString() : string.Empty,
+                                CodigoBarras = dr.Table.Columns.Contains("IdProduto") && dr["IdProduto"] != DBNull.Value ? Convert.ToInt64(dr["IdProduto"]) :0L,
+                                NomeProd = dr.Table.Columns.Contains("Nome") ? dr["Nome"].ToString()! : string.Empty,
+                                Qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) :0,
+                                Descricao = dr.Table.Columns.Contains("descricao") && dr["descricao"] != DBNull.Value ? dr["descricao"].ToString()! : string.Empty,
                                 ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) :0m,
+                                Foto = dr.Table.Columns.Contains("foto") && dr["foto"] != DBNull.Value ? dr["foto"].ToString() : null
                             };
                         }
                     }
                 }
-                return Produto;
+                return produto;
             }
 
-            public void AlterarProduto(Produto produto)
+            public void AlterarProduto(Produto produto, IFormFile? foto)
             {
+                string? relPath = null;
+                if (foto != null && foto.Length >0)
+                {
+                    var ext = Path.GetExtension(foto.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosProduto");
+                    Directory.CreateDirectory(saveDir);
+                    var absPath = Path.Combine(saveDir, fileName);
+                    using var fs = new FileStream(absPath, FileMode.Create);
+                    foto.CopyTo(fs);
+                    relPath = Path.Combine("fotosProduto", fileName).Replace("\\", "/");
+                    produto.Foto = relPath;
+                }
+
                 using (var conexao = _dataBase.GetConnection())
                 {
                     conexao.Open();
@@ -80,9 +110,10 @@ namespace Lustrious.Repositorio
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("vCodigoBarras", produto.CodigoBarras);
                         cmd.Parameters.AddWithValue("vNomeProd", produto.NomeProd);
-                        cmd.Parameters.AddWithValue("vQtd", produto.qtd);
+                        cmd.Parameters.AddWithValue("vQtd", produto.Qtd);
                         cmd.Parameters.AddWithValue("vDescricao", produto.Descricao);
                         cmd.Parameters.AddWithValue("vValorUnitario", produto.ValorUnitario);
+                        cmd.Parameters.AddWithValue("vFoto", (object?)produto.Foto ?? DBNull.Value);
                         cmd.ExecuteNonQuery();
                         conexao.Close();
                     }
@@ -103,10 +134,10 @@ namespace Lustrious.Repositorio
                 }
             }
 
-        public IEnumerable<Produto> ListarProdutos(int codTipoProduto = 0)
+        public IEnumerable<Produto> ListarProdutos(int codTipoProduto =0)
         {
 
-            List<Produto> Produtos = new List<Produto>();
+            List<Produto> produtos = new List<Produto>();
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
@@ -123,20 +154,20 @@ namespace Lustrious.Repositorio
 
                     foreach (DataRow dr in dt.Rows)
                     {
-                        Produtos.Add(new Produto
+                        produtos.Add(new Produto
                         {
-                            CodigoBarras = Convert.ToInt32(dr["IdProduto"]),
-                            NomeProd = dr.Table.Columns.Contains("Nome") ? dr["Nome"].ToString() : string.Empty,
-                            qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) : 0,
-                            Descricao = dr.Table.Columns.Contains("descricao") ? dr["descricao"].ToString() : string.Empty,
-                            ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) : 0m,
+                            CodigoBarras = dr.Table.Columns.Contains("IdProduto") && dr["IdProduto"] != DBNull.Value ? Convert.ToInt64(dr["IdProduto"]) :0L,
+                            NomeProd = dr.Table.Columns.Contains("Nome") ? dr["Nome"].ToString()! : string.Empty,
+                            Qtd = dr.Table.Columns.Contains("qtd") && dr["qtd"] != DBNull.Value ? Convert.ToInt32(dr["qtd"]) :0,
+                            Descricao = dr.Table.Columns.Contains("descricao") ? dr["descricao"].ToString()! : string.Empty,
+                            ValorUnitario = dr.Table.Columns.Contains("valor_unitario") && dr["valor_unitario"] != DBNull.Value ? Convert.ToDecimal(dr["valor_unitario"]) :0m,
+                            Foto = dr.Table.Columns.Contains("foto") && dr["foto"] != DBNull.Value ? dr["foto"].ToString() : null
                         }
                         );
                     }
                 }
             }
-            return Produtos;
+            return produtos;
         }
     }
 }
-    
