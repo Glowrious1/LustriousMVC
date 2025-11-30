@@ -44,6 +44,43 @@ namespace Lustrious.Controllers
             return View(items);
         }
 
+        // Nova ação pública para vitrine (clientes)
+        [HttpGet]
+        public IActionResult Vitrine(string q = null, int codCategoria =0, int codTipoProduto =0, int page =1)
+        {
+            const int pageSize =12; // mais itens por página na vitrine
+            var result = _produtoRepositorio.ListarProdutos(q, codCategoria, codTipoProduto, page, pageSize);
+            var items = result.Items.ToList();
+            var total = result.TotalCount;
+            var totalPages = (int)System.Math.Ceiling(total / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = total;
+
+            ViewBag.FilterQ = q;
+            ViewBag.FilterCategoria = codCategoria;
+            ViewBag.FilterTipo = codTipoProduto;
+
+            ViewBag.Categorias = _produtoRepositorio.GetCategorias(codCategoria).ToList();
+            ViewBag.Tipos = _produtoRepositorio.GetTipos(codTipoProduto, codCategoria).ToList();
+
+            return View(items);
+        }
+
+        // Ação para detalhes do produto (vitrine)
+        [HttpGet]
+        public IActionResult AcharProduto(long id)
+        {
+            var produto = _produtoRepositorio.AcharProduto(id);
+            if (produto == null)
+            {
+                return NotFound();
+            }
+            return View(produto);
+        }
+
         public IActionResult CriarProduto()
         {
             var model = new Produto();

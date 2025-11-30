@@ -17,5 +17,8 @@ namespace Lustrious.Repositorio
         // Novos métodos para popular selects nas views
         public IEnumerable<SelectListItem> GetCategorias(int? selectedId = null);
         public IEnumerable<SelectListItem> GetTipos(int? selectedId = null, int? codCategoria = null);
+
+        // Conveniência: retornar somente produtos (sem total) para views públicas
+        public IEnumerable<Produto> ListarProdutosPublico(string? q = null, int codCategoria =0, int codTipoProduto =0, int page =1, int pageSize =12);
     }
 }

@@ -99,7 +99,7 @@
  <td>@item.NomeTipoProduto</td>
  <td class="acoes">
  <a asp-action="EditarProduto" asp-route-id="@item.CodigoBarras" class="btn btn-edit">Editar</a>
- <form asp-action="ExcluirProduto" method="post" style="display:inline;">
+ <form asp-action="ExcluirProduto" method="post" style="display:inline; margin-left:6px">
  @Html.AntiForgeryToken()
  <input type="hidden" name="id" value="@item.CodigoBarras" />
  <button type="submit" class="btn btn-delete" onclick="return confirm('Confirma exclusão?');">Excluir</button>

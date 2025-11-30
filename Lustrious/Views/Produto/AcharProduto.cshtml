@@ -1,0 +1,31 @@
+@model Lustrious.Models.Produto
+@{
+ ViewData["Title"] = "Detalhes do Produto";
+}
+<style>
+ .detalhe { width:80%; margin:20px auto; display:flex; gap:24px; }
+ .foto { width:40%; }
+ .foto img { width:100%; height:auto; object-fit:cover; border-radius:8px; }
+ .info { width:60%; }
+ .btn { padding:8px12px; border-radius:6px; border:none; cursor:pointer; }
+ .btn-cart { background:#0069d9; color:#fff; }
+</style>
+<div class="detalhe">
+ <div class="foto">
+ <img src="@(string.IsNullOrEmpty(Model.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + Model.Foto.TrimStart('/')))" alt="@Model.NomeProd" />
+ </div>
+ <div class="info">
+ <h2>@Model.NomeProd</h2>
+ <p><strong>Categoria:</strong> @Model.NomeCategoria</p>
+ <p><strong>Tipo:</strong> @Model.NomeTipoProduto</p>
+ <p><strong>Quantidade:</strong> @Model.Qtd</p>
+ <p><strong>Valor:</strong> @Model.ValorUnitario.ToString("C")</p>
+ <p>@Model.Descricao</p>
+
+ <form class="ajax-add-to-cart" asp-controller="Carrinho" asp-action="AdicionarItem" method="post">
+ @Html.AntiForgeryToken()
+ <input type="hidden" name="produtoId" value="@Model.CodigoBarras" />
+ <button type="submit" class="btn btn-cart" @(Model.Qtd <=0 ? "disabled" : "")>@(Model.Qtd <=0 ? "Sem estoque" : "Adicionar ao Carrinho")</button>
+ </form>
+ </div>
+</div>

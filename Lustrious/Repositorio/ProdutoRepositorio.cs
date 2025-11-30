@@ -254,5 +254,12 @@ LIMIT @limit OFFSET @offset", conexao);
             }
             return list;
         }
+
+        // Conveniência: retornar apenas a lista de produtos para a vitrine
+        public IEnumerable<Produto> ListarProdutosPublico(string? q = null, int codCategoria =0, int codTipoProduto =0, int page =1, int pageSize =12)
+        {
+            var result = ListarProdutos(q, codCategoria, codTipoProduto, page, pageSize);
+            return result.Items;
+        }
     }
 }

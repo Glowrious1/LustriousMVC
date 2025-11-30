@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using Lustrious.Repositorio
+@inject ICarrinhoRepositorio _carrinhoRepo
+@{
+    int cartCount =0;
+    var uid = Context.Session.GetInt32("UserId");
+    if (uid.HasValue)
+    {
+        try { var c = _carrinhoRepo.AcharCarrinho(uid.Value); cartCount = c?.Qtd ??0; } catch { cartCount =0; }
+    }
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,6 +38,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Vitrine">Vitrine</a>
+                        </li>
 
                     </ul>
 
@@ -41,6 +54,9 @@
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-link nav-link" style="display:inline;padding:0;">Sair</button>
                                 </form>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Carrinho" asp-action="Index">Carrinho <span id="cart-badge" class="badge bg-primary ms-1">@cartCount</span></a>
                             </li>
                         }
                         else
@@ -56,6 +72,16 @@
         </nav>
     </header>
     <div class="container">
+        <form id="antiforgeryForm">@Html.AntiForgeryToken()</form>
+        <div id="ajax-notification-placeholder"></div>
+        @if (TempData["Ok"] != null)
+        {
+            <div class="alert alert-success mt-2">@TempData["Ok"]</div>
+        }
+        @if (TempData["Erro"] != null)
+        {
+            <div class="alert alert-danger mt-2">@TempData["Erro"]</div>
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -63,12 +89,60 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Lustrious - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy;2025 - Lustrious - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+    (function(){
+        function getAntiForgeryToken(){
+            var tokenInput = document.querySelector('#antiforgeryForm input[name="__RequestVerificationToken"]');
+            return tokenInput ? tokenInput.value : '';
+        }
+        function showNotification(message, type){
+            var ph = document.getElementById('ajax-notification-placeholder');
+            var alert = document.createElement('div');
+            alert.className = 'alert mt-2 ' + (type === 'success' ? 'alert-success' : 'alert-danger');
+            alert.textContent = message;
+            ph.appendChild(alert);
+            setTimeout(function(){ alert.remove(); },4000);
+        }
+
+        // Delegate click on forms with class ajax-add-to-cart
+        document.addEventListener('submit', function(e){
+            var form = e.target;
+            if (form && form.classList && form.classList.contains('ajax-add-to-cart')){
+                e.preventDefault();
+                var produtoId = form.querySelector('input[name="produtoId"]').value;
+                var fd = new FormData();
+                fd.append('__RequestVerificationToken', getAntiForgeryToken());
+                fd.append('produtoId', produtoId);
+                fetch('/Carrinho/AdicionarItemAjax', {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'same-origin'
+                }).then(function(resp){ return resp.json(); })
+                .then(function(data){
+                    if (!data) return;
+                    if (data.authenticated === false && data.redirectUrl){
+                        // redirect to login
+                        window.location = data.redirectUrl;
+                        return;
+                    }
+                    if (data.success){
+                        showNotification(data.message || 'Adicionado ao carrinho', 'success');
+                        var badge = document.getElementById('cart-badge');
+                        if (badge) badge.textContent = data.cartCount ||0;
+                    } else {
+                        showNotification(data.message || 'Erro ao adicionar', 'error');
+                    }
+                }).catch(function(){ showNotification('Erro de comunicação', 'error'); });
+            }
+        });
+    })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
