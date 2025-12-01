@@ -138,6 +138,24 @@ IdUser int,
 NF int,
 IdEntrega int
 );
+
+
+ create table VendaProduto(
+IdVendaProduto int primary key auto_increment,
+ valorItem decimal(9,2),
+ Qtd int,
+ CodigoBarras bigint,
+ IdVenda int
+ );
+CREATE TABLE IF NOT EXISTS Notificacao (
+  Id INT PRIMARY KEY AUTO_INCREMENT,
+  IdUser INT NOT NULL,
+  Mensagem VARCHAR(500) NOT NULL,
+  DataEnvio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Lida TINYINT(1) NOT NULL DEFAULT 0,
+  INDEX idx_notificacao_user (IdUser)
+    );
+
  
  create table VendaProduto(
 IdVendaProduto int primary key auto_increment,
