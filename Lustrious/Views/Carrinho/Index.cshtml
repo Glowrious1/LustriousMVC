@@ -75,7 +75,7 @@ else
  </form>
 
  @* Simple checkout form: select address (if present) and send via AJAX to CheckoutAjax *@
- <form id="checkout-form" class="ajax-checkout-form" method="post">
+ <form asp-action="CheckoutAjax" id="checkout-form" class="ajax-checkout-form" method="post">
  @Html.AntiForgeryToken()
  <div style="margin-top:12px">
  <label for="idEnd">Endereço (id):</label>

@@ -1,12 +1,10 @@
 -- Criando a Data Base
+drop database dbilumina;
 create database dbilumina;
 -- Usando a Data Base
 use dbilumina;
 
 -- Criação de tabelas
-
-
-
 
 
 create table Usuario (
@@ -86,7 +84,7 @@ IdEndereco int not null,
 DataEntrega dateTime,
 ValorFrete decimal(7,2),
 DataPrevista date,
- Status enum ('Pedido enviado','Produto saiu para entrega', 'Seu Produto Chegou'),
+Status enum ('Pedido enviado','Produto saiu para entrega', 'Seu Produto Chegou'),
 foreign key (IdEndereco) references Endereco(IdEndereco)
 );
 
@@ -400,7 +398,6 @@ select IdUser,Nome,Email, Senha,role,ativo,Sexo,CPF from usuario where email= p_
 limit 1;
 end $$
 
-use dbilumina ; 
 create procedure obterProduto (in vCodigoBarras bigint)
 begin
   select CodigoBarras,NomeProd,Qtd,Foto,Descricao,ValorUnitario,codCategoria,codTipoProduto from Produto where CodigoBarras = vCodigoBarras;
@@ -424,7 +421,7 @@ BEGIN
  END IF ; 
 end $$ 
 
-call DeleteUsuario(4);
+
 create procedure DeleteUsuario(in vIdUser int)
 begin
   if exists (select IdUser from Usuario where IdUser = vIdUser)then
@@ -487,7 +484,6 @@ begin
   end if;
 end$$
 delimiter ;
-call insertProduto (254932837248,'Pergume Lavuar',25,'Perfume mais que demais é lavuar',12.2,'Masculino',3,5);
 
 
 delimiter $$
@@ -937,5 +933,5 @@ END$$
 
 DELIMITER ;
 
-SELECT * FROM Produto where not CodigoBarras =  1;
+SELECT * FROM Usuario where not CodigoBarras =  1;
 

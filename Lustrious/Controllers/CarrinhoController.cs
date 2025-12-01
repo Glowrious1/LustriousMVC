@@ -143,7 +143,7 @@ namespace Lustrious.Controllers
 
             _carrinhoRepositorio.FinalizarCompra(idEnd, userId.Value);
             // após finalizar, o carrinho deve ficar vazio
-            return Json(new { success = true, message = "Compra finalizada.", cartCount = 0 });
+            return RedirectToAction("Index");
         }
     }
 }

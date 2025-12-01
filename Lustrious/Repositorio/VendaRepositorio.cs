@@ -65,6 +65,7 @@ namespace Lustrious.Repositorio
         public int RegistrarEntrega(Entrega entrega)
         {
             using var conn = _dataBase.GetConnection();
+            conn.Open();
             using var cmd = new MySqlCommand("insertEntrega", conn);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("vIdEndereco", entrega.IdEndereco);
@@ -73,7 +74,6 @@ namespace Lustrious.Repositorio
             cmd.Parameters.AddWithValue("vDataPrevista", entrega.DataPrevista);
             cmd.Parameters.AddWithValue("vStatus", entrega.Status);
             cmd.ExecuteNonQuery();
-
             using var cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", conn);
             return Convert.ToInt32(cmdId.ExecuteScalar());
         }

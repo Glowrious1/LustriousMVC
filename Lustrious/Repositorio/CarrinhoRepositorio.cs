@@ -166,9 +166,10 @@ namespace Lustrious.Repositorio
             conexao.Open();
 
             using var cmd = new MySqlCommand(@"SELECT p.CodigoBarras AS CodigoBarras, p.ValorUnitario AS ValorUnitario, c.Qtd AS Qtd, p.CodigoBarras AS ProdutoId, p.NomeProd AS Nome, p.Foto AS Imagem
-FROM Carrinho c
-INNER JOIN Produto p ON p.CodigoBarras = c.IdProd
-WHERE c.IdUser = @userId", conexao);
+            FROM Carrinho c
+            INNER JOIN Produto p ON p.CodigoBarras = c.IdProd
+            WHERE c.IdUser = @userId;
+            ", conexao);
             cmd.Parameters.AddWithValue("@userId", userId);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -201,7 +202,7 @@ WHERE c.IdUser = @userId", conexao);
                 DataEntrega = DateTime.Now,
                 ValorFrete = frete,
                 DataPrevista = DateTime.Now.AddDays(3),
-                Status = "Pendente"
+                Status = "Pedido enviado"
             };
 
             int idEntrega = _vendaRepositorio.RegistrarEntrega(entrega);
@@ -211,15 +212,13 @@ WHERE c.IdUser = @userId", conexao);
                 IdUser = userId,
                 DataVenda = DateTime.Now,
                 ValorTotal = total + frete,
-                NF = 0,
+                NF = 1,
                 IdEntrega = idEntrega
             };
 
             _vendaRepositorio.RegistrarVenda(venda, itens);
 
-            using var cmdClear = new MySqlCommand("DELETE FROM Carrinho WHERE IdUser = @userId", conexao);
-            cmdClear.Parameters.AddWithValue("@userId", userId);
-            cmdClear.ExecuteNonQuery();
+            LimparCarrinho(userId);
         }
 
         public void LimparCarrinho(int userId)
