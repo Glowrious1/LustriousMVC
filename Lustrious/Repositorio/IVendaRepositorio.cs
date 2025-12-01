@@ -9,5 +9,11 @@ namespace Lustrious.Repositorio
         Venda AcharVenda(int id);
         IEnumerable<Venda> ListarVendasPorUsuario(int userId);
         int RegistrarEntrega(Entrega entrega);
+        IEnumerable<Venda> ListarTodasVendas();
+        void NotificarClienteVenda(int userId, string mensagem);
+        IEnumerable<Notificacao> ListarNotificacoes(int userId);
+        int ContarNotificacoesNaoLidas(int userId);
+        IEnumerable<Notificacao> ListarUltimasNotificacoes(int userId, int max);
+        void MarcarUltimasNotificacoesComoLidas(int userId, int max);
     }
 }

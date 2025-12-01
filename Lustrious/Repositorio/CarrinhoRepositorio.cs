@@ -128,32 +128,34 @@ namespace Lustrious.Repositorio
             INNER JOIN Produto p ON p.CodigoBarras = c.IdProd
             WHERE c.IdUser = @userId", conexao);
             cmd.Parameters.AddWithValue("@userId", userId);
-            using var reader = cmd.ExecuteReader();
 
             int totalQtd = 0;
             decimal total = 0m;
 
-            while (reader.Read())
+            using (var reader = cmd.ExecuteReader())
             {
-                var idProd = reader["IdProd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdProd"]);
-                var qtd = reader["Qtd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Qtd"]);
-                var valorUnit = reader["ValorUnitario"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorUnitario"]);
-                var codigo = reader["CodigoBarras"] == DBNull.Value ? 0L : Convert.ToInt64(reader["CodigoBarras"]);
-                var nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString();
-                var imagem = reader["Imagem"] == DBNull.Value ? string.Empty : reader["Imagem"].ToString();
-
-                totalQtd += qtd;
-                total += valorUnit * qtd;
-
-                carrinho.Items.Add(new VendaProduto
+                while (reader.Read())
                 {
-                    CodigoBarras = new BigInteger(codigo),
-                    ValorItem = valorUnit,
-                    Qtd = qtd,
-                    Nome = nome,
-                    Imagem = imagem,
-                    ProdutoId = idProd
-                });
+                    var idProd = reader["IdProd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdProd"]);
+                    var qtd = reader["Qtd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Qtd"]);
+                    var valorUnit = reader["ValorUnitario"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorUnitario"]);
+                    var codigo = reader["CodigoBarras"] == DBNull.Value ? 0L : Convert.ToInt64(reader["CodigoBarras"]);
+                    var nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString();
+                    var imagem = reader["Imagem"] == DBNull.Value ? string.Empty : reader["Imagem"].ToString();
+
+                    totalQtd += qtd;
+                    total += valorUnit * qtd;
+
+                    carrinho.Items.Add(new VendaProduto
+                    {
+                        CodigoBarras = new BigInteger(codigo),
+                        ValorItem = valorUnit,
+                        Qtd = qtd,
+                        Nome = nome,
+                        Imagem = imagem,
+                        ProdutoId = idProd
+                    });
+                }
             }
 
             carrinho.Qtd = totalQtd;
@@ -173,26 +175,31 @@ namespace Lustrious.Repositorio
             WHERE c.IdUser = @userId;
             ", conexao);
             cmd.Parameters.AddWithValue("@userId", userId);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                var codigo = reader["CodigoBarras"] == DBNull.Value ? 0L : Convert.ToInt64(reader["CodigoBarras"]);
-                var valor = reader["ValorUnitario"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorUnitario"]);
-                var qtd = reader["Qtd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Qtd"]);
-                var produtoId = reader["ProdutoId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["ProdutoId"]);
-                var nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString();
-                var imagem = reader["Imagem"] == DBNull.Value ? string.Empty : reader["Imagem"].ToString();
 
-                itens.Add(new VendaProduto
+            // Ler itens dentro de um using para garantir que o DataReader será fechado antes de executar outras queries usando a mesma conexão
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
                 {
-                    CodigoBarras = new BigInteger(codigo),
-                    ValorItem = valor,
-                    Qtd = qtd,
-                    ProdutoId = produtoId,
-                    Nome = nome,
-                    Imagem = imagem
-                });
+                    var codigo = reader["CodigoBarras"] == DBNull.Value ? 0L : Convert.ToInt64(reader["CodigoBarras"]);
+                    var valor = reader["ValorUnitario"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorUnitario"]);
+                    var qtd = reader["Qtd"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Qtd"]);
+                    var produtoId = reader["ProdutoId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["ProdutoId"]);
+                    var nome = reader["Nome"] == DBNull.Value ? string.Empty : reader["Nome"].ToString();
+                    var imagem = reader["Imagem"] == DBNull.Value ? string.Empty : reader["Imagem"].ToString();
+
+                    itens.Add(new VendaProduto
+                    {
+                        CodigoBarras = new BigInteger(codigo),
+                        ValorItem = valor,
+                        Qtd = qtd,
+                        ProdutoId = produtoId,
+                        Nome = nome,
+                        Imagem = imagem
+                    });
+                }
             }
+
             if (!itens.Any()) return;
 
             var total = itens.Sum(i => i.ValorItem * i.Qtd);
@@ -207,6 +214,15 @@ namespace Lustrious.Repositorio
                 Status = "Pedido enviado"
             };
 
+            // Validar existência do endereço antes de criar a entrega
+            using (var cmdCheckEnd = new MySqlCommand("SELECT COUNT(1) FROM Endereco WHERE IdEndereco = @id", conexao))
+            {
+                cmdCheckEnd.Parameters.AddWithValue("@id", idEnd);
+                var existsEnd = Convert.ToInt32(cmdCheckEnd.ExecuteScalar()) > 0;
+                if (!existsEnd)
+                    throw new InvalidOperationException("Endereço informado não existe. Finalização da compra abortada.");
+            }
+
             int idEntrega = _vendaRepositorio.RegistrarEntrega(entrega);
 
             var venda = new Venda
@@ -214,11 +230,23 @@ namespace Lustrious.Repositorio
                 IdUser = userId,
                 DataVenda = DateTime.Now,
                 ValorTotal = total + frete,
-                NF = 1,
+                // Não atribuir1 aqui — usar0 para que o repositório crie a NotaFiscal e retorne o id
+                NF = 0,
                 IdEntrega = idEntrega
             };
 
             _vendaRepositorio.RegistrarVenda(venda, itens);
+
+            // Notificar cliente que a compra foi realizada com sucesso
+            try
+            {
+                var mensagem = $"Compra realizada com sucesso em {DateTime.Now:dd/MM/yyyy HH:mm}. Valor: {venda.ValorTotal:C}.";
+                _vendaRepositorio.NotificarClienteVenda(userId, mensagem);
+            }
+            catch
+            {
+                // Não interromper o fluxo por falha na notificação; apenas ignorar
+            }
 
             LimparCarrinho(userId);
         }

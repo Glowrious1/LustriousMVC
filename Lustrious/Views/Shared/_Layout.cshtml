@@ -1,11 +1,17 @@
 ﻿@using Lustrious.Repositorio
+@using System.Linq
 @inject ICarrinhoRepositorio _carrinhoRepo
+@inject IVendaRepositorio _vendaRepo
 @{
     int cartCount =0;
+    int notifCount =0;
+    var ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>();
     var uid = Context.Session.GetInt32("UserId");
     if (uid.HasValue)
     {
         try { var c = _carrinhoRepo.AcharCarrinho(uid.Value); cartCount = c?.Qtd ??0; } catch { cartCount =0; }
+        try { notifCount = _vendaRepo.ContarNotificacoesNaoLidas(uid.Value); } catch { notifCount =0; }
+        try { ultimasNotifs = _vendaRepo.ListarUltimasNotificacoes(uid.Value,5); } catch { ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>(); }
     }
 }
 <!DOCTYPE html>
@@ -54,6 +60,31 @@
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-link nav-link" style="display:inline;padding:0;">Sair</button>
                                 </form>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Notificações <span id="notif-badge" class="badge bg-secondary ms-1">@notifCount</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown">
+                                    @if (!ultimasNotifs.Any())
+                                    {
+                                        <li class="dropdown-item">Sem notificações</li>
+                                    }
+                                    else
+                                    {
+                                        foreach(var n in ultimasNotifs)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action("Index", "Notificacao")">
+                                                    <small class="text-muted">@n.DataEnvio.ToString("g")</small><br />
+                                                    @n.Mensagem
+                                                </a>
+                                            </li>
+                                        }
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item text-center" href="@Url.Action("Index", "Notificacao")">Ver todas as notificações</a></li>
+                                    }
+                                </ul>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Carrinho" asp-action="Index">Carrinho <span id="cart-badge" class="badge bg-primary ms-1">@cartCount</span></a>
@@ -141,6 +172,22 @@
                 }).catch(function(){ showNotification('Erro de comunicação', 'error'); });
             }
         });
+
+        var notifDropdown = document.getElementById('notifDropdown');
+        if (notifDropdown){
+            notifDropdown.addEventListener('show.bs.dropdown', function(){
+                // Chamar endpoint para marcar últimas notificações como lidas via fetch
+                fetch('@Url.Action("MarcarUltimasComoLidas", "Notificacao")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('#antiforgeryForm input[name="__RequestVerificationToken"]').value },
+                    body: JSON.stringify({ max:5 })
+                }).then(function(resp){
+                    // atualizar badge localmente
+                    var badge = document.getElementById('notif-badge');
+                    if (badge) badge.textContent = '0';
+                }).catch(function(){ /* ignore */ });
+            });
+        }
     })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)

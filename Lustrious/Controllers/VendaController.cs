@@ -40,5 +40,14 @@ namespace Lustrious.Controllers
 
  return View(venda);
  }
+
+ // Lista todas vendas — ação para funcionários/admin
+ [HttpGet]
+ public IActionResult ListarTodas()
+ {
+ // Aqui você pode verificar Role do usuário se precisar restringir a funcionários
+ var vendas = _vendaRepositorio.ListarTodasVendas();
+ return View(vendas);
+ }
  }
 }

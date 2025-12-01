@@ -1,0 +1,20 @@
+@model IEnumerable<Lustrious.Models.Notificacao>
+@{
+ ViewData["Title"] = "Notificações";
+}
+<h2>Notificações</h2>
+@if (!Model?.Any() ?? true)
+{
+ <p>Sem notificações.</p>
+}
+else
+{
+ <ul class="list-group">
+ @foreach(var n in Model)
+ {
+ <li class="list-group-item">
+ <strong>@n.DataEnvio.ToString("g")</strong> - @n.Mensagem
+ </li>
+ }
+ </ul>
+}
