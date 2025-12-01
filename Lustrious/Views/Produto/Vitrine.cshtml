@@ -52,7 +52,8 @@
 <div class="vitrine">
  @foreach(var p in Model){
  <div class="card">
- <img src="@(string.IsNullOrEmpty(p.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("/~" + p.Foto.TrimStart('/')) )" alt="@p.NomeProd" />
+ @{ var imgSrc = string.IsNullOrEmpty(p.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + p.Foto.TrimStart('/','\\')); }
+ <img src="@imgSrc" alt="@p.NomeProd" onerror="this.onerror=null;this.src='@Url.Content("~/imagens/capa_foto.png")'" />
  <div class="nome">@p.NomeProd</div>
  <div>@p.NomeCategoria - @p.NomeTipoProduto</div>
  <div class="valor">@p.ValorUnitario.ToString("C")</div>

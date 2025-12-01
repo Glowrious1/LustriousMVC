@@ -4,6 +4,7 @@ using Lustrious.Models;
 using Lustrious.Repositorio;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using System.IO;
 
 
 namespace Lustrious.Controllers
@@ -54,6 +55,19 @@ namespace Lustrious.Controllers
             var total = result.TotalCount;
             var totalPages = (int)System.Math.Ceiling(total / (double)pageSize);
 
+            // validate image files exist; if not, clear Foto so view uses placeholder
+            foreach(var p in items)
+            {
+                if (!string.IsNullOrWhiteSpace(p.Foto))
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", p.Foto.TrimStart('/','\\'));
+                    if (!System.IO.File.Exists(path))
+                    {
+                        p.Foto = null;
+                    }
+                }
+            }
+
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.PageSize = pageSize;
@@ -77,6 +91,12 @@ namespace Lustrious.Controllers
             if (produto == null)
             {
                 return NotFound();
+            }
+            // ensure foto exists
+            if (!string.IsNullOrWhiteSpace(produto.Foto))
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", produto.Foto.TrimStart('/','\\'));
+                if (!System.IO.File.Exists(path)) produto.Foto = null;
             }
             return View(produto);
         }
