@@ -8,6 +8,8 @@ using System;
 using System.Data;
 using Lustrious.Services;
 
+//testando aaaaaa
+
 namespace Lustrious.Repositorio
 {
     public class CarrinhoRepositorio : ICarrinhoRepositorio
@@ -239,5 +241,9 @@ namespace Lustrious.Repositorio
             cmd.Parameters.AddWithValue("@produtoId", produtoId);
             cmd.ExecuteNonQuery();
         }
+        public void funcaoTeste()
+        {
+            return;
+        }   
     }
 }
