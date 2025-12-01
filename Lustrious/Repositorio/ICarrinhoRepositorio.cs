@@ -13,7 +13,7 @@ namespace Lustrious.Repositorio
         public bool AdicionarItem(int produtoId, int userId);
         public void RemoverItem(int produtoId, int userId);
         public void LimparCarrinho(int userId);
-        public void FinalizarCompra(int idEnd, int userId);
+        public bool FinalizarCompra(int idEnd, int userId);
         public Carrinho AcharCarrinho(int userId);
 
         // Novos métodos para ajustar quantidade

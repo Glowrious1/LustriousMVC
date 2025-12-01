@@ -163,7 +163,7 @@ namespace Lustrious.Repositorio
             return carrinho;
         }
 
-        public void FinalizarCompra(int idEnd, int userId)
+        public bool FinalizarCompra(int idEnd, int userId)
         {
             var itens = new List<VendaProduto>();
             using var conexao = _dataBase.GetConnection();
@@ -200,7 +200,7 @@ namespace Lustrious.Repositorio
                 }
             }
 
-            if (!itens.Any()) return;
+            if (!itens.Any()) return false;
 
             var total = itens.Sum(i => i.ValorItem * i.Qtd);
             decimal frete = _freteService.CalcularFreteAsync(idEnd).GetAwaiter().GetResult();
@@ -238,17 +238,12 @@ namespace Lustrious.Repositorio
             _vendaRepositorio.RegistrarVenda(venda, itens);
 
             // Notificar cliente que a compra foi realizada com sucesso
-            try
-            {
-                var mensagem = $"Compra realizada com sucesso em {DateTime.Now:dd/MM/yyyy HH:mm}. Valor: {venda.ValorTotal:C}.";
-                _vendaRepositorio.NotificarClienteVenda(userId, mensagem);
-            }
-            catch
-            {
-                // Não interromper o fluxo por falha na notificação; apenas ignorar
-            }
+            var mensagem = $"Compra realizada com sucesso em {DateTime.Now:dd/MM/yyyy HH:mm}. Valor: {venda.ValorTotal:C}.";
+            var notified = false;
+            try { notified = _vendaRepositorio.NotificarClienteVenda(userId, mensagem); } catch { notified = false; }
 
             LimparCarrinho(userId);
+            return notified;
         }
 
         public void LimparCarrinho(int userId)

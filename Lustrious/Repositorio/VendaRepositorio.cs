@@ -134,6 +134,16 @@ namespace Lustrious.Repositorio
                 }
 
                 transaction.Commit();
+
+                // Após commit, tentar notificar o cliente; falhas na notificação não devem invalidar a venda
+                try
+                {
+                    NotificarClienteVenda(venda.IdUser, $"Sua compra (NF {venda.NF}) foi registrada com sucesso.");
+                }
+                catch (Exception notifyEx)
+                {
+                    try { System.Diagnostics.Debug.WriteLine($"Falha ao notificar cliente: {notifyEx}"); } catch { }
+                }
             }
             catch (Exception ex)
             {
@@ -234,20 +244,34 @@ namespace Lustrious.Repositorio
             return lista;
         }
 
-        public void NotificarClienteVenda(int userId, string mensagem)
+        public bool NotificarClienteVenda(int userId, string mensagem)
         {
-            using var conn = _dataBase.GetConnection();
-            conn.Open();
-            // Create table with proper syntax for default0
-            using var cmd = new MySqlCommand(@"CREATE TABLE IF NOT EXISTS Notificacao (Id int primary key auto_increment, IdUser int, Mensagem varchar(500), DataEnvio datetime, Lida tinyint(1) default0)", conn);
-            cmd.ExecuteNonQuery();
+            try
+            {
+                using var conn = _dataBase.GetConnection();
+                conn.Open();
+                using var cmd = new MySqlCommand(@"CREATE TABLE IF NOT EXISTS Notificacao (
+ Id INT PRIMARY KEY AUTO_INCREMENT,
+ IdUser INT,
+ Mensagem VARCHAR(500),
+ DataEnvio DATETIME,
+ Lida TINYINT(1) DEFAULT 0
+)", conn);
+                cmd.ExecuteNonQuery();
 
-            using var cmdIns = new MySqlCommand("INSERT INTO Notificacao (IdUser, Mensagem, DataEnvio, Lida) VALUES (@idUser, @msg, @data, @lida)", conn);
-            cmdIns.Parameters.AddWithValue("@idUser", userId);
-            cmdIns.Parameters.AddWithValue("@msg", mensagem);
-            cmdIns.Parameters.AddWithValue("@data", DateTime.Now);
-            cmdIns.Parameters.AddWithValue("@lida", false);
-            cmdIns.ExecuteNonQuery();
+                using var cmdIns = new MySqlCommand("INSERT INTO Notificacao (IdUser, Mensagem, DataEnvio, Lida) VALUES (@idUser, @msg, @data, @lida)", conn);
+                cmdIns.Parameters.AddWithValue("@idUser", userId);
+                cmdIns.Parameters.AddWithValue("@msg", mensagem);
+                cmdIns.Parameters.AddWithValue("@data", DateTime.Now);
+                cmdIns.Parameters.AddWithValue("@lida",0);
+                cmdIns.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                try { System.Diagnostics.Debug.WriteLine($"Notificação falhou: {ex}"); } catch { }
+                return false;
+            }
         }
 
         public IEnumerable<Notificacao> ListarNotificacoes(int userId)

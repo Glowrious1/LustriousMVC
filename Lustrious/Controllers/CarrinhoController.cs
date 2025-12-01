@@ -107,8 +107,15 @@ namespace Lustrious.Controllers
         public IActionResult Checkout(int idEnd)
         {
             var userId = HttpContext.Session.GetInt32(SessionsKeys.UserId);
-            _carrinhoRepositorio.FinalizarCompra(idEnd, userId.Value);
-            // após finalizar, redireciona para histórico de vendas ou para confirmação
+            var notified = _carrinhoRepositorio.FinalizarCompra(idEnd, userId.Value);
+            if (notified)
+            {
+                TempData["Ok"] = "Compra finalizada e notificação enviada.";
+            }
+            else
+            {
+                TempData["Ok"] = "Compra finalizada.";
+            }
             return RedirectToAction("Index", "Venda");
         }
 
@@ -141,9 +148,8 @@ namespace Lustrious.Controllers
             if (userId == null)
                 return Json(new { success = false, message = "Usuário não autenticado." });
 
-            _carrinhoRepositorio.FinalizarCompra(idEnd, userId.Value);
-            // após finalizar, o carrinho deve ficar vazio
-            return RedirectToAction("Index");
+            var notified = _carrinhoRepositorio.FinalizarCompra(idEnd, userId.Value);
+            return Json(new { success = true, notified = notified });
         }
     }
 }
