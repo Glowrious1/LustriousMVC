@@ -135,15 +135,7 @@ namespace Lustrious.Repositorio
 
                 transaction.Commit();
 
-                // Após commit, tentar notificar o cliente; falhas na notificação não devem invalidar a venda
-                try
-                {
-                    NotificarClienteVenda(venda.IdUser, $"Sua compra (NF {venda.NF}) foi registrada com sucesso.");
-                }
-                catch (Exception notifyEx)
-                {
-                    try { System.Diagnostics.Debug.WriteLine($"Falha ao notificar cliente: {notifyEx}"); } catch { }
-                }
+                // NOTA: notificar cliente é responsabilidade do chamador (ex: CarrinhoRepositorio/Controller)
             }
             catch (Exception ex)
             {

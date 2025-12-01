@@ -74,8 +74,8 @@ else
  <button type="submit" class="btn btn-danger">Limpar Carrinho</button>
  </form>
 
- @* Simple checkout form: select address (if present) and send via AJAX to CheckoutAjax *@
- <form asp-action="CheckoutAjax" id="checkout-form" class="ajax-checkout-form" method="post">
+ @* Normal checkout form: post to Checkout action (server redirect) *@
+ <form asp-action="Checkout" method="post">
  @Html.AntiForgeryToken()
  <div style="margin-top:12px">
  <label for="idEnd">Endereço (id):</label>
@@ -84,30 +84,9 @@ else
  </div>
  </form>
 }
-<p><a href="/">Voltar</a></p>
-@section Scripts {
- <script>
- if (!checkoutForm) return;
- checkoutForm.addEventListener('submit', function(e){
- e.preventDefault();
- var token = document.querySelector('#checkout-form input[name="__RequestVerificationToken"]').value;
- var idEnd = document.getElementById('idEnd').value ||0;
- var fd = new FormData();
- fd.append('__RequestVerificationToken', token);
- fd.append('idEnd', idEnd);
- fetch('/Carrinho/CheckoutAjax', { method: 'POST', body: fd, credentials: 'same-origin' })
- .then(r => r.json()).then(function(data){
- if (!data) return;
- if (data.success){
- // update badge to zero
- var badge = document.getElementById('cart-badge'); if (badge) badge.textContent =0;
- alert(data.message || 'Compra finalizada');
- window.location = '/Venda/Index';
- } else {
- alert(data.message || 'Erro ao finalizar compra');
- }
- }).catch(()=> alert('Erro de comunicação'));
- });
- })();
- </script>
+
+<p><a href="/">Voltar</a></p>
+
+@section Scripts {
+ @* No AJAX script: server will handle redirect after Checkout *@
 }
