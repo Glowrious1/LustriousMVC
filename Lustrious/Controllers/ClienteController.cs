@@ -101,5 +101,17 @@ namespace Lustrious.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult CriarContaCliente()
+        {
+            return View();
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult CriarContaCliente(Usuario cliente, IFormFile foto)
+        {
+            _clienteRepositorio.CadastrarCliente(cliente, foto);
+            TempData["ok"] = "Cliente Cadastrado!";
+            return RedirectToAction("Login", "Auth");
+        }
     }
 }
