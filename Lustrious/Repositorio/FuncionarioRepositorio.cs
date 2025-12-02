@@ -1,8 +1,9 @@
-﻿using Lustrious.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using Lustrious.Data;
 using Lustrious.Models;
 using MySql.Data.MySqlClient;
-using System.Data;
-using System.Collections.Generic;
+using MySqlX.XDevAPI;
 
 namespace Lustrious.Repositorio
 {
@@ -14,26 +15,44 @@ namespace Lustrious.Repositorio
         {
             _dataBase = dataBase;
         }
-        public void CadastrarFuncionario(Usuario funcionario)
+        public void CadastrarFuncionario(Usuario funcionario, IFormFile? foto)
         {
-            using (var conexao = _dataBase.GetConnection())
+            string? relPath = null;
+
+            if (foto != null && foto.Length > 0)
             {
+                var ext = Path.GetExtension(foto.FileName);
+                var fileName = $"{Guid.NewGuid()}{ext}";
+                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosUsuario");
+                Directory.CreateDirectory(saveDir);
+                var absPath = Path.Combine(saveDir, fileName);
+
+                using var fs = new FileStream(absPath, FileMode.Create);
+                foto.CopyTo(fs);
+
+                relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
+
+                // Assign the relative path to the cliente object so it's available for later use
+                funcionario.Foto = relPath;
+            }
+
+             using var conexao = _dataBase.GetConnection();
+            
                 conexao.Open();
-                using (var cmd = new MySqlCommand("insertUsuario", conexao))
-                {
+                using var cmd = new MySqlCommand("insertUsuario", conexao);
+                var senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor: 12);
+
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
                     cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
-                    // Hash password before saving
-                    var senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor:12);
                     cmd.Parameters.AddWithValue("vSenha", senhaHash);
-                    cmd.Parameters.AddWithValue("vRole", funcionario.Role);
+                    cmd.Parameters.AddWithValue("vRole", string.IsNullOrWhiteSpace(funcionario.Role)? "Funcionario" : funcionario.Role);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
                     cmd.Parameters.AddWithValue("vFoto", (object?)funcionario.Foto ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
-                }
-            }
+                
+            
         }
         public Usuario AcharFuncionario(int id)
         {
@@ -95,8 +114,24 @@ namespace Lustrious.Repositorio
         }
 
 
-        public void AlterarFuncionario(Usuario funcionario)
+        public void AlterarFuncionario(Usuario funcionario, IFormFile? foto)
         {
+            string? relPath = null;
+            if (foto != null && foto.Length > 0)
+            {
+                var ext = Path.GetExtension(foto.FileName);
+                var fileName = $"{Guid.NewGuid()}{ext}";
+                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosUsuario");
+                Directory.CreateDirectory(saveDir);
+                var absPath = Path.Combine(saveDir, fileName);
+
+                using var fs = new FileStream(absPath, FileMode.Create);
+                foto.CopyTo(fs);
+
+                relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
+                funcionario.Foto = relPath;
+            }
+
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
