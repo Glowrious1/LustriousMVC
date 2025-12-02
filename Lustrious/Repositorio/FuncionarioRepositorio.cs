@@ -15,27 +15,10 @@ namespace Lustrious.Repositorio
         {
             _dataBase = dataBase;
         }
-        public void CadastrarFuncionario(Usuario funcionario, IFormFile? foto)
+        public void CadastrarFuncionario(Usuario funcionario)
         {
-            string? relPath = null;
 
-            if (foto != null && foto.Length > 0)
-            {
-                var ext = Path.GetExtension(foto.FileName);
-                var fileName = $"{Guid.NewGuid()}{ext}";
-                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosUsuario");
-                Directory.CreateDirectory(saveDir);
-                var absPath = Path.Combine(saveDir, fileName);
-
-                using var fs = new FileStream(absPath, FileMode.Create);
-                foto.CopyTo(fs);
-
-                relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
-
-                // Assign the relative path to the cliente object so it's available for later use
-                funcionario.Foto = relPath;
-            }
-
+           
              using var conexao = _dataBase.GetConnection();
             
                 conexao.Open();
@@ -114,24 +97,9 @@ namespace Lustrious.Repositorio
         }
 
 
-        public void AlterarFuncionario(Usuario funcionario, IFormFile? foto)
+        public void AlterarFuncionario(Usuario funcionario)
         {
-            string? relPath = null;
-            if (foto != null && foto.Length > 0)
-            {
-                var ext = Path.GetExtension(foto.FileName);
-                var fileName = $"{Guid.NewGuid()}{ext}";
-                var saveDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fotosUsuario");
-                Directory.CreateDirectory(saveDir);
-                var absPath = Path.Combine(saveDir, fileName);
-
-                using var fs = new FileStream(absPath, FileMode.Create);
-                foto.CopyTo(fs);
-
-                relPath = Path.Combine("fotosUsuario", fileName).Replace("\\", "/");
-                funcionario.Foto = relPath;
-            }
-
+           
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();

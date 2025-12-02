@@ -49,7 +49,7 @@ else
  </div>
  </td>
  <td>@item.ValorItem.ToString("C")</td>
- <td>@(item.ValorItem * item.Qtd).ToString("C")</td>
+ <td>R$ @(item.ValorItem * item.Qtd)</td>
  <td>
  <form asp-action="RemoverItem" method="post">
  @Html.AntiForgeryToken()
