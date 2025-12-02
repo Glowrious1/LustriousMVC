@@ -23,7 +23,6 @@
  <table class="table-clientes">
  <thead>
  <tr>
- <th>FOTO</th>
  <th>NOME</th>
  <th>EMAIL</th>
  <th>SEXO</th>
@@ -36,18 +35,10 @@
  <tbody>
  @foreach (var funcionario in Model)
  {
- var fotoVal = funcionario.Foto ?? string.Empty;
- var fileName = System.IO.Path.GetFileName(fotoVal.Replace('\\', '/'));
- var imgSrc = string.IsNullOrWhiteSpace(fileName)
- ? Url.Content("~/imagens/capa_foto.png")
- : Url.Content("~/fotosUsuario/" + fileName);
+
 
  <tr>
- <td>
- <div style="width:60px;height:60px;overflow:hidden;border-radius:8px;">
- <img src="@imgSrc" alt="Foto do funcionario" class="cliente-foto" />
- </div>
- </td>
+
  <td>@funcionario.Nome</td>
  <td>@funcionario.Email</td>
  <td>@funcionario.Sexo</td>
