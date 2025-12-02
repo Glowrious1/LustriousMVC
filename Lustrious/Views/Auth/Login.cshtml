@@ -1,12 +1,10 @@
-@{
+Ôªø@{
     ViewData["Title"] = "Login";
 }
 
 <div class="login-container">
 
     <div class="login-title">LOGIN</div>
-
-
 
     <form asp-action="Login" method="post">
 
@@ -17,17 +15,19 @@
         <input type="password" name="senha" required />
 
         <button type="submit">ENTRAR</button>
+
+        <!-- üîπ NOVO BOT√ÉO CRIAR CONTA -->
+        <a asp-controller="Cliente" asp-action="CriarCliente" class="btn-criar">CRIAR CONTA</a>
+
     </form>
 </div>
 
 <style>
-
-  
     body {
         background-color: #c8b68a;
         font-family: Arial, sans-serif;
     }
-    
+
     .login-container {
         width: 550px;
         margin: 70px auto;
@@ -39,7 +39,6 @@
         text-align: center;
     }
 
-    /* TÌtulo */
     .login-title {
         display: inline-block;
         background-color: #a7956c;
@@ -50,7 +49,6 @@
         margin-bottom: 40px;
     }
 
-    /* Inputs */
     .login-container input[type="email"],
     .login-container input[type="password"] {
         width: 75%;
@@ -62,7 +60,6 @@
         font-size: 16px;
     }
 
-    /* Labels */
     .login-container label {
         display: block;
         font-size: 15px;
@@ -70,9 +67,8 @@
         margin-bottom: 5px;
     }
 
-    /* Bot„o */
     .login-container button {
-        background-color: #1b6625; /* verde escuro */
+        background-color: #1b6625;
         color: white;
         border: none;
         padding: 12px 30px;
@@ -82,10 +78,24 @@
         transition: 0.2s;
     }
 
-        /* Hover do bot„o */
         .login-container button:hover {
-            background-color: #2e8b3a; /* verde mais claro */
+            background-color: #2e8b3a;
         }
 
+    /* Bot√£o Criar Conta */
+    .btn-criar {
+        display: inline-block;
+        margin-top: 18px;
+        background-color: #6b5332;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: 0.2s;
+    }
 
+        .btn-criar:hover {
+            background-color: #8a6b41;
+        }
 </style>
