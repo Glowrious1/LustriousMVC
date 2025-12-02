@@ -1,17 +1,91 @@
 @{
- ViewData["Title"] = "Login";
+    ViewData["Title"] = "Login";
 }
-<h2>Login (teste)</h2>
-<form asp-action="Login" method="post">
- <div>
- <label>Email</label>
- <input type="email" name="email" />
- </div>
- <div>
- <label>Senha</label>
- <input type="password" name="senha" />
- </div>
- <div>
- <button type="submit">Entrar</button>
- </div>
-</form>
+
+<div class="login-container">
+
+    <div class="login-title">LOGIN</div>
+
+
+
+    <form asp-action="Login" method="post">
+
+        <label>Email</label>
+        <input type="email" name="email" required />
+
+        <label>Senha</label>
+        <input type="password" name="senha" required />
+
+        <button type="submit">ENTRAR</button>
+    </form>
+</div>
+
+<style>
+
+  
+    body {
+        background-color: #c8b68a;
+        font-family: Arial, sans-serif;
+    }
+    
+    .login-container {
+        width: 550px;
+        margin: 70px auto;
+        padding: 50px 40px;
+        background-color: #c7bda8;
+        border: 8px solid #a7956c;
+        border-radius: 25px;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    /* Título */
+    .login-title {
+        display: inline-block;
+        background-color: #a7956c;
+        padding: 8px 25px;
+        border-radius: 10px;
+        font-size: 32px;
+        color: white;
+        margin-bottom: 40px;
+    }
+
+    /* Inputs */
+    .login-container input[type="email"],
+    .login-container input[type="password"] {
+        width: 75%;
+        padding: 10px;
+        margin: 12px 0 25px 0;
+        border: none;
+        border-radius: 5px;
+        background: white;
+        font-size: 16px;
+    }
+
+    /* Labels */
+    .login-container label {
+        display: block;
+        font-size: 15px;
+        color: white;
+        margin-bottom: 5px;
+    }
+
+    /* Botão */
+    .login-container button {
+        background-color: #1b6625; /* verde escuro */
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        /* Hover do botão */
+        .login-container button:hover {
+            background-color: #2e8b3a; /* verde mais claro */
+        }
+
+
+</style>
