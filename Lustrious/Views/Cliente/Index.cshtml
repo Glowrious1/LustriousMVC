@@ -199,23 +199,6 @@
 
     }
 
-        .new-btn {
-                background: #d6b36a;
-                color: white;
-                padding: 8px 18px;
-                border-radius: 10px;
-                text-decoration: none;
-                font-weight: bold;
-                font-size: 14px;
-                transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
-
-    }
-
-            .new-btn:hover {
-                    background-color: #CCAC66; /* Cor de fundo ao passar o mouse */
-                    color: #FFFFFF; /* Cor do texto ao passar o mouse */
-
-    }
 
 
 
@@ -241,25 +224,33 @@
 
         }
 
-        .edit-btn {
-                background: #8a8a8a;
-                color: white;
-                padding: 5px 12px;
-                border-radius: 8px;
-                text-decoration: none;
-                margin-right: 8px;
+    /* Botões — padrão correto */
 
-    }
+   
+    .button-row { text-align: center; margin-top: 25px; }
 
-        .delete-btn {
-                background: #b54845;
-                color: white;
-                padding: 5px 12px;
-                border-radius: 8px;
-                text-decoration: none;
-                border: none; /* Adicionado para garantir que se pareça com o link EDITAR */
+    .editar { background: #d6b36a; color: #fff; padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
 
-    }
+        .editar:hover { background: #e7c67a; }
+
+    .cancelar { background: #a04444; color: #fff; padding: 10px 18px; border-radius: 8px; text-decoration: none; margin-left: 10px; transition: 0.2s; }
+
+        .cancelar:hover { background: #b85a5a; color: white; }
+
+    /* Aplicação desse estilo nos botões da tabela */
+    .edit-btn { background: #d6b36a; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; }
+
+        .edit-btn:hover { background: #e7c67a; }
+
+    .delete-btn { background: #a04444; color: white; padding: 8px 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+
+        .delete-btn:hover { background: #b85a5a; color: white; }
+
+    /* Botão "NOVO CLIENTE" seguindo o padrão EDITAR */
+    .new-btn { background: #d6b36a; color: white; padding: 8px 18px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 14px; transition: 0.2s; }
+
+        .new-btn:hover { background: #e7c67a; }
+
 
         .filters input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
         .pagination { margin-top: 16px; }
