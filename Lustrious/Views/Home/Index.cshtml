@@ -186,7 +186,7 @@
  .destaques-mes {
  margin-top:30px; /* você pode ajustar:10px,20px,40px */
  text-align: center;
- padding:25px0;
+ padding:25px 0;
  }
 
 
@@ -195,7 +195,7 @@
  color: #b5954b;
  font-weight:500;
  border:2px solid #b5954b;
- padding:10px30px;
+ padding:10px 30px;
  display: inline-block;
  border-radius:40px;
  }
@@ -203,7 +203,7 @@
  /* ----------- BANNER LONGO ----------- */
  .banner-longo {
  width:100vw;
- margin-left: calc(-50vw +50%);
+ margin-left:-12%;
  overflow: hidden;
  /* thin border like cliente cards */
  border:2px solid #d6b36a;
@@ -307,6 +307,7 @@
  flex-wrap: wrap;
  gap:20px;
  justify-content: center;
+ margin-bottom:80px; /* espaço embaixo para não grudar no rodapé */
  }
 
  .produto-card {
@@ -350,6 +351,10 @@
  padding:35px;
  margin-top:60px;
  text-align: center;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap:18px; /* espaço entre elementos do footer */
  }
 
  .logo-footer {
@@ -357,9 +362,16 @@
  opacity:0.75;
  }
 
+ /* Organiza os ícones horizontalmente com espaçamento consistente */
+ .rodape .icones {
+ display: flex;
+ gap:12px;
+ justify-content: center;
+ align-items: center;
+ }
+
  .icones img {
  width:38px;
- margin:10px;
  cursor: pointer;
  }
 

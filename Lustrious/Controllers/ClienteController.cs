@@ -110,7 +110,7 @@ namespace Lustrious.Controllers
         public IActionResult CriarContaCliente(Usuario cliente, IFormFile foto)
         {
             _clienteRepositorio.CadastrarCliente(cliente, foto);
-            TempData["ok"] = "Cliente Cadastrado!";
+            TempData["ok"] = "Conta Criada com Sucesso!";
             return RedirectToAction("Login", "Auth");
         }
     }
