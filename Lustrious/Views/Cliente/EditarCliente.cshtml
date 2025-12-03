@@ -5,169 +5,131 @@
 }
 
 <style>
-    /* body */
-    body {
-        font-family: Arial, sans-serif;
-        background: #c7b99a;
-        margin: 0;
-        padding: 0;
-    }
+    body { background: #FFEFCC; font-family: 'Times New Roman', serif; }
 
-    .container {
-        width: 70%;
-        margin: 40px auto;
-        background: #fff9d6;
-        border: 4px solid #b8995e;
-        border-radius: 20px;
-        padding: 30px;
-    }
+    .container-card { width: 70%; margin: 40px auto; background: #fff6c6; padding: 25px; border-radius: 15px; border: 4px solid #d6b36a; }
 
-    h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        color: #3a2f1b;
-    }
+    h2 { text-align: center; margin-bottom: 20px; font-weight: bold; }
 
-    .form-group {
-        margin-bottom: 15px;
-        font-weight: bold;
-        font-size: 14px;
-    }
+    .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; }
+
+    .left-side { width: 65%; }
+
+    .form-group { margin-top: 10px; font-size: 14px; font-weight: bold; }
 
     input[type="text"],
     input[type="email"],
-    input[type="password"] {
-        width: 60%;
-        padding: 10px;
-        border: 2px solid #ccb27a;
-        border-radius: 6px;
-        font-size: 14px;
-    }
+    input[type="password"],
+    select { width: 95%; padding: 8px; margin-top: 6px; border-radius: 6px; border: 1px solid #d6b36a; background: #fff; font-size: 14px; }
 
-    .foto-container {
-        width: 230px;
-        height: 260px;
-        background: #fffefa;
-        border: 3px solid #c6a96b;
-        border-radius: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
+    /* FOTO */
+    .foto-container { width: 200px; height: 200px; border: 4px solid #c9a55b; border-radius: 12px; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #fff; }
 
-    .foto-preview {
-        width: 150px;
-        object-fit: cover;
-    }
+    .foto-preview { width: 100%; height: 100%; object-fit: cover; }
 
-    .row {
-        display: flex;
-        justify-content: space-between;
-    }
+    .foto-input { display: none !important; }
 
-    .button-row {
-        margin-top: 20px;
-        display: flex;
-        gap: 20px;
-    }
 
-    button {
-        padding: 10px 25px;
-        border-radius: 10px;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    /* Editar */
-    .editar {
-        border-radius: 10px;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-    }
+    /* Botões */
+    .button-row { text-align: center; margin-top: 25px; }
 
-    .cancelar {
-        background: #b34747;
-        color: white;
-    }
+    .editar { background: #d6b36a; color: #fff; padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
 
-    .select-sexo {
-        width: 150px;
-        padding: 10px;
-        border: 2px solid #ccb27a;
-        border-radius: 6px;
-        font-size: 14px;
-    }
+        .editar:hover { background: #e7c67a; }
+
+    .cancelar { background: #a04444; color: #fff; padding: 10px 18px; border-radius: 8px; text-decoration: none; margin-left: 10px; transition: 0.2s; }
+
+        .cancelar:hover { background: #b85a5a; color: white}
+
+    /* Alerts */
+    .alert-success { padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 6px; margin-bottom: 10px; }
+
+    .alert-danger { padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 6px; margin-bottom: 10px; }
 </style>
 
-<form class="container" asp-action="EditarCliente" method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
 
-    <h2>EDITAR CLIENTE</h2>
+<div class="container-card">
+    <form asp-action="EditarCliente" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
 
-    <div class="row">
+        <h2>EDITAR CLIENTE</h2>
 
-        <div>
-            <input asp-for="IdUser" type="hidden" />
+        <div class="row">
 
-            <div class="form-group">NOME DO CLIENTE:</div>
-            <input asp-for="Nome" type="text" placeholder="Digite o nome aqui..." />
-            <span asp-validation-for="Nome" class="text-danger"></span>
+            <!-- inputs -->
+            <div class="left-side">
 
-            <div class="form-group">EMAIL:</div>
-            <input asp-for="Email" type="email" placeholder="Digite o email aqui..." />
-            <span asp-validation-for="Email" class="text-danger"></span>
+                <input asp-for="IdUser" type="hidden" />
 
-            <div class="form-group">SENHA:</div>
-            <input asp-for="Senha" type="password" placeholder="Digite a senha aqui..." />
-            <span asp-validation-for="Senha" class="text-danger"></span>
+                <div class="form-group">NOME DO CLIENTE:</div>
+                <input asp-for="Nome" type="text" placeholder="Digite o nome aqui..." />
+                <span asp-validation-for="Nome" class="text-danger"></span>
 
-            <div class="form-group">CPF:</div>
-            <input asp-for="CPF" type="text" placeholder="Digite o CPF aqui..." />
-            <span asp-validation-for="CPF" class="text-danger"></span>
+                <div class="form-group">EMAIL:</div>
+                <input asp-for="Email" type="email" placeholder="Digite o email aqui..." />
+                <span asp-validation-for="Email" class="text-danger"></span>
 
-            <div class="form-group">SEXO:</div>
-            <select asp-for="Sexo" class="select-sexo">
-                <option value="Masculino">Masculino</option>
-                <option value="Feminino">Feminino</option>
-                <option value="Outro">Outro</option>
-            </select>
+                <div class="form-group">SENHA:</div>
+                <input asp-for="Senha" type="password" placeholder="Digite a senha aqui..." />
+                <span asp-validation-for="Senha" class="text-danger"></span>
+
+                <div class="form-group">CPF:</div>
+                <input asp-for="CPF" type="text" placeholder="Digite o CPF aqui..." />
+                <span asp-validation-for="CPF" class="text-danger"></span>
+
+                <div class="form-group">SEXO:</div>
+                <select asp-for="Sexo">
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Outro">Outro</option>
+                </select>
+
+            </div>
+
+            <div class="foto-container" id="fotoBox">
+                <img src="@(string.IsNullOrWhiteSpace(Model?.Foto)
+                                     ? Url.Content("~/imagens/capa_foto.png")
+                                     : Url.Content("~/" + Model.Foto))"
+                     class="foto-preview" id="fotoPreview" />
+
+                <input type="file" id="fotoInput" name="foto" accept="image/*" class="foto-input" />
+            </div>
+
+
         </div>
 
-        <!-- FOTO -->
-        <label class="foto-container" for="fotoInput">
-            <img src="@(string.IsNullOrWhiteSpace(Model?.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + Model.Foto))" class="foto-preview" id="fotoPreview" />
-            <input type="file" id="fotoInput" name="foto" accept="image/*" style="opacity:0;position:absolute;left:0;top:0;width:100%;height:100%;cursor:pointer;" />
-        </label>
+        <!-- Botões -->
+        <div class="button-row">
+            <button type="submit" class="editar">EDITAR</button>
+            <a asp-action="Index" asp-controller="Cliente" class="cancelar">CANCELAR</a>
+        </div>
 
-    </div>
+    </form>
+</div>
 
-    <!-- Botões -->
-    <div class="button-row">
-        <button type="submit" class="editar">EDITAR</button>
-        <a asp-action="Index" asp-controller="Cliente" class="cancelar">CANCELAR</a>
-    </div>
-</form>
 
 <script>
-    (function(){
-        var input = document.getElementById('fotoInput');
-        var preview = document.getElementById('fotoPreview');
-        if(!input) return;
-        input.addEventListener('change', function(e){
-            var file = input.files && input.files[0];
-            if(!file) return;
-            var reader = new FileReader();
-            reader.onload = function(ev){
-                preview.src = ev.target.result;
-            };
+    (function () {
+
+        const fotoBox = document.getElementById('fotoBox');
+        const fotoInput = document.getElementById('fotoInput');
+        const fotoPreview = document.getElementById('fotoPreview');
+
+        // Clicar na foto abre o input
+        fotoBox.addEventListener('click', () => {
+            fotoInput.click();
+        });
+
+        // Preview da imagem
+        fotoInput.addEventListener('change', () => {
+            let file = fotoInput.files[0];
+            if (!file) return;
+
+            let reader = new FileReader();
+            reader.onload = e => fotoPreview.src = e.target.result;
             reader.readAsDataURL(file);
         });
+
     })();
 </script>
+
