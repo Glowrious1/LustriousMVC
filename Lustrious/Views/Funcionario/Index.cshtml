@@ -2,6 +2,7 @@
 
 @{
  ViewData["Title"] = "Funcionários";
+ ViewData["HideFooter"] = true;
  var role = Context.Session.GetString("UserRole") ?? string.Empty;
  bool isAdmin = role.ToLower() == "admin";
  bool isStaff = role.ToLower() == "admin" || role.ToLower() == "funcionario";
@@ -54,8 +55,9 @@
 
  @if (isAdmin)
  {
- <form asp-controller="Funcionario" asp-action="ExcluirFuncionario" method="post" asp-route-id="@funcionario.IdUser" style="display:inline;">
+ <form asp-controller="Funcionario" asp-action="ExcluirFuncionario" method="post" style="display:inline;">
  @Html.AntiForgeryToken()
+ <input type="hidden" name="id" value="@funcionario.IdUser" />
  <button type="submit" class="delete-btn" onclick="return confirm('Deseja realmente Excluir este item?');">EXCLUIR</button>
  </form>
  }
@@ -69,40 +71,40 @@
 </main>
 
 <style>
-    body { margin: 0; padding: 0; background-color: #FFEFCC; font-family: 'Times New Roman', serif; }
+ body { margin:0; padding:0; background-color: #FFEFCC; font-family: 'Times New Roman', serif; }
 
-    .main-content { display: flex; justify-content: center; padding: 40px 0; }
+ .main-content { display: flex; justify-content: center; padding:40px0; }
 
-    .card { background: #fff6c6; width: 70%; border-radius: 15px; padding: 25px; border: 4px solid #d6b36a; }
+ .card { background: #fff6c6; width:70%; border-radius:15px; padding:25px; border:4px solid #d6b36a; }
 
-    .card-header { display: flex; justify-content: space-between; align-items: center; }
+ .card-header { display: flex; justify-content: space-between; align-items: center; }
 
-    /* Botão NOVO — seguindo padrão EDITAR */
-    .new-btn { background: #d6b36a; color: white; padding: 8px 18px; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.2s; }
-        .new-btn:hover { background: #e7c67a; color: white; }
+ /* Botão NOVO é seguindo padrão EDITAR */
+ .new-btn { background: #d6b36a; color: white; padding:8px18px; border-radius:10px; text-decoration: none; font-weight: bold; transition:0.2s; }
+ .new-btn:hover { background: #e7c67a; color: white; }
 
-    /* Tabela */
-    .table-clientes { width: 100%; border-collapse: collapse; margin-top: 20px; }
+ /* Tabela */
+ .table-clientes { width:100%; border-collapse: collapse; margin-top:20px; }
 
-        .table-clientes th { text-align: left; padding: 12px 0; font-weight: bold; border-bottom: 2px solid #d6b36a; }
+ .table-clientes th { text-align: left; padding:12px0; font-weight: bold; border-bottom:2px solid #d6b36a; }
 
-        .table-clientes td { padding: 12px 0; vertical-align: middle; }
+ .table-clientes td { padding:12px0; vertical-align: middle; }
 
-    /* ----------- BOTÕES PADRÃO (EDITAR / EXCLUIR) ---------------- */
+ /* ----------- BOTÕES PADRÃO (EDITAR / EXCLUIR) ---------------- */
 
-    /* EDITAR — padrão correto */
-    .edit-btn { background: #d6b36a; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; border: none; }
-        .edit-btn:hover { background: #e7c67a; color: white; }
+ /* EDITAR é padrão correto */
+ .edit-btn { background: #d6b36a; color: white; padding:8px16px; border-radius:8px; text-decoration: none; font-weight: bold; transition:0.2s; border: none; }
+ .edit-btn:hover { background: #e7c67a; color: white; }
 
-    /* EXCLUIR — padrão correto */
-    .delete-btn { background: #a04444; color: white; padding: 8px 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .delete-btn:hover { background: #b85a5a; color: white; }
+ /* EXCLUIR é padrão correto */
+ .delete-btn { background: #a04444; color: white; padding:8px16px; border-radius:8px; border: none; font-weight: bold; cursor: pointer; transition:0.2s; }
+ .delete-btn:hover { background: #b85a5a; color: white; }
 
-    /* Foto */
-    .cliente-foto { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e6d6a8; }
+ /* Foto */
+ .cliente-foto { width:60px; height:60px; object-fit: cover; border-radius:8px; border:2px solid #e6d6a8; }
 
-    /* Alerts */
-    .alert-success { padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 6px; margin-bottom: 10px; }
+ /* Alerts */
+ .alert-success { padding:10px; background: #d4edda; color: #155724; border:1px solid #c3e6cb; border-radius:6px; margin-bottom:10px; }
 
-    .alert-danger { padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 6px; margin-bottom: 10px; }
+ .alert-danger { padding:10px; background: #f8d7da; color: #721c24; border:1px solid #f5c6cb; border-radius:6px; margin-bottom:10px; }
 </style>

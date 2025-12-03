@@ -18,9 +18,9 @@ namespace Lustrious.Repositorio
         public void CadastrarFuncionario(Usuario funcionario)
         {
 
-           
+
              using var conexao = _dataBase.GetConnection();
-            
+
                 conexao.Open();
                 using var cmd = new MySqlCommand("insertUsuario", conexao);
                 var senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor: 12);
@@ -34,8 +34,8 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
                     cmd.Parameters.AddWithValue("vFoto", (object?)funcionario.Foto ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
-                
-            
+
+
         }
         public Usuario AcharFuncionario(int id)
         {
@@ -72,7 +72,8 @@ namespace Lustrious.Repositorio
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();
-                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto, Ativo FROM Usuario WHERE not Role = 'Cliente' ORDER BY Nome", conexao))
+                // Only return non-client users who are active (Ativo = '1' or NULL)
+                using (var cmd = new MySqlCommand("SELECT IdUser, Nome, Email, Senha, Sexo, CPF, Role, Foto, Ativo FROM Usuario WHERE not Role = 'Cliente' AND (Ativo IS NULL OR Ativo = '1') ORDER BY Nome", conexao))
                 {
                     using var reader = cmd.ExecuteReader();
                     while (reader.Read())
@@ -99,7 +100,7 @@ namespace Lustrious.Repositorio
 
         public void AlterarFuncionario(Usuario funcionario)
         {
-           
+
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();

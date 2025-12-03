@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<Lustrious.Models.Produto>
 @{
     ViewData["Title"] = "Produtos";
+    ViewData["HideFooter"] = true;
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     string filterQ = ViewBag.FilterQ as string ?? string.Empty;

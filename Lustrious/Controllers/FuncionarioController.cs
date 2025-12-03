@@ -53,10 +53,40 @@ namespace Lustrious.Controllers
         }
         [HttpPost, ValidateAntiForgeryToken]
         [SessionAuthorize(RoleAnyOf = "Admin")]
-        public IActionResult ExcluirFuncionario(int id)
+        public IActionResult ExcluirFuncionario(int? id)
         {
-            _funcionarioRepositorio.ExcluirFuncionario(id);
-            TempData["ok"] = "Funcionario Excluído!";
+            // try to obtain id from route or form if not bound
+            var resolvedId = id ??0;
+            if (resolvedId ==0)
+            {
+                // attempt to read from form field named "id"
+                if (Request.HasFormContentType && Request.Form.ContainsKey("id"))
+                {
+                    int.TryParse(Request.Form["id"], out resolvedId);
+                }
+                // attempt route data
+                if (resolvedId ==0 && RouteData.Values.ContainsKey("id"))
+                {
+                    int.TryParse(RouteData.Values["id"]?.ToString() ?? "0", out resolvedId);
+                }
+            }
+
+            if (resolvedId ==0)
+            {
+                TempData["erro"] = "Id do funcionário não informado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _funcionarioRepositorio.ExcluirFuncionario(resolvedId);
+                TempData["ok"] = "Funcionario Excluído!";
+            }
+            catch (Exception ex)
+            {
+                TempData["erro"] = "Erro ao excluir funcionário: " + ex.Message;
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }

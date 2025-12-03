@@ -1,6 +1,8 @@
 @model Lustrious.Models.Produto
 @{
     ViewData["Title"] = "Detalhes do Produto";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    bool isStaff = role.ToLower() == "admin" || role.ToLower() == "funcionario";
 }
 
 <style>
@@ -30,6 +32,10 @@
         .btn-cart:hover:not(:disabled) { background: #8c6a3a; }
 
         .btn-cart:disabled { background: #a08b67; cursor: not-allowed; opacity: 0.7; }
+
+    .btn-back { margin-top: 12px; display: inline-block; padding: 8px 14px; border-radius: 10px; background: #b54845; color: #fff; text-decoration: none; }
+
+        .btn-back:hover { background: #c85c59; }
 </style>
 
 
@@ -63,6 +69,16 @@
                 @(Model.Qtd <= 0 ? "SEM ESTOQUE" : "Adicionar ao Carrinho")
             </button>
         </form>
+
+        @* Back button: go to Index for staff, Vitrine for public *@
+        @if (isStaff)
+        {
+            <a asp-controller="Produto" asp-action="Index" class="btn-back">Voltar para Produtos</a>
+        }
+        else
+        {
+            <a asp-controller="Produto" asp-action="Vitrine" class="btn-back">Voltar para Produtos</a>
+        }
     </div>
 
 </div>

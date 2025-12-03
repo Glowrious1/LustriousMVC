@@ -1,6 +1,7 @@
 @model IEnumerable<Lustrious.Models.Venda>
 @{
  ViewData["Title"] = "Todas Vendas";
+ ViewData["HideFooter"] = true;
 }
 
 <div id="vendas-container" class="container">
@@ -97,7 +98,7 @@
  #vendas-container { width:95%; padding:18px; }
  table { display: block; overflow-x: auto; white-space: nowrap; }
  thead th, tbody td { padding:8px; }
- .top-row .criar { padding:6px 10px; }
+ .top-row .criar { padding:6px10px; }
  }
 
 </style>
