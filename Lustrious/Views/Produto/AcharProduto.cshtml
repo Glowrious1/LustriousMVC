@@ -2,30 +2,67 @@
 @{
     ViewData["Title"] = "Detalhes do Produto";
 }
+
 <style>
-    .detalhe { width: 80%; margin: 20px auto; display: flex; gap: 24px; }
-    .foto { width: 40%; }
-        .foto img { width: 100%; height: auto; object-fit: cover; border-radius: 8px; }
-    .info { width: 60%; }
-    .btn { padding: 8px12px; border-radius: 6px; border: none; cursor: pointer; }
-    .btn-cart { background: #0069d9; color: #fff; }
+    body { margin: 0; padding: 0; background: #f3e4c7; /* bege claro do fundo */ font-family: 'Segoe UI', sans-serif; }
+
+    .detalhe-container { max-width: 1100px; margin: 60px auto; background: #fff8e8; /* bege muito claro interno */ padding: 40px; border-radius: 18px; border: 3px solid #d4b98a; /* bege mais escuro */ display: flex; gap: 50px; align-items: flex-start; }
+
+    /* FOTO */
+    .foto { width: 420px; height: 420px; border-radius: 12px; background: #efe7d7; border: 2px solid #ccb48c; display: flex; align-items: center; justify-content: center; }
+
+        .foto img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+    /* INFO */
+    .info { flex: 1; padding-top: 5px; }
+
+        .info h1 { margin-bottom: 12px; font-size: 28px; font-weight: 700; color: #3d2d17; }
+
+        .info p { margin: 8px 0; font-size: 15px; color: #4b3b22; }
+
+        .info strong { font-weight: 700; color: #3d2d17; }
+
+    .descricao { margin-top: 15px; font-size: 15px; color: #2e2718; }
+
+    /* BOTÃO */
+    .btn-cart { margin-top: 25px; padding: 10px 26px; border-radius: 20px; background: #6f4f26; border: none; color: white; cursor: pointer; font-size: 15px; transition: 0.2s; }
+
+        .btn-cart:hover:not(:disabled) { background: #8c6a3a; }
+
+        .btn-cart:disabled { background: #a08b67; cursor: not-allowed; opacity: 0.7; }
 </style>
-<div class="detalhe">
+
+
+<div class="detalhe-container">
+
+    <!-- FOTO -->
     <div class="foto">
-        <img src="@(string.IsNullOrEmpty(Model.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + Model.Foto.TrimStart('/')))" alt="@Model.NomeProd" />
+        <img src="@(string.IsNullOrEmpty(Model.Foto)
+                             ? Url.Content("~/imagens/capa_foto.png")
+                             : Url.Content("~/" + Model.Foto.TrimStart('/')))" />
     </div>
+
+    <!-- INFO -->
     <div class="info">
-        <h2>@Model.NomeProd</h2>
+        <h1>@Model.NomeProd</h1>
+
         <p><strong>Categoria:</strong> @Model.NomeCategoria</p>
         <p><strong>Tipo:</strong> @Model.NomeTipoProduto</p>
         <p><strong>Quantidade:</strong> @Model.Qtd</p>
         <p><strong>Valor:</strong> @Model.ValorUnitario.ToString("C")</p>
-        <p>@Model.Descricao</p>
 
-        <form class="ajax-add-to-cart" asp-controller="Carrinho" asp-action="AdicionarItem" method="post">
+        <p class="descricao">@Model.Descricao</p>
+
+        <form asp-controller="Carrinho" asp-action="AdicionarItem" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" name="produtoId" value="@Model.CodigoBarras" />
-            <button type="submit" class="btn btn-cart" @(Model.Qtd <= 0 ? "disabled" : "")>@(Model.Qtd <= 0 ? "Sem estoque" : "Adicionar ao Carrinho")</button>
+
+            <button type="submit"
+                    class="btn-cart"
+                    @(Model.Qtd <= 0 ? "disabled" : "")>
+                @(Model.Qtd <= 0 ? "SEM ESTOQUE" : "Adicionar ao Carrinho")
+            </button>
         </form>
     </div>
+
 </div>
