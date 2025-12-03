@@ -25,5 +25,57 @@ body {
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 
+/* --- HEADER BASE --- */
+.navbar { padding: 15px 40px; background-color: white !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-family: 'Montserrat', sans-serif; }
+
+/* Logo estilo elegante */
+.navbar-brand { font-size: 20px; font-weight: 600; letter-spacing: 2px; color: #a57c48 !important; /* dourado elegante */ text-transform: uppercase; }
+
+/* --- CENTRALIZAÇÃO DO MENU --- */
+.navbar-nav.flex-grow-1 { justify-content: center; gap: 60px; /* espaçamento entre itens */ }
+
+/* Links do menu */
+.nav-link { font-size: 14px; letter-spacing: 0.8px; font-weight: 500; color: #000 !important; text-transform: uppercase; }
+
+    .nav-link:hover { color: #a57c48 !important; }
+
+/* --- DIVISORES DOURADOS ENTRE ITENS --- */
+.nav-item { position: relative; padding: 0 25px; }
+
+    .nav-item:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 5px; height: 20px; width: 1px; background-color: #e7d1a8; /* dourado claro */ }
+
+/* Não colocar divisores entre cliente/notificações/ícones */
+.navbar-nav:last-child .nav-item::after { display: none; }
+
+/* Mensagem Olá, Henrique */
+.navbar-nav:last-child .nav-item.nav-link { margin-right: 8px; font-size: 14px; }
+
+/* --- ÍCONES (maiores e com espaçamento entre eles) --- */
+
+/* --- ÍCONES (maiores e com espaçamento entre eles) --- */
+
+/* aumenta o tamanho de TODOS os ícones */
+.navbar svg { width: 28px !important; /* antes: 16–22px */ height: 28px !important; margin-left: 15px; /* separa os ícones */ cursor: pointer; }
+
+    .navbar svg:hover { color: #a57c48; }
+
+/* badge acompanha o tamanho do ícone */
+#notif-badge { font-size: 11px; padding: 3px 7px; transform: translate(-6px, -10px); /* reposiciona se necessário */ }
+
+/* badge acompanha o tamanho do ícone */
+#notif-badge {
+    font-size: 11px;
+    padding: 3px 7px;
+    transform: translate(-6px, -10px); /* reposiciona se necessário */
+}
+
+/* Badge da notificação */
+#notif-badge { font-size: 10px; padding: 2px 6px; }
+
+/* Dropdown alinhado à direita */
+.dropdown-menu-end { right: 0 !important; left: auto !important; }
+
+/* Remover sublinhado dos botões do logout */
+.btn-link.nav-link { text-decoration: none; }
 
 
