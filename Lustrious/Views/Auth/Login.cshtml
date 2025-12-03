@@ -8,6 +8,20 @@
 
     <form asp-action="Login" method="post">
 
+        @* Display errors from controller *@
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert error">@ViewBag.Error</div>
+        }
+        @if (ViewBag.Erro != null)
+        {
+            <div class="alert error">@ViewBag.Erro</div>
+        }
+        @if (TempData["Erro"] != null)
+        {
+            <div class="alert error">@TempData["Erro"]</div>
+        }
+
         <label>Email</label>
         <input type="email" name="email" required />
 
@@ -98,4 +112,16 @@
         .btn-criar:hover {
             background-color: #8a6b41;
         }
+
+    /* simple alert styling */
+    .alert.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        padding: 10px 12px;
+        border-radius: 6px;
+        width: 80%;
+        margin: 0 auto 18px auto;
+        text-align: left;
+    }
 </style>

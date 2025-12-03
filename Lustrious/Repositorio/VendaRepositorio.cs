@@ -28,7 +28,7 @@ namespace Lustrious.Repositorio
                     venda.DataVenda = DateTime.Now;
 
                 // Garantir que exista uma NotaFiscal válida. Se NF for0, criar uma nova nota fiscal
-                if (venda.NF ==0)
+                if (venda.NF == 0)
                 {
                     using var cmdNota = new MySqlCommand("INSERT INTO NotaFiscal (TotalNota, DataEmissao) VALUES (@total, @data)", conn, transaction);
                     cmdNota.Parameters.Add("@total", MySqlDbType.Decimal).Value = venda.ValorTotal;
@@ -44,7 +44,7 @@ namespace Lustrious.Repositorio
                     }
 
                     venda.NF = Convert.ToInt32(inserted);
-                    if (venda.NF <=0)
+                    if (venda.NF <= 0)
                     {
                         transaction.Rollback();
                         throw new InvalidOperationException("Falha ao inserir NotaFiscal: id retornado inválido (<=0).");
@@ -53,7 +53,7 @@ namespace Lustrious.Repositorio
                     // Verificar que a nota fiscal inserida existe (ajuda a diagnosticar FK)
                     using var cmdCheckNota = new MySqlCommand("SELECT COUNT(1) FROM NotaFiscal WHERE NF = @nf", conn, transaction);
                     cmdCheckNota.Parameters.Add("@nf", MySqlDbType.Int32).Value = venda.NF;
-                    var notaExists = Convert.ToInt32(cmdCheckNota.ExecuteScalar()) >0;
+                    var notaExists = Convert.ToInt32(cmdCheckNota.ExecuteScalar()) > 0;
                     if (!notaExists)
                     {
                         transaction.Rollback();
@@ -62,18 +62,18 @@ namespace Lustrious.Repositorio
                 }
 
                 // Verificação final antes de inserir Venda
-                if (venda.NF <=0)
+                if (venda.NF <= 0)
                 {
                     transaction.Rollback();
                     throw new InvalidOperationException("NF inválida ao tentar inserir Venda. Certifique-se de que NotaFiscal foi criada corretamente.");
                 }
 
                 // Se foi informado IdEntrega, validar que a entrega existe (evita FK inválida)
-                if (venda.IdEntrega >0)
+                if (venda.IdEntrega > 0)
                 {
                     using var cmdCheckEntrega = new MySqlCommand("SELECT COUNT(1) FROM Entrega WHERE IdEntrega = @id", conn, transaction);
                     cmdCheckEntrega.Parameters.Add("@id", MySqlDbType.Int32).Value = venda.IdEntrega;
-                    var exists = Convert.ToInt32(cmdCheckEntrega.ExecuteScalar()) >0;
+                    var exists = Convert.ToInt32(cmdCheckEntrega.ExecuteScalar()) > 0;
                     if (!exists)
                     {
                         transaction.Rollback();
@@ -92,7 +92,7 @@ namespace Lustrious.Repositorio
 
                     // passar NULL para vIdEntrega quando não informado (0)
                     var pIdEntrega = cmd.Parameters.Add("vIdEntrega", MySqlDbType.Int32);
-                    if (venda.IdEntrega >0)
+                    if (venda.IdEntrega > 0)
                         pIdEntrega.Value = venda.IdEntrega;
                     else
                         pIdEntrega.Value = DBNull.Value;
@@ -131,6 +131,17 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.Add("vQtd", MySqlDbType.Int32).Value = item.Qtd;
                     cmd.Parameters.Add("vValorItem", MySqlDbType.Decimal).Value = item.ValorItem;
                     cmd.ExecuteNonQuery();
+
+                    // Atualizar estoque do produto: decrementar qtd. Garantir que há estoque suficiente
+                    using var cmdUpd = new MySqlCommand("UPDATE Produto SET qtd = qtd - @qtd WHERE CodigoBarras = @codigo AND qtd >= @qtd", conn, transaction);
+                    cmdUpd.Parameters.AddWithValue("@qtd", item.Qtd);
+                    cmdUpd.Parameters.AddWithValue("@codigo", codigoLong);
+                    var affected = cmdUpd.ExecuteNonQuery();
+                    if (affected != 1)
+                    {
+                        transaction.Rollback();
+                        throw new InvalidOperationException($"Estoque insuficiente para o produto {codigoLong} ou produto não encontrado. Operação abortada.");
+                    }
                 }
 
                 transaction.Commit();
@@ -174,13 +185,13 @@ namespace Lustrious.Repositorio
             {
                 venda = new Venda
                 {
-                    IdVenda = reader["IdVenda"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdVenda"]),
+                    IdVenda = reader["IdVenda"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdVenda"]),
                     NomeProd = reader["NomeProd"] == DBNull.Value ? string.Empty : reader["NomeProd"].ToString(),
-                    IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                    IdUser = reader["IdUser"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdUser"]),
                     DataVenda = reader["DataVenda"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["DataVenda"]),
-                    ValorTotal = reader["ValorTotal"] == DBNull.Value ?0m : Convert.ToDecimal(reader["ValorTotal"]),
-                    NF = reader["NF"] == DBNull.Value ?0 : Convert.ToInt32(reader["NF"]),
-                    IdEntrega = reader["IdEntrega"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdEntrega"])
+                    ValorTotal = reader["ValorTotal"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorTotal"]),
+                    NF = reader["NF"] == DBNull.Value ? 0 : Convert.ToInt32(reader["NF"]),
+                    IdEntrega = reader["IdEntrega"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdEntrega"])
                 };
             }
             return venda;
@@ -199,13 +210,13 @@ namespace Lustrious.Repositorio
             {
                 var venda = new Venda
                 {
-                    IdVenda = reader["IdVenda"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdVenda"]),
+                    IdVenda = reader["IdVenda"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdVenda"]),
                     NomeProd = reader["NomeProd"] == DBNull.Value ? string.Empty : reader["NomeProd"].ToString(),
-                    IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                    IdUser = reader["IdUser"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdUser"]),
                     DataVenda = reader["DataVenda"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["DataVenda"]),
-                    ValorTotal = reader["ValorTotal"] == DBNull.Value ?0m : Convert.ToDecimal(reader["ValorTotal"]),
-                    NF = reader["NF"] == DBNull.Value ?0 : Convert.ToInt32(reader["NF"]),
-                    IdEntrega = reader["IdEntrega"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdEntrega"])
+                    ValorTotal = reader["ValorTotal"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorTotal"]),
+                    NF = reader["NF"] == DBNull.Value ? 0 : Convert.ToInt32(reader["NF"]),
+                    IdEntrega = reader["IdEntrega"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdEntrega"])
                 };
                 lista.Add(venda);
             }
@@ -223,13 +234,13 @@ namespace Lustrious.Repositorio
             {
                 var venda = new Venda
                 {
-                    IdVenda = reader["IdVenda"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdVenda"]),
+                    IdVenda = reader["IdVenda"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdVenda"]),
                     NomeProd = reader["NomeProd"] == DBNull.Value ? string.Empty : reader["NomeProd"].ToString(),
-                    IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                    IdUser = reader["IdUser"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdUser"]),
                     DataVenda = reader["DataVenda"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["DataVenda"]),
-                    ValorTotal = reader["ValorTotal"] == DBNull.Value ?0m : Convert.ToDecimal(reader["ValorTotal"]),
-                    NF = reader["NF"] == DBNull.Value ?0 : Convert.ToInt32(reader["NF"]),
-                    IdEntrega = reader["IdEntrega"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdEntrega"])
+                    ValorTotal = reader["ValorTotal"] == DBNull.Value ? 0m : Convert.ToDecimal(reader["ValorTotal"]),
+                    NF = reader["NF"] == DBNull.Value ? 0 : Convert.ToInt32(reader["NF"]),
+                    IdEntrega = reader["IdEntrega"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdEntrega"])
                 };
                 lista.Add(venda);
             }
@@ -243,19 +254,19 @@ namespace Lustrious.Repositorio
                 using var conn = _dataBase.GetConnection();
                 conn.Open();
                 using var cmd = new MySqlCommand(@"CREATE TABLE IF NOT EXISTS Notificacao (
- Id INT PRIMARY KEY AUTO_INCREMENT,
- IdUser INT,
- Mensagem VARCHAR(500),
- DataEnvio DATETIME,
- Lida TINYINT(1) DEFAULT 0
-)", conn);
+                     Id INT PRIMARY KEY AUTO_INCREMENT,
+                     IdUser INT,
+                     Mensagem VARCHAR(500),
+                     DataEnvio DATETIME,
+                     Lida TINYINT(1) DEFAULT 0
+                    )", conn);
                 cmd.ExecuteNonQuery();
 
                 using var cmdIns = new MySqlCommand("INSERT INTO Notificacao (IdUser, Mensagem, DataEnvio, Lida) VALUES (@idUser, @msg, @data, @lida)", conn);
                 cmdIns.Parameters.AddWithValue("@idUser", userId);
                 cmdIns.Parameters.AddWithValue("@msg", mensagem);
                 cmdIns.Parameters.AddWithValue("@data", DateTime.Now);
-                cmdIns.Parameters.AddWithValue("@lida",0);
+                cmdIns.Parameters.AddWithValue("@lida", 0);
                 cmdIns.ExecuteNonQuery();
                 return true;
             }
@@ -278,11 +289,11 @@ namespace Lustrious.Repositorio
             {
                 lista.Add(new Notificacao
                 {
-                    Id = reader["Id"] == DBNull.Value ?0 : Convert.ToInt32(reader["Id"]),
-                    IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                    Id = reader["Id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Id"]),
+                    IdUser = reader["IdUser"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdUser"]),
                     Mensagem = reader["Mensagem"] == DBNull.Value ? string.Empty : reader["Mensagem"].ToString(),
                     DataEnvio = reader["DataEnvio"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["DataEnvio"]),
-                    Lida = reader["Lida"] == DBNull.Value ? false : Convert.ToBoolean(reader["Lida"]) 
+                    Lida = reader["Lida"] == DBNull.Value ? false : Convert.ToBoolean(reader["Lida"])
                 });
             }
             return lista;
@@ -295,7 +306,7 @@ namespace Lustrious.Repositorio
             using var cmd = new MySqlCommand("SELECT COUNT(1) FROM Notificacao WHERE IdUser = @id AND Lida =0", conn);
             cmd.Parameters.AddWithValue("@id", userId);
             var obj = cmd.ExecuteScalar();
-            return obj == null || obj == DBNull.Value ?0 : Convert.ToInt32(obj);
+            return obj == null || obj == DBNull.Value ? 0 : Convert.ToInt32(obj);
         }
 
         public IEnumerable<Notificacao> ListarUltimasNotificacoes(int userId, int max)
@@ -311,11 +322,11 @@ namespace Lustrious.Repositorio
             {
                 lista.Add(new Notificacao
                 {
-                    Id = reader["Id"] == DBNull.Value ?0 : Convert.ToInt32(reader["Id"]),
-                    IdUser = reader["IdUser"] == DBNull.Value ?0 : Convert.ToInt32(reader["IdUser"]),
+                    Id = reader["Id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Id"]),
+                    IdUser = reader["IdUser"] == DBNull.Value ? 0 : Convert.ToInt32(reader["IdUser"]),
                     Mensagem = reader["Mensagem"] == DBNull.Value ? string.Empty : reader["Mensagem"].ToString(),
                     DataEnvio = reader["DataEnvio"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["DataEnvio"]),
-                    Lida = reader["Lida"] == DBNull.Value ? false : Convert.ToBoolean(reader["Lida"]) 
+                    Lida = reader["Lida"] == DBNull.Value ? false : Convert.ToBoolean(reader["Lida"])
                 });
             }
             return lista;
