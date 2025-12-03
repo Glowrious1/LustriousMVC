@@ -2,8 +2,21 @@
 @{
  ViewData["Title"] = "Todas Vendas";
 }
-<h2>Todas Vendas</h2>
-<table class="table">
+
+<div id="vendas-container" class="container">
+ <div class="top-row">
+ <h2>Todas Vendas</h2>
+ </div>
+
+ <table>
+ <colgroup>
+ <col style="width:8%" />
+ <col style="width:28%" />
+ <col style="width:18%" />
+ <col style="width:18%" />
+ <col style="width:12%" />
+ <col style="width:16%" />
+ </colgroup>
  <thead>
  <tr>
  <th>Id</th>
@@ -15,11 +28,11 @@
  </tr>
  </thead>
  <tbody>
- @foreach(var v in Model)
+ @foreach (var v in Model)
  {
  <tr>
  <td>@v.IdVenda</td>
- <td>@v.DataVenda</td>
+ <td class="nowrap">@v.DataVenda.ToString("g")</td>
  <td>@v.IdUser</td>
  <td>@v.ValorTotal.ToString("C")</td>
  <td>@v.NF</td>
@@ -27,4 +40,64 @@
  </tr>
  }
  </tbody>
-</table>
+ </table>
+
+ <!-- pagination placeholder: controller can supply ViewBag values if needed -->
+ <div class="pagination">
+ <!-- If you have pagination variables, they can be used here like in Produtos -->
+ </div>
+</div>
+
+<style>
+ /* Use same palette and layout as Produtos Index */
+ body { background-color: #c8b68a; font-family: Arial, sans-serif; }
+
+ #vendas-container {
+ background-color: #cfc7b4;
+ width:85%;
+ max-width:1100px;
+ margin:40px auto;
+ padding:30px;
+ border:6px solid #95845c;
+ border-radius:20px;
+ box-shadow:0010px rgba(0,0,0,0.1);
+ margin-bottom:80px;
+ padding-bottom:40px;
+ }
+
+ .top-row {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom:20px;
+ }
+
+ .top-row h2 { font-size:26px; color: #4b4b4b; margin:0; }
+
+ .top-row .criar {
+ background-color: #6b5530;
+ color: #fff;
+ padding:8px14px;
+ border-radius:6px;
+ text-decoration: none;
+ transition:0.2s;
+ }
+ .top-row .criar:hover { background-color: #8a6d3f; }
+
+ /* Table alignment and layout */
+ table { width:100%; border-collapse: collapse; background: #e8e2d4; border-radius:10px; overflow: hidden; table-layout: fixed; }
+ thead { background-color: #b5a78a; }
+ thead th { padding:12px; color: #fff; font-weight: bold; text-align: center; }
+ tbody tr:nth-child(even) { background-color: #f2eee4; }
+ tbody td { padding:10px; text-align: center; color: #4b4b4b; vertical-align: middle; }
+ .nowrap { white-space: nowrap; }
+
+ /* Smaller screens: allow table to scroll */
+ @@media (max-width:768px) {
+ #vendas-container { width:95%; padding:18px; }
+ table { display: block; overflow-x: auto; white-space: nowrap; }
+ thead th, tbody td { padding:8px; }
+ .top-row .criar { padding:6px 10px; }
+ }
+
+</style>
