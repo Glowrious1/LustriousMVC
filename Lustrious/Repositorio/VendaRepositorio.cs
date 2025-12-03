@@ -131,6 +131,17 @@ namespace Lustrious.Repositorio
                     cmd.Parameters.Add("vQtd", MySqlDbType.Int32).Value = item.Qtd;
                     cmd.Parameters.Add("vValorItem", MySqlDbType.Decimal).Value = item.ValorItem;
                     cmd.ExecuteNonQuery();
+
+                    // Atualizar estoque do produto: decrementar qtd. Garantir que há estoque suficiente
+                    using var cmdUpd = new MySqlCommand("UPDATE Produto SET qtd = qtd - @qtd WHERE CodigoBarras = @codigo AND qtd >= @qtd", conn, transaction);
+                    cmdUpd.Parameters.AddWithValue("@qtd", item.Qtd);
+                    cmdUpd.Parameters.AddWithValue("@codigo", codigoLong);
+                    var affected = cmdUpd.ExecuteNonQuery();
+                    if (affected !=1)
+                    {
+                        transaction.Rollback();
+                        throw new InvalidOperationException($"Estoque insuficiente para o produto {codigoLong} ou produto não encontrado. Operação abortada.");
+                    }
                 }
 
                 transaction.Commit();
