@@ -8,6 +8,8 @@
 	var ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>();
 	var uid = Context.Session.GetInt32("UserId");
 	string firstName = string.Empty;
+	var role = Context.Session.GetString("UserRole") ?? string.Empty;
+	bool isStaff = !string.IsNullOrWhiteSpace(role) && (role.ToLower() == "admin" || role.ToLower() == "funcionario");
 	if (uid.HasValue)
 	{
 		try { var c = _carrinhoRepo.AcharCarrinho(uid.Value); cartCount = c?.Qtd ?? 0; } catch { cartCount = 0; }
@@ -44,18 +46,21 @@
 				</button>
 				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Funcionario" asp-action="Index">Funcionarios</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Venda" asp-action="ListarTodas">Vendas</a>
-						</li>
+						@if (isStaff)
+						{
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Funcionario" asp-action="Index">Funcionarios</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Venda" asp-action="ListarTodas">Vendas</a>
+							</li>
+						}
 
 					</ul>
 

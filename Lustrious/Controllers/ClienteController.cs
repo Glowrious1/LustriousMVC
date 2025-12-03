@@ -7,6 +7,7 @@ using Microsoft.Net.Http.Headers;
 using Lustrious.Repositorio;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
+using Lustrious.Autenticacao;
 
 namespace Lustrious.Controllers
 {
@@ -17,6 +18,7 @@ namespace Lustrious.Controllers
         {
             _clienteRepositorio = clienteRepositorio;
         }
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult Index(string q = null, int page =1)
         {
             const int pageSize =10;
@@ -46,11 +48,13 @@ namespace Lustrious.Controllers
         }
 
         [HttpGet]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult EditarCliente(int id)
         {
             return View(_clienteRepositorio.AcharCliente(id));
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult EditarCliente(Usuario model, IFormFile? foto)
         {
             _clienteRepositorio.AlterarCliente(model, foto);
@@ -60,6 +64,7 @@ namespace Lustrious.Controllers
 
 
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult ExcluirCliente(int id)
         {
             try
@@ -88,6 +93,7 @@ namespace Lustrious.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult ReativarCliente(int id)
         {
             try

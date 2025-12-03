@@ -2,13 +2,19 @@
 
 @{
  ViewData["Title"] = "Funcionários";
+ var role = Context.Session.GetString("UserRole") ?? string.Empty;
+ bool isAdmin = role.ToLower() == "admin";
+ bool isStaff = role.ToLower() == "admin" || role.ToLower() == "funcionario";
 }
 
 <main class="main-content">
  <div class="card">
  <div class="card-header">
  <h2>FUNCIONÁRIOS</h2>
+ @if (isAdmin)
+ {
  <a class="new-btn" asp-controller="Funcionario" asp-action="CriarFuncionario">NOVO FUNCIONARIO</a>
+ }
  </div>
 
  @if (TempData["ok"] != null)
@@ -35,22 +41,25 @@
  <tbody>
  @foreach (var funcionario in Model)
  {
-
-
  <tr>
-
  <td>@funcionario.Nome</td>
  <td>@funcionario.Email</td>
  <td>@funcionario.Sexo</td>
  <td>@funcionario.CPF</td>
  <td>@funcionario.Role</td>
  <td>
+ @if (isStaff)
+ {
  <a class="edit-btn" asp-controller="Funcionario" asp-action="EditarFuncionario" asp-route-id="@funcionario.IdUser">EDITAR</a>
 
+ @if (isAdmin)
+ {
  <form asp-controller="Funcionario" asp-action="ExcluirFuncionario" method="post" asp-route-id="@funcionario.IdUser" style="display:inline;">
  @Html.AntiForgeryToken()
  <button type="submit" class="delete-btn" onclick="return confirm('Deseja realmente Excluir este item?');">EXCLUIR</button>
  </form>
+ }
+ }
  </td>
  </tr>
  }

@@ -5,6 +5,7 @@ using Lustrious.Repositorio;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.IO;
+using Lustrious.Autenticacao;
 
 
 namespace Lustrious.Controllers
@@ -21,6 +22,7 @@ namespace Lustrious.Controllers
             _produtoRepositorio = produtoRepostorio;
         }
 
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult Index(string q = null, int codCategoria =0, int codTipoProduto =0, int page =1)
         {
             const int pageSize =10;
@@ -101,6 +103,7 @@ namespace Lustrious.Controllers
             return View(produto);
         }
 
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult CriarProduto()
         {
             var model = new Produto();
@@ -109,6 +112,7 @@ namespace Lustrious.Controllers
             return View(model);
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult CriarProduto(Produto produto, IFormFile? foto)
         {
             try
@@ -130,6 +134,7 @@ namespace Lustrious.Controllers
         }
 
         [HttpGet]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult EditarProduto(long id)
         {
             Produto produto = _produtoRepositorio.AcharProduto(id);
@@ -138,6 +143,7 @@ namespace Lustrious.Controllers
             return View(produto);
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult EditarProduto(Produto model, IFormFile? foto)
         {
             try
@@ -155,6 +161,7 @@ namespace Lustrious.Controllers
             return RedirectToAction(nameof(Index));
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult ExcluirProduto(long id)
         {
             try

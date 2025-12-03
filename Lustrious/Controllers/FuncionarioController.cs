@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using Microsoft.Net.Http.Headers;
 using Lustrious.Repositorio;
+using Lustrious.Autenticacao;
 
 namespace Lustrious.Controllers
 {
@@ -15,15 +16,20 @@ namespace Lustrious.Controllers
         {
             _funcionarioRepositorio = funcionarioRepositorio;
         }
+
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult Index()
         {
             return View(_funcionarioRepositorio.ListarFuncionario());
         }
+
+        [SessionAuthorize(RoleAnyOf = "Admin")]
         public IActionResult CriarFuncionario()
         {
             return View();
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin")]
         public IActionResult CriarFuncionario(Usuario funcionario)
         {
             _funcionarioRepositorio.CadastrarFuncionario(funcionario);
@@ -32,11 +38,13 @@ namespace Lustrious.Controllers
         }
 
         [HttpGet]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult EditarFuncionario(int id)
         {
             return View(_funcionarioRepositorio.AcharFuncionario(id));
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
         public IActionResult EditarFuncionario(Usuario model)
         {
             _funcionarioRepositorio.AlterarFuncionario(model);
@@ -44,6 +52,7 @@ namespace Lustrious.Controllers
             return RedirectToAction(nameof(Index));
         }
         [HttpPost, ValidateAntiForgeryToken]
+        [SessionAuthorize(RoleAnyOf = "Admin")]
         public IActionResult ExcluirFuncionario(int id)
         {
             _funcionarioRepositorio.ExcluirFuncionario(id);

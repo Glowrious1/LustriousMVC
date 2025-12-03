@@ -5,13 +5,19 @@
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     string filterQ = ViewBag.FilterQ as string ?? string.Empty;
+
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    bool isStaff = role.ToLower() == "admin" || role.ToLower() == "funcionario";
 }
 
 <main class="main-content">
     <div class="card">
         <div class="card-header">
             <h2>CLIENTES</h2>
-            <a class="new-btn" href="/Cliente/CriarCliente">NOVO CLIENTE</a>
+            @if (isStaff)
+            {
+                <a class="new-btn" href="/Cliente/CriarCliente">NOVO CLIENTE</a>
+            }
         </div>
 
         @if (TempData["ok"] != null)
@@ -66,30 +72,33 @@
                         <td>@cliente.CPF</td>
                         <td>@(cliente.Ativo == "0" ? "Não" : "Sim")</td>
                         <td>
-                            <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
-
-                            @if (cliente.Ativo == "1" || string.IsNullOrEmpty(cliente.Ativo))
+                            @if (isStaff)
                             {
-                                <form asp-controller="Cliente" asp-action="ExcluirCliente" method="post"
+                                <a class="edit-btn" asp-controller="Cliente" asp-action="EditarCliente" asp-route-id="@cliente.IdUser">EDITAR</a>
+
+                                @if (cliente.Ativo == "1" || string.IsNullOrEmpty(cliente.Ativo))
+                                {
+                                    <form asp-controller="Cliente" asp-action="ExcluirCliente" method="post"
                                                    asp-route-id="@cliente.IdUser" style="display:inline;">
 
-                                @Html.AntiForgeryToken()
+                                    @Html.AntiForgeryToken()
 
-                                <button type="submit" class="delete-btn"
+                                    <button type="submit" class="delete-btn"
                                                             onclick="return confirm('Deseja realmente desativar este cliente?');">
-                                    DESATIVAR
-                                </button>
-                            </form>
-                            }
-                            else
-                            {
-                                <form asp-controller="Cliente" asp-action="ReativarCliente" method="post"
+                                        DESATIVAR
+                                    </button>
+                                </form>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Cliente" asp-action="ReativarCliente" method="post"
                                                    asp-route-id="@cliente.IdUser" style="display:inline;">
 
-                                @Html.AntiForgeryToken()
+                                    @Html.AntiForgeryToken()
 
-                                <button type="submit" class="edit-btn" onclick="return confirm('Reativar este cliente?');">REATIVAR</button>
-                            </form>
+                                    <button type="submit" class="edit-btn" onclick="return confirm('Reativar este cliente?');">REATIVAR</button>
+                                </form>
+                                }
                             }
                         </td>
                     </tr>

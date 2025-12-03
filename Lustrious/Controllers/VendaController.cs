@@ -43,6 +43,7 @@ namespace Lustrious.Controllers
 
  // Lista todas vendas — ação para funcionários/admin
  [HttpGet]
+ [SessionAuthorize(RoleAnyOf = "Admin,Funcionario")]
  public IActionResult ListarTodas()
  {
  // Aqui você pode verificar Role do usuário se precisar restringir a funcionários

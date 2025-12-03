@@ -8,6 +8,9 @@
     int filterTipo = ViewBag.FilterTipo ?? 0;
     var categorias = ViewBag.Categorias as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
     var tipos = ViewBag.Tipos as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    bool isStaff = role.ToLower() == "admin" || role.ToLower() == "funcionario";
 }
 
 
@@ -15,7 +18,10 @@
 
     <div class="top-row">
         <h2>Produtos</h2>
-        <a asp-action="CriarProduto" asp-controller="Produto" class="criar">Novo Produto</a>
+        @if (isStaff)
+        {
+            <a asp-action="CriarProduto" asp-controller="Produto" class="criar">Novo Produto</a>
+        }
     </div>
 
     <form method="get" asp-action="Index" class="filters">
@@ -86,15 +92,18 @@
                     <td>@item.NomeTipoProduto</td>
 
                     <td>
-                        <a asp-action="EditarProduto" asp-route-id="@item.CodigoBarras" class="btn btn-edit">Editar</a>
+                        @if (isStaff)
+                        {
+                            <a asp-action="EditarProduto" asp-route-id="@item.CodigoBarras" class="btn btn-edit">Editar</a>
 
-                        <form asp-action="ExcluirProduto" method="post" style="display:inline; margin-left:6px">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@item.CodigoBarras" />
-                            <button type="submit" class="btn btn-delete" onclick="return confirm('Confirma exclusão?');">
-                                Excluir
-                            </button>
-                        </form>
+                            <form asp-action="ExcluirProduto" method="post" style="display:inline; margin-left:6px">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.CodigoBarras" />
+                                <button type="submit" class="btn btn-delete" onclick="return confirm('Confirma exclusão?');">
+                                    Excluir
+                                </button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }
