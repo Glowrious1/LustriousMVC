@@ -107,10 +107,7 @@
 <div class="notificacoes-container">
  <div class="notificacoes-header">
  <h2>Notificações</h2>
- <!-- botão para marcar como lidas -->
- <div>
- <button id="btnLimpar" class="btn-limpar">Limpar</button>
- </div>
+ <div></div>
  </div>
 
  @if (!Model?.Any() ?? true)
@@ -134,38 +131,3 @@
  </ul>
  }
 </div>
-
-@* antiforgery token para requisição AJAX *@
-@Html.AntiForgeryToken()
-
-<script>
- (function(){
- var btn = document.getElementById('btnLimpar');
- if(!btn) return;
- btn.addEventListener('click', function(){
- if(!confirm('Deseja marcar todas as notificações como lidas?')) return;
- // obter token antifalsificação do input gerado pelo Html.AntiForgeryToken()
- var tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
- var token = tokenInput ? tokenInput.value : '';
-
- fetch('@Url.Action("MarcarUltimasComoLidas", "Notificacao")', {
- method: 'POST',
- headers: {
- 'Content-Type': 'application/json',
- 'RequestVerificationToken': token
- },
- body: JSON.stringify({ max:1000 }) // grande número para limpar todas
- })
- .then(function(resp){
- if(resp.ok) {
- location.reload();
- } else {
- alert('Erro ao limpar notificações.');
- }
- })
- .catch(function(){
- alert('Erro ao limpar notificações.');
- });
- });
- })();
-</script>
