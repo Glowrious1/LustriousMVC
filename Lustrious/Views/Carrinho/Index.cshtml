@@ -1,5 +1,6 @@
 @model Lustrious.Models.Carrinho
 @{
+ ViewData["HideFooter"] = true;
  ViewData["Title"] = "Carrinho";
 }
 <h2>Carrinho</h2>
@@ -74,7 +75,7 @@
  }
 
  .cart-side .summary-box h4 { margin-top:0; color:#3c6b2a; }
- .cart-side .summary-row { display:flex; justify-content:space-between; padding:6px0; }
+ .cart-side .summary-row { display:flex; justify-content:space-between; padding:6px 0; }
 
  /* Botões temáticos */
  .btn-danger { background:#b54845; border-color:#a33d3b; color:#fff; padding:12px 18px; }
@@ -92,8 +93,8 @@
  @@media (max-width:900px) {
  .cart-content { flex-direction:column; }
  .cart-side { width:100%; }
- .cart-table thead th { padding:12px8px; }
- .cart-table td { padding:12px8px; }
+ .cart-table thead th { padding:12px 8px; }
+ .cart-table td { padding:12px 8px; }
  }
  </style>
 
