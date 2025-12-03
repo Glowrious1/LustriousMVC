@@ -82,7 +82,10 @@
 </div>
 
 <!-- PRODUTOS -->
-<h2 class="titulo-produtos">PRODUTOS</h2>
+<div class="produtos-header">
+ <h2 class="titulo-produtos">PRODUTOS</h2>
+ <a asp-controller="Produto" asp-action="Vitrine" class="ver-todos-btn">VER TODOS PRODUTOS</a>
+</div>
 
 <div class="linha-produtos">
  @if (!grid.Any())
@@ -112,7 +115,6 @@
 </div>
 
 
-
 <style>
 
  /* ----------- CONFIGURAÇÕES GERAIS ----------- */
@@ -122,6 +124,33 @@
  font-family: "Times New Roman", serif;
  /* match Cliente index background */
  background-color: #FFEFCC;
+ }
+
+ /* Produtos header with link */
+ .produtos-header {
+ width:90%;
+ max-width:1150px;
+ margin:30px auto0;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ }
+
+ .ver-todos-btn {
+ background: transparent;
+ color: #3c6b2a;
+ border:2px solid #3c6b2a;
+ padding:8px14px;
+ border-radius:24px;
+ font-weight:700;
+ text-decoration: none;
+ transition: background-color0.2s, color0.2s, transform0.12s;
+ }
+
+ .ver-todos-btn:hover {
+ background: #3c6b2a;
+ color: #fff;
+ transform: translateY(-2px);
  }
 
  /* ----------- HERO (PARTE DE CIMA) ----------- */
@@ -174,7 +203,7 @@
  /* ----------- BANNER LONGO ----------- */
  .banner-longo {
  width:100vw;
- margin-left:-9%;
+ margin-left: calc(-50vw +50%);
  overflow: hidden;
  /* thin border like cliente cards */
  border:2px solid #d6b36a;
