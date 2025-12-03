@@ -62,26 +62,38 @@
 <style>
     body { margin: 0; padding: 0; background-color: #FFEFCC; font-family: 'Times New Roman', serif; }
 
- .main-content { display:flex; justify-content:center; padding:40px0; }
+    .main-content { display: flex; justify-content: center; padding: 40px 0; }
 
- .card { background:#fff6c6; width:70%; border-radius:15px; padding:25px; border:4px solid #d6b36a; }
+    .card { background: #fff6c6; width: 70%; border-radius: 15px; padding: 25px; border: 4px solid #d6b36a; }
 
- .card-header { display:flex; justify-content:space-between; align-items:center; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; }
 
- .new-btn { background:#d6b36a; color:white; padding:8px18px; border-radius:10px; text-decoration:none; font-weight:bold; }
+    /* Botão NOVO — seguindo padrão EDITAR */
+    .new-btn { background: #d6b36a; color: white; padding: 8px 18px; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.2s; }
+        .new-btn:hover { background: #e7c67a; color: white; }
 
- .table-clientes { width:100%; border-collapse:collapse; margin-top:20px; }
+    /* Tabela */
+    .table-clientes { width: 100%; border-collapse: collapse; margin-top: 20px; }
 
- .table-clientes th { text-align:left; padding:12px0; font-weight:bold; border-bottom:2px solid #d6b36a; }
+        .table-clientes th { text-align: left; padding: 12px 0; font-weight: bold; border-bottom: 2px solid #d6b36a; }
 
- .table-clientes td { padding:12px0; vertical-align:middle; }
+        .table-clientes td { padding: 12px 0; vertical-align: middle; }
 
- .edit-btn { background:#8a8a8a; color:white; padding:5px12px; border-radius:8px; text-decoration:none; margin-right:8px; }
+    /* ----------- BOTÕES PADRÃO (EDITAR / EXCLUIR) ---------------- */
 
- .delete-btn { background:#b54845; color:white; padding:5px12px; border-radius:8px; border:none; }
+    /* EDITAR — padrão correto */
+    .edit-btn { background: #d6b36a; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.2s; border: none; }
+        .edit-btn:hover { background: #e7c67a; color: white; }
 
- .cliente-foto { width:60px; height:60px; object-fit:cover; border-radius:8px; border:2px solid #e6d6a8; }
+    /* EXCLUIR — padrão correto */
+    .delete-btn { background: #a04444; color: white; padding: 8px 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .delete-btn:hover { background: #b85a5a; color: white; }
 
- .alert-success { padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:6px; margin-bottom:10px; }
- .alert-danger { padding:10px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; margin-bottom:10px; }
+    /* Foto */
+    .cliente-foto { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #e6d6a8; }
+
+    /* Alerts */
+    .alert-success { padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 6px; margin-bottom: 10px; }
+
+    .alert-danger { padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 6px; margin-bottom: 10px; }
 </style>
