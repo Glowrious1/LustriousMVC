@@ -111,7 +111,7 @@ namespace Lustrious.Controllers
             var roleLower = (role ?? string.Empty).ToLower();
             if (roleLower == "cliente")
             {
-                return RedirectToAction("Index", "Produto");
+                return RedirectToAction("Index", "Home");
             }
             else
             {

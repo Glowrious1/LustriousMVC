@@ -3,258 +3,281 @@
 @inject ICarrinhoRepositorio _carrinhoRepo
 @inject IVendaRepositorio _vendaRepo
 @{
-    int cartCount =0;
-    int notifCount =0;
-    var ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>();
-    var uid = Context.Session.GetInt32("UserId");
-    if (uid.HasValue)
-    {
-        try { var c = _carrinhoRepo.AcharCarrinho(uid.Value); cartCount = c?.Qtd ??0; } catch { cartCount =0; }
-        try { notifCount = _vendaRepo.ContarNotificacoesNaoLidas(uid.Value); } catch { notifCount =0; }
-        try { ultimasNotifs = _vendaRepo.ListarUltimasNotificacoes(uid.Value,5); } catch { ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>(); }
-    }
+ int cartCount =0;
+ int notifCount =0;
+ var ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>();
+ var uid = Context.Session.GetInt32("UserId");
+ string firstName = string.Empty;
+ if (uid.HasValue)
+ {
+ try { var c = _carrinhoRepo.AcharCarrinho(uid.Value); cartCount = c?.Qtd ??0; } catch { cartCount =0; }
+ try { notifCount = _vendaRepo.ContarNotificacoesNaoLidas(uid.Value); } catch { notifCount =0; }
+ try { ultimasNotifs = _vendaRepo.ListarUltimasNotificacoes(uid.Value,5); } catch { ultimasNotifs = Enumerable.Empty<Lustrious.Models.Notificacao>(); }
+ 
+ // compute first name for compact greeting
+ var fullName = Context.Session.GetString("UserName") ?? string.Empty;
+ if (!string.IsNullOrWhiteSpace(fullName)) {
+ firstName = fullName.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? fullName;
+ }
+}
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Lustrious</title><img src="~/imagens/logo.png" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Lustrious.styles.css" asp-append-version="true" />
-<<<<<<< HEAD
-    <style>
-    /* Notification dropdown styling */
-    .notif-dropdown {
-    width:380px;
-    max-height:320px;
-    padding:8px;
-    background: #e6d39a; /* tom mais escuro para dropdown */
-    border:1px solid #b89a54;
-    border-radius:6px;
-    overflow: auto;
-    }
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+ <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+ <link rel="stylesheet" href="~/Lustrious.styles.css" asp-append-version="true" />
+ <style>
+ /* Notification dropdown styling */
+ .notif-dropdown {
+ width:380px;
+ max-height:320px;
+ padding:8px;
+ background: #e6d39a; /* tom mais escuro para dropdown */
+ border:1px solid #b89a54;
+ border-radius:6px;
+ overflow: auto;
+ }
 
-    .notif-dropdown .dropdown-item {
-    background: transparent;
-    padding:10px12px;
-    margin-bottom:6px;
-    border-radius:8px;
-    display: block;
-    color: inherit;
-    }
+ .notif-dropdown .dropdown-item {
+ background: transparent;
+ padding:10px12px;
+ margin-bottom:6px;
+ border-radius:8px;
+ display: block;
+ color: inherit;
+ }
 
-    .notif-dropdown .dropdown-item:last-child { margin-bottom:0; }
+ .notif-dropdown .dropdown-item:last-child { margin-bottom:0; }
 
-    .notif-dropdown .dropdown-item:hover {
-    background: rgba(136,104,48,0.16);
-    text-decoration: none;
-    }
+ .notif-dropdown .dropdown-item:hover {
+ background: rgba(136,104,48,0.16);
+ text-decoration: none;
+ }
 
-    .notif-dropdown .timestamp {
-    display: block;
-    font-size:12px;
-    color: #6b5a3a;
-    margin-bottom:6px;
-    }
+ .notif-dropdown .timestamp {
+ display: block;
+ font-size:12px;
+ color: #6b5a3a;
+ margin-bottom:6px;
+ }
 
-    .notif-dropdown .msg {
-    color: #064a78; /* mensagem em azul mais escuro */
-    font-size:15px;
-    line-height:1.3;
-    font-weight:600;
-    }
+ .notif-dropdown .msg {
+ color: #064a78; /* mensagem em azul mais escuro */
+ font-size:15px;
+ line-height:1.3;
+ font-weight:600;
+ }
 
-    .notif-dropdown .dropdown-divider { margin:6px0; }
+ .notif-dropdown .dropdown-divider { margin:6px0; }
 
-    /* ensure dropdown aligns visually with navbar */
-    .navbar .dropdown-menu.notif-dropdown { right:0; left: auto; }
-    </style>
-=======
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
->>>>>>> 636f90965c070702238698fdd4d113d103460fce
+ /* ensure dropdown aligns visually with navbar */
+ .navbar .dropdown-menu.notif-dropdown { right:0; left: auto; }
+
+ /* Compact navbar and icon sizing */
+ .navbar { padding-top: .35rem; padding-bottom: .35rem; }
+ .navbar-brand { font-size:1.15rem; padding-right:1rem; }
+ .navbar-nav .nav-link { padding:.45rem .6rem; font-size:.92rem; }
+ .navbar-nav.flex-grow-1 .nav-item { margin-right:.25rem; }
+
+ /* Icon group on right: larger icons, tighter spacing */
+ .nav-icons .nav-link, .nav-icons .btn {
+ display:inline-flex; align-items:center; justify-content:center; padding:.25rem .45rem; color:inherit;
+ }
+ .nav-icons .bi { font-size:1.25rem; }
+ .nav-icons .badge { font-size:.75rem; padding:.25rem .4rem; border-radius:.5rem; }
+ .nav-icons .nav-link:hover, .nav-icons .btn:hover { background: transparent; }
+
+ /* Make badges sit slightly above baseline */
+ #notif-badge, #cart-badge { transform: translateY(-3px); }
+
+ /* Reduce separator line impact */
+ .border-bottom.box-shadow { box-shadow: none; }
+ </style>
+
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Lustrious</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Funcionario" asp-action="Index">Funcionarios</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Venda" asp-action="Index">Vendas</a>
-                        </li>
+ <header>
+ <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+ <div class="container-fluid">
+ <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Lustrious</a>
+ <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+ aria-expanded="false" aria-label="Toggle navigation">
+ <span class="navbar-toggler-icon"></span>
+ </button>
+ <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+ <ul class="navbar-nav me-auto">
+ <li class="nav-item">
+ <a class="nav-link text-dark" asp-area="" asp-controller="Funcionario" asp-action="Index">Funcionarios</a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link text-dark" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link text-dark" asp-area="" asp-controller="Produto" asp-action="Index">Produtos</a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link text-dark" asp-area="" asp-controller="Venda" asp-action="Index">Vendas</a>
+ </li>
 
-                    </ul>
+ </ul>
 
-                    <ul class="navbar-nav">
-                        @if (Context.Session.GetInt32("UserId") != null)
-                        {
-                            <li class="nav-item nav-link">Olá, @Context.Session.GetString("UserName")</li>
-                            <li class="nav-item nav-link">(@Context.Session.GetString("UserRole"))</li>
-                            <li class="nav-item">
-                               
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16">
-                                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901" />
-                                    </svg> <span id="notif-badge" class="badge bg-secondary ms-1">@notifCount</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end notif-dropdown" aria-labelledby="notifDropdown">
-                                    @if (!ultimasNotifs.Any())
-                                    {
-                                        <li class="dropdown-item">Sem notificações</li>
-                                    }
-                                    else
-                                    {
-                                        foreach(var n in ultimasNotifs)
-                                        {
-                                            <li>
-                                                <a class="dropdown-item" href="@Url.Action("Index", "Notificacao")">
-                                                    <small class="text-muted">@n.DataEnvio.ToString("g")</small><br />
-                                                    @n.Mensagem
-                                                </a>
-                                            </li>
-                                        }
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li><a class="dropdown-item text-center" href="@Url.Action("Index", "Notificacao")">Ver todas as notificações</a></li>
-                                    }
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
-                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-                                </svg>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Entrar</a>
-                            </li>
-                        }
+ <ul class="navbar-nav nav-icons">
+ @if (Context.Session.GetInt32("UserId") != null)
+ {
+ <li class="nav-item nav-link">Olá, @firstName</li>
+ <li class="nav-item nav-link small text-muted">(@Context.Session.GetString("UserRole"))</li>
+ 
+ <li class="nav-item dropdown">
+ <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <i class="bi bi-bell-fill" aria-hidden="true"></i>
+ <span id="notif-badge" class="badge bg-danger ms-1">@notifCount</span>
+ </a>
+ <ul class="dropdown-menu dropdown-menu-end notif-dropdown" aria-labelledby="notifDropdown">
+ @if (!ultimasNotifs.Any())
+ {
+ <li class="dropdown-item">Sem notificações</li>
+ }
+ else
+ {
+ foreach(var n in ultimasNotifs)
+ {
+ <li>
+ <a class="dropdown-item" href="@Url.Action("Index", "Notificacao")">
+ <small class="text-muted">@n.DataEnvio.ToString("g")</small><br />
+ @n.Mensagem
+ </a>
+ </li>
+ }
+ <li><hr class="dropdown-divider" /></li>
+ <li><a class="dropdown-item text-center" href="@Url.Action("Index", "Notificacao")">Ver todas as notificações</a></li>
+ }
+ </ul>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link" asp-controller="Carrinho" asp-action="Index">
+ <i class="bi bi-cart-fill" aria-hidden="true"></i>
+ <span id="cart-badge" class="badge bg-danger ms-1">@cartCount</span>
+ </a>
+ </li>
 
-                        <form asp-controller="Auth" asp-action="Logout" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-link nav-link" style="display:inline;padding:0;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-door-open-fill" viewBox="0 0 16 16">
-                                    <path d="M1.5 15a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2.5A1.5 1.5 0 0 0 11.5 1H11V.5a.5.5 0 0 0-.57-.495l-7 1A.5.5 0 0 0 3 1.5V15zM11 2h.5a.5.5 0 0 1 .5.5V15h-1zm-2.5 8c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1" />
-                                </svg>
-                            </button>
-                        </form>
-                    </ul>
+ <li class="nav-item">
+ <form asp-controller="Auth" asp-action="Logout" method="post" style="display:inline;">
+ @Html.AntiForgeryToken()
+ <button type="submit" class="btn btn-link nav-link p-0" title="Sair">
+ <i class="bi bi-box-arrow-right"></i>
+ </button>
+ </form>
+ </li>
+ }
+ else
+ {
+ <li class="nav-item">
+ <a class="nav-link" asp-controller="Auth" asp-action="Login">Entrar</a>
+ </li>
+ }
 
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <form id="antiforgeryForm">@Html.AntiForgeryToken()</form>
-        <div id="ajax-notification-placeholder"></div>
-        @if (TempData["Ok"] != null)
-        {
-            <div class="alert alert-success mt-2">@TempData["Ok"]</div>
-        }
-        @if (TempData["Erro"] != null)
-        {
-            <div class="alert alert-danger mt-2">@TempData["Erro"]</div>
-        }
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+ </ul>
 
-  
+ </div>
+ </div>
+ </nav>
+ </header>
+ <div class="container">
+ <form id="antiforgeryForm">@Html.AntiForgeryToken()</form>
+ <div id="ajax-notification-placeholder"></div>
+ @if (TempData["Ok"] != null)
+ {
+ <div class="alert alert-success mt-2">@TempData["Ok"]</div>
+ }
+ @if (TempData["Erro"] != null)
+ {
+ <div class="alert alert-danger mt-2">@TempData["Erro"]</div>
+ }
+ <main role="main" class="pb-3">
+ @RenderBody()
+ </main>
+ </div>
+
+ 
 
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy;2025 - Lustrious
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script>
-    (function(){
-        function getAntiForgeryToken(){
-            var tokenInput = document.querySelector('#antiforgeryForm input[name="__RequestVerificationToken"]');
-            return tokenInput ? tokenInput.value : '';
-        }
-        function showNotification(message, type){
-            var ph = document.getElementById('ajax-notification-placeholder');
-            var alert = document.createElement('div');
-            alert.className = 'alert mt-2 ' + (type === 'success' ? 'alert-success' : 'alert-danger');
-            alert.textContent = message;
-            ph.appendChild(alert);
-            setTimeout(function(){ alert.remove(); },4000);
-        }
+ <footer class="border-top footer text-muted">
+ <div class="container">
+ &copy;2025 - Lustrious
+ </div>
+ </footer>
+ <script src="~/lib/jquery/dist/jquery.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+ <script src="~/js/site.js" asp-append-version="true"></script>
+ <script>
+ (function(){
+ function getAntiForgeryToken(){
+ var tokenInput = document.querySelector('#antiforgeryForm input[name="__RequestVerificationToken"]');
+ return tokenInput ? tokenInput.value : '';
+ }
+ function showNotification(message, type){
+ var ph = document.getElementById('ajax-notification-placeholder');
+ var alert = document.createElement('div');
+ alert.className = 'alert mt-2 ' + (type === 'success' ? 'alert-success' : 'alert-danger');
+ alert.textContent = message;
+ ph.appendChild(alert);
+ setTimeout(function(){ alert.remove(); },4000);
+ }
 
-        // Delegate click on forms with class ajax-add-to-cart
-        document.addEventListener('submit', function(e){
-            var form = e.target;
-            if (form && form.classList && form.classList.contains('ajax-add-to-cart')){
-                e.preventDefault();
-                var produtoId = form.querySelector('input[name="produtoId"]').value;
-                var fd = new FormData();
-                fd.append('__RequestVerificationToken', getAntiForgeryToken());
-                fd.append('produtoId', produtoId);
-                fetch('/Carrinho/AdicionarItemAjax', {
-                    method: 'POST',
-                    body: fd,
-                    credentials: 'same-origin'
-                }).then(function(resp){ return resp.json(); })
-                .then(function(data){
-                    if (!data) return;
-                    if (data.authenticated === false && data.redirectUrl){
-                        // redirect to login
-                        window.location = data.redirectUrl;
-                        return;
-                    }
-                    if (data.success){
-                        showNotification(data.message || 'Adicionado ao carrinho', 'success');
-                        var badge = document.getElementById('cart-badge');
-                        if (badge) badge.textContent = data.cartCount ||0;
-                    } else {
-                        showNotification(data.message || 'Erro ao adicionar', 'error');
-                    }
-                }).catch(function(){ showNotification('Erro de comunicação', 'error'); });
-            }
-        });
+ // Delegate click on forms with class ajax-add-to-cart
+ document.addEventListener('submit', function(e){
+ var form = e.target;
+ if (form && form.classList && form.classList.contains('ajax-add-to-cart')){
+ e.preventDefault();
+ var produtoId = form.querySelector('input[name="produtoId"]').value;
+ var fd = new FormData();
+ fd.append('__RequestVerificationToken', getAntiForgeryToken());
+ fd.append('produtoId', produtoId);
+ fetch('/Carrinho/AdicionarItemAjax', {
+ method: 'POST',
+ body: fd,
+ credentials: 'same-origin'
+ }).then(function(resp){ return resp.json(); })
+ .then(function(data){
+ if (!data) return;
+ if (data.authenticated === false && data.redirectUrl){
+ // redirect to login
+ window.location = data.redirectUrl;
+ return;
+ }
+ if (data.success){
+ showNotification(data.message || 'Adicionado ao carrinho', 'success');
+ var badge = document.getElementById('cart-badge');
+ if (badge) badge.textContent = data.cartCount ||0;
+ } else {
+ showNotification(data.message || 'Erro ao adicionar', 'error');
+ }
+ }).catch(function(){ showNotification('Erro de comunicação', 'error'); });
+ }
+ });
 
-        var notifDropdown = document.getElementById('notifDropdown');
-        if (notifDropdown){
-            notifDropdown.addEventListener('show.bs.dropdown', function(){
-                // Chamar endpoint para marcar últimas notificações como lidas via fetch
-                fetch('@Url.Action("MarcarUltimasComoLidas", "Notificacao")', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('#antiforgeryForm input[name="__RequestVerificationToken"]').value },
-                    body: JSON.stringify({ max:5 })
-                }).then(function(resp){
-                    // atualizar badge localmente
-                    var badge = document.getElementById('notif-badge');
-                    if (badge) badge.textContent = '0';
-                }).catch(function(){ /* ignore */ });
-            });
-        }
-    })();
-    </script>
-    @await RenderSectionAsync("Scripts", required: false)
+ var notifToggle = document.getElementById('notifDropdown');
+ var notifDropdownEl = notifToggle ? notifToggle.closest('.dropdown') : null;
+ if (notifDropdownEl){
+ notifDropdownEl.addEventListener('show.bs.dropdown', function(){
+ // Chamar endpoint para marcar últimas notificações como lidas via fetch
+ fetch('@Url.Action("MarcarUltimasComoLidas", "Notificacao")', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('#antiforgeryForm input[name="__RequestVerificationToken"]').value },
+ body: JSON.stringify({ max:5 })
+ }).then(function(resp){
+ // atualizar badge localmente
+ var badge = document.getElementById('notif-badge');
+ if (badge) badge.textContent = '0';
+ }).catch(function(){ /* ignore */ });
+ });
+ }
+ })();
+ </script>
+ @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
