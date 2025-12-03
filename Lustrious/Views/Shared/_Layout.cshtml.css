@@ -2,47 +2,163 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+ white-space: normal;
+ text-align: center;
+ word-break: break-all;
 }
 
 a {
-  color: #0077cc;
+ color: #0077cc;
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+ color: #fff;
+ background-color: #1b6ec2;
+ border-color: #1861ac;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+ color: #fff;
+ background-color: #1b6ec2;
+ border-color: #1861ac;
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+ border-top:1px solid #e5e5e5;
 }
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+ border-bottom:1px solid #e5e5e5;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+ box-shadow:0 .25rem .75rem rgba(0,0,0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+ font-size:1rem;
+ line-height: inherit;
 }
 
+/* Legacy rule changed: make footer static so the new .site-footer styles take effect */
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+ position: static !important; /* removed absolute positioning to avoid overlap */
+ bottom: auto !important;
+ width:100% !important;
+ white-space: normal !important;
+ line-height: normal !important;
 }
+
+/* Stronger site-footer rules to ensure visibility */
+.site-footer {
+ position: relative !important;
+ width:100% !important;
+ box-sizing: border-box !important;
+ display: block !important;
+ flex-shrink:0;
+ margin-top:0 !important;
+ padding:0 !important;
+}
+
+/* Footer styling adjustments to reduce overall size */
+.site-footer .footer-top {
+ background: #b5954b !important; /* tom principal */
+ color: #2b2118 !important;
+}
+.site-footer .footer-top .container {
+ display: flex !important;
+ justify-content: space-between !important;
+ align-items: center !important;
+ padding-top: .4rem !important; /* consistent small padding */
+ padding-bottom: .4rem !important;
+ max-height:64px !important; /* cap height */
+ overflow: hidden !important;
+}
+.site-footer .footer-top a { color: inherit !important; text-decoration: none !important; }
+.site-footer .footer-contacts .small { color: rgba(255,255,255,0.95) !important; }
+
+/* Make logo small and prevent image from expanding layout */
+.site-footer .logo-small {
+ height:20px !important;
+ max-height:20px !important;
+ width: auto !important;
+ max-width:120px !important;
+ display: inline-block !important;
+ object-fit: contain !important;
+}
+
+.site-footer .footer-icons { display: flex !important; align-items: center !important; gap:12px !important; }
+.site-footer .footer-icons img { height:24px !important; max-height:24px !important; max-width:48px !important; width: auto !important; display: block !important; opacity:0.95 !important; transition: transform .12s ease, opacity .12s ease !important; }
+.site-footer .footer-icons a { display: inline-block !important; margin-left:8px !important; }
+.site-footer .footer-icons img:hover { transform: translateY(-2px) scale(1.03) !important; opacity:1 !important; }
+
+/* Ensure footer does not overflow due to large images */
+.site-footer { overflow: hidden !important; }
+
+/* Match bottom bar color to top */
+.site-footer .footer-bottom { background: #b5954b !important; color: #2b2118 !important; font-size:0.82rem !important; padding-top:.35rem !important; padding-bottom:.35rem !important; }
+.site-footer .contact-line { letter-spacing:0.4px !important; font-size:0.9rem !important; }
+.site-footer .version { font-weight:600 !important; font-size:0.9rem !important; }
+@media (max-width:992px) {
+ .site-footer .footer-top .container { padding-left:1rem !important; padding-right:1rem !important; }
+}
+@media (max-width:576px) {
+ .site-footer .footer-top { text-align: center !important; }
+ .site-footer .footer-top .d-flex { flex-direction: column !important; gap:6px !important; }
+ .site-footer .logo-small { height:18px !important; max-height:18px !important; }
+ .site-footer .footer-icons img { height:18px !important; max-height:18px !important; max-width:36px !important; }
+ .site-footer .contact-line { font-size:0.85rem !important; }
+ .site-footer .footer-bottom { font-size:0.78rem !important; }
+}
+
+/* Compact sizes */
+.footer-icon { font-size:16px !important; width:auto !important; height:auto !important; display:inline-block !important; line-height:1 !important; color: #2b2118 !important; padding:6px !important; }
+
+.site-footer .footer-top .container img { display:inline-block !important; }
+
+/* Ensure page uses full height and content area grows so footer stays at page-bottom */
+html, body {
+ height:100%;
+}
+body {
+ display: flex;
+ flex-direction: column;
+ min-height:100vh;
+}
+/* Make the main container take remaining space so footer is pushed down consistently */
+body > .container {
+ flex:10 auto; /* grow to fill available vertical space */
+ display: flex;
+ flex-direction: column;
+}
+
+/* make main content area take remaining vertical space */
+main[role="main"] { flex:10 auto; }
+
+/* Footer should not add unexpected margins */
+.site-footer {
+ flex-shrink:0;
+ margin-top:0 !important;
+ padding:0 !important;
+}
+
+/* Keep footer compact */
+.site-footer .footer-top .container {
+ padding-top: .4rem !important;
+ padding-bottom: .4rem !important;
+}
+.site-footer .footer-bottom {
+ padding-top: .35rem !important;
+ padding-bottom: .35rem !important;
+}
+
+/* remove large bottom margins from common block elements inside container */
+body > .container p:last-child, body > .container div:last-child, body > .container form:last-child, body > .container section:last-child {
+ margin-bottom:0 !important;
+}
+
+/* small responsive tweaks */
+@media (max-width:576px) {
+ body > .container { padding-bottom:0.5rem; }
+}
+
+/* end of footer layout rules */
