@@ -1,43 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<Lustrious.Models.Produto>
+@using System.Linq
+@{
+ ViewData["Title"] = "Home Page";
+ var produtos = (Model ?? Enumerable.Empty<Lustrious.Models.Produto>()).ToList();
+ var showcase = produtos.Take(3).ToList();
+ var grid = produtos.Take(6).ToList();
 }
 <header>
-   
+ 
 
 </header>
 
 <div id="meuCarrossel" class="carousel slide" data-bs-ride="carousel">
 
-    <!-- Indicadores -->
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#meuCarrossel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#meuCarrossel" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#meuCarrossel" data-bs-slide-to="2"></button>
-    </div>
+ <!-- Indicadores -->
+ <div class="carousel-indicators">
+ <button type="button" data-bs-target="#meuCarrossel" data-bs-slide-to="0" class="active"></button>
+ <button type="button" data-bs-target="#meuCarrossel" data-bs-slide-to="1"></button>
+ <button type="button" data-bs-target="#meuCarrossel" data-bs-slide-to="2"></button>
+ </div>
 
-    <!-- Imagens -->
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="imagens/Carrossel/imagens_carrossel_1.png" class="d-block w-100" alt="Imagem 1">
-        </div>
+ <!-- Imagens -->
+ <div class="carousel-inner">
+ <div class="carousel-item active">
+ <img src="@Url.Content("~/imagens/Carrossel/imagens_carrossel_1.png")" class="d-block w-100" alt="Imagem1">
+ </div>
 
-        <div class="carousel-item">
-            <img src="imagens/Carrossel/imagens_carrossel_3.png" class="d-block w-100" alt="Imagem 2">
-        </div>
+ <div class="carousel-item">
+ <img src="@Url.Content("~/imagens/Carrossel/imagens_carrossel_3.png")" class="d-block w-100" alt="Imagem2">
+ </div>
 
-        <div class="carousel-item">
-            <img src="imagens/Carrossel/imagens_carrossel_2.png" class="d-block w-100" alt="Imagem 3">
-        </div>
-    </div>
+ <div class="carousel-item">
+ <img src="@Url.Content("~/imagens/Carrossel/imagens_carrossel_2.png")" class="d-block w-100" alt="Imagem3">
+ </div>
+ </div>
 
-    <!-- Botões de navegação -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#meuCarrossel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
+ <!-- Botões de navegação -->
+ <button class="carousel-control-prev" type="button" data-bs-target="#meuCarrossel" data-bs-slide="prev">
+ <span class="carousel-control-prev-icon"></span>
+ </button>
 
-    <button class="carousel-control-next" type="button" data-bs-target="#meuCarrossel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
+ <button class="carousel-control-next" type="button" data-bs-target="#meuCarrossel" data-bs-slide="next">
+ <span class="carousel-control-next-icon"></span>
+ </button>
 
 </div>
 
@@ -45,315 +50,294 @@
 <!-- 🔻 🔻 🔻 AQUI COMEÇA A PARTE DE BAIXO DA TELA 🔻 🔻 🔻 -->
 
 <section class="destaques-mes">
-    <p>veja nossos destaques do mês</p>
+ <p>veja nossos destaques do mês</p>
 </section>
 
 <!-- Banner -->
 <div class="banner-longo">
-    <!-- COLOQUE A IMAGEM DO BANNER AQUI (banner_azul.png) -->
-    <img src="../Imagens/Banner/imagem_banner_1.png" />
+ <img src="@Url.Content("~/Imagens/Banner/imagem_banner_1.png")" />
 </div>
 
 <!-- DESTAQUE -->
 <h2 class="titulo-destaque">DESTAQUE</h2>
 
 <div class="box-destaque">
-    <!-- COLOQUE SUAS IMAGENS DE PRODUTOS DESTACADOS AQUI -->
-    <img src="../wwwroot/imagens/Pele/imagem_pele_hidratante_1.png" />
-    <img src="../wwwroot/imagens/Corpo/imagem_corpo_bory_1.png" />
-    <img src="../wwwroot/imagens/Maquiagem/imagem_rosto_bruma_1.png" />
+ @{
+ // Mostrar até3 produtos com imagem; quando produto não tiver imagem usar imagem ilustrativa estática
+ var placeholders = new[] { "~/imagens/Pele/imagem_pele_hidratante_1.png", "~/imagens/Corpo/imagem_corpo_bory_1.png", "~/imagens/Maquiagem/imagem_rosto_bruma_1.png" };
+ for (int i =0; i <3; i++)
+ {
+ var prod = showcase.ElementAtOrDefault(i);
+ if (prod != null && !string.IsNullOrWhiteSpace(prod.Foto))
+ {
+ var path = Url.Content("~/" + prod.Foto.TrimStart('/','\\'));
+ <img src="@path" onerror="this.onerror=null;this.src='@Url.Content("~/imagens/capa_foto.png")'" />
+ }
+ else
+ {
+ <img src="@Url.Content(placeholders[i])" />
+ }
+ }
+ }
 </div>
 
 <!-- PRODUTOS -->
 <h2 class="titulo-produtos">PRODUTOS</h2>
 
 <div class="linha-produtos">
+ @if (!grid.Any())
+ {
+ <div>Nenhum produto disponível no momento.</div>
+ }
+ else
+ {
+ foreach (var p in grid)
+ {
+ <div class="produto-card">
+ @{ var imgSrc = string.IsNullOrEmpty(p.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + p.Foto.TrimStart('/','\\')); }
+ <img src="@imgSrc" alt="@p.NomeProd" onerror="this.onerror=null;this.src='@Url.Content("~/imagens/capa_foto.png")'" />
+ <p class="nome">@p.NomeProd</p>
+ <p class="preco">@p.ValorUnitario.ToString("C")</p>
 
-    <div class="produto-card">
-        <img src="../Imagens/LustrativaP2.png" />
-        <p class="nome">LUSTROUS - Glow</p>
-        <p class="preco">R$ 70,00</p>
+ <a asp-action="AcharProduto" asp-controller="Produto" asp-route-id="@p.CodigoBarras" class="btn-comprar">DETALHES</a>
 
-        <button class="btn-comprar" onclick="comprar('LUSTROUS - Glow')">COMPRAR</button>
-        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Glow')">Carrinho</button>
-    </div>
-
-    <div class="produto-card">
-        <img src="../Imagens/p4.png" />
-        <p class="nome">LUX PRIME</p>
-        <p class="preco">R$ 106,00</p>
-
-        <button class="btn-comprar" onclick="comprar('LUX PRIME')">COMPRAR</button>
-        <button class="btn-carrinho" onclick="adicionarCarrinho('LUX PRIME')">Carrinho</button>
-    </div>
-
-    <div class="produto-card">
-        <img src="../Imagens/P5.png" />
-        <p class="nome">LUSTROUS - Pink</p>
-        <p class="preco">R$ 70,00</p>
-
-        <button class="btn-comprar" onclick="comprar('LUSTROUS - Pink')">COMPRAR</button>
-        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Pink')">Carrinho</button>
-    </div>
-
-</div>
-
-<!-- Segunda linha -->
-<div class="linha-produtos">
-
-    <div class="produto-card">
-        <img src="../Imagens/P6.png" />
-        <p class="nome">LUSTROUS - Gloss</p>
-        <p class="preco">R$ 70,00</p>
-
-        <button class="btn-comprar" onclick="comprar('LUSTROUS - Gloss')">COMPRAR</button>
-        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Gloss')">Carrinho</button>
-    </div>
-
-    <div class="produto-card">
-        <img src="../Imagens/P1.png" />
-        <p class="nome">LUX PRIME GOLD</p>
-        <p class="preco">R$ 106,00</p>
-
-        <button class="btn-comprar" onclick="comprar('LUX PRIME GOLD')">COMPRAR</button>
-        <button class="btn-carrinho" onclick="adicionarCarrinho('LUX PRIME GOLD')">Carrinho</button>
-    </div>
-
-    <div class="produto-card">
-        <img src="../Imagens/P2.png" />
-        <p class="nome">LUSTROUS - Rose</p>
-        <p class="preco">R$ 70,00</p>
-
-        <button class="btn-comprar" onclick="comprar('LUSTROUS - Rose')">COMPRAR</button>
-        <button class="btn-carrinho" onclick="adicionarCarrinho('LUSTROUS - Rose')">Carrinho</button>
-    </div>
-
+ <form class="ajax-add-to-cart" asp-controller="Carrinho" asp-action="AdicionarItem" method="post">
+ @Html.AntiForgeryToken()
+ <input type="hidden" name="produtoId" value="@p.CodigoBarras" />
+ <button type="submit" class="btn-carrinho" @(p.Qtd <=0 ? "disabled" : "")>@(p.Qtd <=0 ? "Sem estoque" : "Adicionar ao Carrinho")</button>
+ </form>
+ </div>
+ }
+ }
 </div>
 
 
-<!-- Rodapé -->
-<footer class="rodape">
-
-    <div class="icones">
-        <!-- COLOQUE OS ÍCONES DO RODAPÉ AQUI -->
-        <img src="../Imagens/Inst.jfif" />
-        <img src="../Imagens/link.jfif" />
-        <img src="../Imagens/what.png" />
-    </div>
-</footer>
-
-</main>
 
 <style>
 
-    /* ----------- CONFIGURAÇÕES GERAIS ----------- */
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: "Times New Roman", serif;
-        background-color: #ffffff;
-    }
+ /* ----------- CONFIGURAÇÕES GERAIS ----------- */
+ body {
+ margin:0;
+ padding:0;
+ font-family: "Times New Roman", serif;
+ /* match Cliente index background */
+ background-color: #FFEFCC;
+ }
 
-    /* ----------- HERO (PARTE DE CIMA) ----------- */
-    .hero {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        z-index: -1;
-    }
+ /* ----------- HERO (PARTE DE CIMA) ----------- */
+ .hero {
+ position: fixed;
+ top:0;
+ left:0;
+ width:100vw;
+ height:100vh;
+ overflow: hidden;
+ z-index: -1;
+ }
 
-        .hero img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+ .hero img {
+ width:100%;
+ height:100%;
+ object-fit: cover;
+ }
 
-    .hero-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 95px;
-        font-weight: 400;
-        letter-spacing: 8px;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-    }
+ .hero-text {
+ position: absolute;
+ top:50%;
+ left:50%;
+ transform: translate(-50%, -50%);
+ color: white;
+ font-size:95px;
+ font-weight:400;
+ letter-spacing:8px;
+ text-shadow:04px15px rgba(0,0,0,0.6);
+ }
 
-    /* ----------- TÍTULO: DESTAQUES DO MÊS ----------- */
-    .destaques-mes {
-        margin-top: 30px; /* você pode ajustar: 10px, 20px, 40px */
-        text-align: center;
-        padding: 25px 0;
-    }
-
-
-        .destaques-mes p {
-            font-size: 25px;
-            color: #b5954b;
-            font-weight: 500;
-            border: 2px solid #b5954b;
-            padding: 10px 30px;
-            display: inline-block;
-            border-radius: 40px;
-        }
-
-    /* ----------- BANNER LONGO ----------- */
-    .banner-longo img {
-        width: 100%;
-        display: block;
-    }
-
-    .banner-longo {
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        overflow: hidden;
-    }
-
-        .banner-longo img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-        }
+ /* ----------- TÍTULO: DESTAQUES DO MÊS ----------- */
+ .destaques-mes {
+ margin-top:30px; /* você pode ajustar:10px,20px,40px */
+ text-align: center;
+ padding:25px0;
+ }
 
 
-    /* ----------- TÍTULOS DOURADOS ----------- */
-    .titulo-destaque,
-    .titulo-produtos {
-        text-align: center;
-        margin-top: 40px;
-        font-size: 22px;
-        background: #b5954b;
-        color: #fff;
-        padding: 10px 25px;
-        border-radius: 12px;
-        width: fit-content;
-        margin-left: 50%;
-        transform: translateX(-50%);
-        letter-spacing: 1px;
-    }
+ .destaques-mes p {
+ font-size:25px;
+ color: #b5954b;
+ font-weight:500;
+ border:2px solid #b5954b;
+ padding:10px30px;
+ display: inline-block;
+ border-radius:40px;
+ }
 
-    /* ----------- DESTAQUE (CAIXA PRETA) ----------- */
-    .box-destaque {
-        width: 90%;
-        margin: 20px auto;
-        background: #000;
-        border-radius: 20px;
-        padding: 30px;
-        display: flex;
-        justify-content: space-around;
-        border: 4px solid #d9b56b;
-    }
+ /* ----------- BANNER LONGO ----------- */
+ .banner-longo {
+ width:100vw;
+ margin-left:-9%;
+ overflow: hidden;
+ /* thin border like cliente cards */
+ border:2px solid #d6b36a;
+ border-radius:8px;
+ }
 
-        .box-destaque img {
-            width: 150px;
-            border-radius: 10px;
-        }
+ .banner-longo img {
+ width:100%;
+ height: auto;
+ display: block;
+ object-fit: cover;
+ }
 
-    /* ----------- PRODUTOS ----------- */
 
-    /* Botão Comprar */
-    .btn-comprar {
-        width: 100%;
-        background: #2c8a36;
-        color: white;
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        font-size: 15px;
-        cursor: pointer;
-        font-weight: bold;
-        margin-top: 10px;
-        transition: 0.2s;
-    }
+ /* ----------- TÍTULOS DOURADOS ----------- */
+ .titulo-destaque,
+ .titulo-produtos {
+ text-align: center;
+ margin-top:40px;
+ font-size:22px;
+ background: #b5954b;
+ color: #fff;
+ padding:10px25px;
+ border-radius:12px;
+ width: fit-content;
+ margin-left:50%;
+ transform: translateX(-50%);
+ letter-spacing:1px;
+ }
 
-        .btn-comprar:hover {
-            background: #1f6a27;
-        }
+ /* ----------- DESTAQUE (CAIXA PRETA) ----------- */
+ .box-destaque {
+ width:90%;
+ margin:20px auto;
+ background: #000;
+ border-radius:20px;
+ padding:30px;
+ display: flex;
+ justify-content: space-around;
+ /* match cliente card border thickness/color */
+ border:4px solid #d6b36a;
+ }
 
-    /* Botão Carrinho */
-    .btn-carrinho {
-        width: 100%;
-        background: #d1c29a;
-        color: #5c4b20;
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        font-size: 15px;
-        cursor: pointer;
-        margin-top: 8px;
-        font-weight: bold;
-        transition: 0.2s;
-    }
+ .box-destaque img {
+ width:150px;
+ border-radius:10px;
+ }
 
-        .btn-carrinho:hover {
-            background: #bda87f;
-        }
+ /* ----------- PRODUTOS ----------- */
 
-    .linha-produtos {
-        width: 90%;
-        margin: 40px auto;
-        display: flex;
-        justify-content: space-evenly;
-    }
+ /* Botão Comprar */
+ .btn-comprar {
+ width:100%;
+ background: #2c8a36;
+ color: white;
+ padding:10px;
+ border: none;
+ border-radius:8px;
+ font-size:15px;
+ cursor: pointer;
+ font-weight: bold;
+ margin-top:10px;
+ transition:0.2s;
+ display: inline-block;
+ text-align: center;
+ text-decoration: none;
+ }
 
-    .produto-card {
-        width: 180px;
-        background: #fff;
-        border-radius: 15px;
-        padding: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        text-align: center;
-        border: 1px solid #e0d6c0;
-    }
+ .btn-comprar:hover {
+ background: #1f6a27;
+ }
 
-        .produto-card img {
-            width: 125px;
-            height: 165px;
-            object-fit: contain;
-        }
+ /* Botão Carrinho */
+ .btn-carrinho {
+ width:100%;
+ background: #d1c29a;
+ color: #5c4b20;
+ padding:10px;
+ border: none;
+ border-radius:8px;
+ font-size:15px;
+ cursor: pointer;
+ margin-top:8px;
+ font-weight: bold;
+ transition:0.2s;
+ }
 
-    /* Nome do produto */
-    .nome {
-        margin-top: 8px;
-        font-size: 16px;
-        font-weight: 600;
-    }
+ .btn-carrinho:hover:not(:disabled) {
+ background: #bda87f;
+ }
 
-    /* Preço */
-    .preco {
-        color: #2c8a36;
-        font-size: 18px;
-        font-weight: bold;
-    }
+ .btn-carrinho:disabled {
+ background: #8b8b8b;
+ cursor: not-allowed;
+ }
 
-    /* ----------- RODAPÉ ----------- */
-    .rodape {
-        background: #e8d9b7;
-        padding: 35px;
-        margin-top: 60px;
-        text-align: center;
-    }
+ .linha-produtos {
+ width:90%;
+ margin:40px auto;
+ display: flex;
+ flex-wrap: wrap;
+ gap:20px;
+ justify-content: center;
+ }
 
-    .logo-footer {
-        width: 130px;
-        opacity: 0.75;
-    }
+ .produto-card {
+ width:180px;
+ background: #fff;
+ border-radius:15px;
+ padding:12px;
+ box-shadow:04px12px rgba(0,0,0,0.12);
+ text-align: center;
+ /* thin border similar to destaque/banners */
+ border:2px solid #d6b36a;
+ display: flex;
+ flex-direction: column;
+ gap:8px;
+ }
 
-    .icones img {
-        width: 38px;
-        margin: 10px;
-        cursor: pointer;
-    }
+ .produto-card img {
+ width:100%;
+ height:165px;
+ object-fit: cover;
+ border-radius:8px;
+ }
 
-    html, body {
-        max-width: 100%;
-        overflow-x: hidden;
-    }
+ /* Nome do produto */
+ .nome {
+ margin-top:8px;
+ font-size:16px;
+ font-weight:600;
+ }
+
+ /* Preço */
+ .preco {
+ color: #2c8a36;
+ font-size:18px;
+ font-weight: bold;
+ }
+
+ /* ----------- RODAPÉ ----------- */
+ .rodape {
+ background: #e8d9b7;
+ padding:35px;
+ margin-top:60px;
+ text-align: center;
+ }
+
+ .logo-footer {
+ width:130px;
+ opacity:0.75;
+ }
+
+ .icones img {
+ width:38px;
+ margin:10px;
+ cursor: pointer;
+ }
+
+ html, body {
+ max-width:100%;
+ overflow-x: hidden;
+ }
 
 
 </style>

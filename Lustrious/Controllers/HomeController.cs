@@ -1,21 +1,26 @@
 using System.Diagnostics;
 using Lustrious.Models;
 using Microsoft.AspNetCore.Mvc;
+using Lustrious.Repositorio;
 
 namespace Lustrious.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProdutoRepostorio _produtoRepositorio;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProdutoRepostorio produtoRepositorio)
         {
             _logger = logger;
+            _produtoRepositorio = produtoRepositorio;
         }
 
         public IActionResult Index()
         {
-            return View();
+            // carregar alguns produtos reais para a home (6 itens)
+            var produtos = _produtoRepositorio.ListarProdutosPublico(pageSize:6).ToList();
+            return View(produtos);
         }
 
         public IActionResult Privacy()
