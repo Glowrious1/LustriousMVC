@@ -1,8 +1,9 @@
-﻿using Lustrious.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using Lustrious.Data;
 using Lustrious.Models;
 using MySql.Data.MySqlClient;
-using System.Data;
-using System.Collections.Generic;
+using MySqlX.XDevAPI;
 
 namespace Lustrious.Repositorio
 {
@@ -16,24 +17,25 @@ namespace Lustrious.Repositorio
         }
         public void CadastrarFuncionario(Usuario funcionario)
         {
-            using (var conexao = _dataBase.GetConnection())
-            {
+
+           
+             using var conexao = _dataBase.GetConnection();
+            
                 conexao.Open();
-                using (var cmd = new MySqlCommand("insertUsuario", conexao))
-                {
+                using var cmd = new MySqlCommand("insertUsuario", conexao);
+                var senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor: 12);
+
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("vNome", funcionario.Nome);
                     cmd.Parameters.AddWithValue("vEmail", funcionario.Email);
                     cmd.Parameters.AddWithValue("vCPF", funcionario.CPF);
-                    // Hash password before saving
-                    var senhaHash = BCrypt.Net.BCrypt.HashPassword(funcionario.Senha, workFactor:12);
                     cmd.Parameters.AddWithValue("vSenha", senhaHash);
-                    cmd.Parameters.AddWithValue("vRole", funcionario.Role);
+                    cmd.Parameters.AddWithValue("vRole", string.IsNullOrWhiteSpace(funcionario.Role)? "Funcionario" : funcionario.Role);
                     cmd.Parameters.AddWithValue("vSexo", funcionario.Sexo);
                     cmd.Parameters.AddWithValue("vFoto", (object?)funcionario.Foto ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
-                }
-            }
+                
+            
         }
         public Usuario AcharFuncionario(int id)
         {
@@ -97,6 +99,7 @@ namespace Lustrious.Repositorio
 
         public void AlterarFuncionario(Usuario funcionario)
         {
+           
             using (var conexao = _dataBase.GetConnection())
             {
                 conexao.Open();

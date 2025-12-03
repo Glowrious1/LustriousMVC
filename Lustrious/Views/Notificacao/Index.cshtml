@@ -2,19 +2,132 @@
 @{
  ViewData["Title"] = "Notificações";
 }
-<h2>Notificações</h2>
-@if (!Model?.Any() ?? true)
-{
- <p>Sem notificações.</p>
-}
-else
-{
- <ul class="list-group">
- @foreach(var n in Model)
+<style>
+ /* Notificações - estilo consistente com tema do site */
+ .notificacoes-container {
+ width:90%;
+ max-width:900px;
+ margin:30px auto;
+ background: #f6f0df; /* tom claro */
+ border:6px solid #c9a55b;
+ border-radius:16px;
+ padding:20px;
+ box-shadow:06px18px rgba(0,0,0,0.06);
+ }
+
+ .notificacoes-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom:12px;
+ }
+
+ .notificacoes-header h2 {
+ margin:0;
+ color: #3c6b2a;
+ font-size:22px;
+ background: #b5954b;
+ color: #fff;
+ padding:8px14px;
+ border-radius:10px;
+ }
+
+ .notificacoes-list {
+ list-style: none;
+ padding:0;
+ margin:0;
+ display: flex;
+ flex-direction: column;
+ gap:12px;
+ max-height:60vh; /* limitar altura e permitir rolagem */
+ overflow: auto;
+ padding-right:6px; /* espaço para scrollbar */
+ }
+
+ .notificacao-item {
+ background: #fff;
+ border:2px solid #e0caa0;
+ border-radius:12px;
+ padding:12px14px;
+ display: flex;
+ flex-direction: column;
+ gap:6px;
+ box-shadow:04px10px rgba(0,0,0,0.04);
+ }
+
+ .notificacao-meta {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ gap:12px;
+ font-size:13px;
+ color: #6b5a3a;
+ }
+
+ .notificacao-meta .timestamp {
+ font-weight:600;
+ color: #4b4b4b;
+ }
+
+ .notificacao-mensagem {
+ color: #333;
+ line-height:1.45;
+ font-size:15px;
+ }
+
+ .sem-notificacoes {
+ text-align: center;
+ padding:30px10px;
+ color: #6b5a3a;
+ }
+
+ /* Botão limpar */
+ #btnLimpar {
+ background: #b5954b;
+ color: #fff;
+ border: none;
+ border-radius: 8px;
+ padding: 8px 16px;
+ cursor: pointer;
+ font-size: 16px;
+ transition: background 0.3s;
+ }
+
+ #btnLimpar:hover {
+ background: #9d7a3b;
+ }
+
+ /* Responsivo */
+ @@media (max-width:600px) {
+ .notificacoes-container { width:95%; padding:14px; }
+ .notificacao-mensagem { font-size:14px; }
+ }
+</style>
+
+<div class="notificacoes-container">
+ <div class="notificacoes-header">
+ <h2>Notificações</h2>
+ <div></div>
+ </div>
+
+ @if (!Model?.Any() ?? true)
  {
- <li class="list-group-item">
- <strong>@n.DataEnvio.ToString("g")</strong> - @n.Mensagem
+ <div class="sem-notificacoes">Sem notificações.</div>
+ }
+ else
+ {
+ <ul class="notificacoes-list">
+ @foreach (var n in Model)
+ {
+ <li class="notificacao-item">
+ <div class="notificacao-meta">
+ <div class="timestamp">@n.DataEnvio.ToString("g")</div>
+ @* Placeholder para status/ação *@
+ <div class="status"></div>
+ </div>
+ <div class="notificacao-mensagem">@n.Mensagem</div>
  </li>
  }
  </ul>
-}
+ }
+</div>

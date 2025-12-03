@@ -1,74 +1,103 @@
 @model IEnumerable<Lustrious.Models.Produto>
 @{
- ViewData["Title"] = "Vitrine";
- int currentPage = ViewBag.CurrentPage ??1;
- int totalPages = ViewBag.TotalPages ??1;
- string filterQ = ViewBag.FilterQ as string ?? string.Empty;
- int filterCategoria = ViewBag.FilterCategoria ??0;
- int filterTipo = ViewBag.FilterTipo ??0;
- var categorias = ViewBag.Categorias as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
- var tipos = ViewBag.Tipos as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+    ViewData["Title"] = "Vitrine";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string filterQ = ViewBag.FilterQ as string ?? string.Empty;
+    int filterCategoria = ViewBag.FilterCategoria ?? 0;
+    int filterTipo = ViewBag.FilterTipo ?? 0;
+    var categorias = ViewBag.Categorias as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+    var tipos = ViewBag.Tipos as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
 }
 
 
-<h2>Vitrine</h2>
+<h2>Todos Produtos</h2>
 <form method="get" asp-action="Vitrine" class="filters">
- <input type="text" name="q" value="@filterQ" placeholder="Pesquisar..." />
- <select name="codCategoria" id="categoriaFilter">
- <option value="0">Todas Categorias</option>
- @foreach(var c in categorias){
- if(filterCategoria.ToString() == c.Value){
- <option value="@c.Value" selected="selected">@c.Text</option>
- } else {
- <option value="@c.Value">@c.Text</option>
- }
- }
- </select>
- <select name="codTipoProduto" id="tipoFilter">
- <option value="0">Todos Tipos</option>
- @foreach(var t in tipos){
- if(filterTipo.ToString() == t.Value){
- <option value="@t.Value" selected="selected">@t.Text</option>
- } else {
- <option value="@t.Value">@t.Text</option>
- }
- }
- </select>
- <button type="submit" class="btn">Filtrar</button>
+    <input type="text" name="q" value="@filterQ" placeholder="Pesquisar..." />
+    <select name="codCategoria" id="categoriaFilter">
+        <option value="0">Todas Categorias</option>
+        @foreach (var c in categorias)
+        {
+            if (filterCategoria.ToString() == c.Value)
+            {
+                <option value="@c.Value" selected="selected">@c.Text</option>
+            }
+            else
+            {
+                <option value="@c.Value">@c.Text</option>
+            }
+        }
+    </select>
+    <select name="codTipoProduto" id="tipoFilter">
+        <option value="0">Todos Tipos</option>
+        @foreach (var t in tipos)
+        {
+            if (filterTipo.ToString() == t.Value)
+            {
+                <option value="@t.Value" selected="selected">@t.Text</option>
+            }
+            else
+            {
+                <option value="@t.Value">@t.Text</option>
+            }
+        }
+    </select>
+    <button type="submit" class="btn">Filtrar</button>
 </form>
 
 <div class="vitrine">
- @foreach(var p in Model){
- <div class="card">
- @{ var imgSrc = string.IsNullOrEmpty(p.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + p.Foto.TrimStart('/','\\')); }
- <img src="@imgSrc" alt="@p.NomeProd" onerror="this.onerror=null;this.src='@Url.Content("~/imagens/capa_foto.png")'" />
- <div class="nome">@p.NomeProd</div>
- <div>@p.NomeCategoria - @p.NomeTipoProduto</div>
- <div class="valor">@p.ValorUnitario.ToString("C")</div>
- <div class="acoes">
- <a asp-action="AcharProduto" asp-controller="Produto" asp-route-id="@p.CodigoBarras" class="btn btn-det">Detalhes</a>
- <form class="ajax-add-to-cart" asp-controller="Carrinho" asp-action="AdicionarItem" method="post">
- @Html.AntiForgeryToken()
- <input type="hidden" name="produtoId" value="@p.CodigoBarras" />
- <button type="submit" class="btn btn-cart" @(p.Qtd <=0 ? "disabled" : "")>@(p.Qtd <=0 ? "Sem estoque" : "Adicionar ao Carrinho")</button>
- </form>
- </div>
- </div>
- }
+    @foreach (var p in Model)
+    {
+        <div class="card">
+            @{
+                var imgSrc = string.IsNullOrEmpty(p.Foto) ? Url.Content("~/imagens/capa_foto.png") : Url.Content("~/" + p.Foto.TrimStart('/', '\\'));
+            }
+            <img src="@imgSrc" alt="@p.NomeProd" onerror="this.onerror=null;this.src='@Url.Content("~/imagens/capa_foto.png")'" />
+            <div class="nome">@p.NomeProd</div>
+            <div>@p.NomeCategoria - @p.NomeTipoProduto</div>
+            <div class="valor">@p.ValorUnitario.ToString("C")</div>
+            <div class="acoes">
+                <a asp-action="AcharProduto" asp-controller="Produto" asp-route-id="@p.CodigoBarras" class="btn btn-det">Detalhes</a>
+                <form class="ajax-add-to-cart" asp-controller="Carrinho" asp-action="AdicionarItem" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="produtoId" value="@p.CodigoBarras" />
+                    <button type="submit" class="btn btn-cart" @(p.Qtd <= 0 ? "disabled" : "")>@(p.Qtd <= 0 ? "Sem estoque" : "Adicionar ao Carrinho")</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- pagination styled like Produto/Index -->
+    <div class="vitrine-footer">
+        @if (totalPages > 1)
+        {
+            if (currentPage > 1)
+            {
+                <a class="page-btn" asp-action="Vitrine" asp-route-page="@(currentPage - 1)" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">&laquo; Anterior</a>
+            }
+
+            for (int i = 1; i <= totalPages; i++)
+            {
+                if (i == currentPage)
+                {
+                    <span class="page-current">@i</span>
+                }
+                else
+                {
+                    <a class="page-btn" asp-action="Vitrine" asp-route-page="@i" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">@i</a>
+                }
+            }
+
+            if (currentPage < totalPages)
+            {
+                <a class="page-btn" asp-action="Vitrine" asp-route-page="@(currentPage + 1)" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">Próximo »</a>
+            }
+        }
+    </div>
+
 </div>
 
-<div style="text-align:center; margin-top:18px">
- @if (totalPages >1){
- if (currentPage >1){ <a asp-action="Vitrine" asp-route-page="@(currentPage-1)" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">&laquo; Anterior</a> }
- for(int i=1;i<=totalPages;i++){
- if (i==currentPage){ <span style="padding:6px10px; background:#d6b36a; color:#fff; border-radius:6px; margin:4px">@i</span> }
- else{ <a asp-action="Vitrine" asp-route-page="@i" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo" style="margin:4px; padding:6px10px; background:#f0f0f0; border-radius:6px; text-decoration:none; color:#333">@i</a> }
- }
- if (currentPage < totalPages){ <a asp-action="Vitrine" asp-route-page="@(currentPage+1)" asp-route-q="@filterQ" asp-route-codCategoria="@filterCategoria" asp-route-codTipoProduto="@filterTipo">Próximo &raquo;</a> }
- }
-</div>
-
- <style>
+<style>
 
     /* FUNDO GERAL DA PÁGINA */
     body {
@@ -97,16 +126,58 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 20px;
+        /* extra space at bottom to avoid overlapping footer */
+        margin-bottom: 80px;
+        padding-bottom: 40px;
+    }
+
+    /* vitrine footer spans full width */
+    .vitrine-footer {
+        grid-column: 1 / -1;
+        text-align: center;
+        margin-top: 18px;
+        padding-bottom: 18px; /* ensure extra spacing under pagination */
+    }
+
+    /* reuse Produto/Index pagination styles */
+    .pagination {
+        margin-top: 25px;
+        text-align: center;
+    }
+
+    .page-btn,
+    .page-current {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 0 4px;
+        border-radius: 6px;
+    }
+
+    .page-btn {
+        background-color: #6b5530;
+        color: white;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .page-btn:hover {
+            background-color: #8a6d3f;
+        }
+
+    .page-current {
+        background-color: #3c6b2a; /* verde escuro */
+        color: white;
     }
 
     /* FILTROS */
     .filters {
         width: 90%;
-        max-width: 1150px;
+        max-width: 700px;
         margin: 0 auto 25px auto;
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+        justify-content: center;
     }
 
         .filters input,
@@ -204,30 +275,4 @@
             cursor: not-allowed;
         }
 
-    /* PAGINAÇÃO */
-    .pagination a,
-    .pagination span {
-        display: inline-block;
-        padding: 8px 12px;
-        margin: 4px;
-        border-radius: 6px;
-    }
-
-    .pagination a {
-        background-color: #6b5530;
-        color: white;
-        text-decoration: none;
-        transition: 0.2s;
-    }
-
-        .pagination a:hover {
-            background-color: #8a6d3f;
-        }
-
-    .pagination .current {
-        background-color: #3c6b2a;
-        color: white;
-    }
-
- 
- </style>
+</style>

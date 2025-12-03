@@ -132,7 +132,7 @@
 
 </style>
 
-<form class="container-card" asp-action="CriarCliente" method="post" enctype="multipart/form-data">
+<form class="container-card" asp-action="CriarContaCliente" method="post" enctype="multipart/form-data">
 
     @Html.AntiForgeryToken()
 
@@ -178,7 +178,7 @@
 
     <div class="button-row">
         <button class="cadastrar" type="submit">CADASTRAR</button>
-        <a asp-action="Index" asp-controller="Cliente" class="cancelar">CANCELAR</a>
+        <a asp-action="Login" asp-controller="Auth" class="cancelar">CANCELAR</a>
     </div>
 
 </form>
