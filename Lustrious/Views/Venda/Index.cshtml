@@ -1,36 +1,35 @@
 @model IEnumerable<Lustrious.Models.Venda>
 @{
- ViewData["Title"] = "Minhas Vendas";
+	ViewData["Title"] = "Minhas Vendas";
 }
 <h2>Meus Pedidos</h2>
 @if (!Model?.Any() ?? true)
 {
- <p>Você não possui pedidos.</p>
+	<p>Você não possui pedidos.</p>
 }
 else
 {
- <table class="table">
- <thead>
- <tr>
- <th>Id</th>
- <th>Data</th>
- <th>Valor</th>
- <th>NF</th>
- <th>Entrega</th>
- </tr>
- </thead>
- <tbody>
- @foreach(var v in Model)
- {
- <tr>
- <td>@v.IdVenda</td>
- <td>@v.DataVenda</td>
- <td>@v.ValorTotal.ToString("C")</td>
- <td>@v.NF</td>
- <td>@v.IdEntrega</td>
- </tr>
- }
- </tbody>
- </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Data</th>
+				<th>Valor</th>
+				<th>NF</th>
+				<th>Entrega</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var v in Model)
+			{
+				<tr>
+					<td>@v.IdVenda</td>
+					<td>@v.DataVenda</td>
+					<td>@v.ValorTotal.ToString("C")</td>
+					<td>@v.NF</td>
+					<td>@v.IdEntrega</td>
+				</tr>
+			}
+		</tbody>
+	</table>
 }
-<p><a asp-action="ListarTodas">Ver todas vendas (admin)</a></p>

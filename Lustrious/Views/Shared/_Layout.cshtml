@@ -23,6 +23,53 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Lustrious.styles.css" asp-append-version="true" />
+    <style>
+    /* Notification dropdown styling */
+    .notif-dropdown {
+    width:380px;
+    max-height:320px;
+    padding:8px;
+    background: #e6d39a; /* tom mais escuro para dropdown */
+    border:1px solid #b89a54;
+    border-radius:6px;
+    overflow: auto;
+    }
+
+    .notif-dropdown .dropdown-item {
+    background: transparent;
+    padding:10px12px;
+    margin-bottom:6px;
+    border-radius:8px;
+    display: block;
+    color: inherit;
+    }
+
+    .notif-dropdown .dropdown-item:last-child { margin-bottom:0; }
+
+    .notif-dropdown .dropdown-item:hover {
+    background: rgba(136,104,48,0.16);
+    text-decoration: none;
+    }
+
+    .notif-dropdown .timestamp {
+    display: block;
+    font-size:12px;
+    color: #6b5a3a;
+    margin-bottom:6px;
+    }
+
+    .notif-dropdown .msg {
+    color: #064a78; /* mensagem em azul mais escuro */
+    font-size:15px;
+    line-height:1.3;
+    font-weight:600;
+    }
+
+    .notif-dropdown .dropdown-divider { margin:6px0; }
+
+    /* ensure dropdown aligns visually with navbar */
+    .navbar .dropdown-menu.notif-dropdown { right:0; left: auto; }
+    </style>
 </head>
 <body>
     <header>
@@ -65,7 +112,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Notificações <span id="notif-badge" class="badge bg-secondary ms-1">@notifCount</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end notif-dropdown" aria-labelledby="notifDropdown">
                                     @if (!ultimasNotifs.Any())
                                     {
                                         <li class="dropdown-item">Sem notificações</li>

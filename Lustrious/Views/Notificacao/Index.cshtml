@@ -3,13 +3,16 @@
  ViewData["Title"] = "Notificações";
 }
 <style>
- /* Notificações - estilo consistente com tema do site */
+ /* usar mesmo fundo da página de Clientes */
+ body { background-color: #FFEFCC; font-family: 'Times New Roman', serif; }
+
+ /* Notificações - estilo consistente com Cliente */
  .notificacoes-container {
  width:90%;
  max-width:900px;
  margin:30px auto;
- background: #f6f0df; /* tom claro */
- border:6px solid #c9a55b;
+ background: #fff6c6; /* mesmo fundo do card de clientes */
+ border:4px solid #d6b36a; /* mesma borda */
  border-radius:16px;
  padding:20px;
  box-shadow:06px18px rgba(0,0,0,0.06);
@@ -45,14 +48,28 @@
  }
 
  .notificacao-item {
- background: #fff;
- border:2px solid #e0caa0;
+ /* base neutra, cores específicas aplicadas por nth-child abaixo */
+ background: transparent;
+ border:2px solid transparent;
  border-radius:12px;
  padding:12px14px;
  display: flex;
  flex-direction: column;
  gap:6px;
  box-shadow:04px10px rgba(0,0,0,0.04);
+ }
+
+ /* Alternância de cores: pares/ímpares para efeito visual igual ao das listas de produto */
+ .notificacoes-list .notificacao-item:nth-child(odd) {
+ /* tom dourado levemente escurecido para combinar com o card */
+ background: #efe2ac;
+ border-color: #e0caa0;
+ }
+
+ .notificacoes-list .notificacao-item:nth-child(even) {
+ /* tom mais próximo ao fundo dos cards */
+ background: #fff6c6;
+ border-color: #d6b36a;
  }
 
  .notificacao-meta {
@@ -81,21 +98,19 @@
  color: #6b5a3a;
  }
 
- /* Botão limpar */
- #btnLimpar {
+ /* Botões / ações */
+ .btn-limpar, .acao-btn {
  background: #b5954b;
  color: #fff;
  border: none;
- border-radius: 8px;
- padding: 8px 16px;
+ border-radius:8px;
+ padding:8px16px;
  cursor: pointer;
- font-size: 16px;
- transition: background 0.3s;
+ font-size:14px;
+ transition: background0.3s;
  }
 
- #btnLimpar:hover {
- background: #9d7a3b;
- }
+ .btn-limpar:hover, .acao-btn:hover { background: #9d7a3b; }
 
  /* Responsivo */
  @@media (max-width:600px) {
